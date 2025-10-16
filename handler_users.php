@@ -1,0 +1,111 @@
+<?php
+// AYONION-CMS/handler_users.php
+
+header('Content-Type: application/json');
+include 'includes/config.php';
+$conn = connect_db();
+
+$action = $_GET['action'] ?? '';
+$input = json_decode(file_get_contents("php://input"), true);
+
+try {
+    // Harden session cookies
+    if (session_status() === PHP_SESSION_NONE) {
+        if (function_exists('session_set_cookie_params')) {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => '/',
+                'domain' => '',
+                'secure' => true, // set true in production over HTTPS
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+        }
+        @ini_set('session.use_strict_mode', '1');
+        session_start();
+    }
+    // Enforce admin session
+    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || ($_SESSION['role'] ?? '') !== 'admin') {
+        throw new Exception("Authentication required.", 401);
+    }
+
+    // --- HANDLE LIST USERS (GET) ---
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'list') {
+        $users = [];
+        $sql = "SELECT id, username, role, is_temp_password FROM users ORDER BY username";
+        if ($result = $conn->query($sql)) {
+            while ($row = $result->fetch_assoc()) {
+                $users[] = [
+                    'id' => (int)$row['id'],
+                    'username' => $row['username'],
+                    'role' => $row['role'],
+                    'isTempPassword' => (bool)$row['is_temp_password']
+                ];
+            }
+            echo json_encode(["success" => true, "users" => $users]);
+        } else {
+            throw new Exception("Database error: Could not fetch users.");
+        }
+    }
+    // --- HANDLE ADD USER (POST) ---
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
+        $username = trim($input['username'] ?? '');
+        $password = (string)($input['password'] ?? '');
+        $role = trim($input['role'] ?? '');
+
+        if ($username === '' || $password === '' || $role === '') {
+            throw new Exception("Username, password, and role are required.", 400);
+        }
+
+        // role validation: allow only marketer and finance (not admin)
+        $allowed_roles = ['marketer', 'finance'];
+        if (!in_array($role, $allowed_roles, true)) {
+            throw new Exception("Invalid role. Allowed roles: marketer, finance.", 400);
+        }
+
+        $username_esc = $conn->real_escape_string($username);
+        $role_esc = $conn->real_escape_string($role);
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        $sql = "INSERT INTO users (username, password, role, is_temp_password) VALUES ('{$username_esc}', '{$hashed_password}', '{$role_esc}', 1)";
+
+        if (query_db($conn, $sql)) {
+            echo json_encode(["success" => true, "message" => "User created successfully."]);
+        } else {
+            // Try to provide a friendlier duplicate username error
+            if (strpos($conn->error, 'Duplicate') !== false) {
+                throw new Exception("Username already exists.", 409);
+            }
+            throw new Exception("Database error: Could not create user.");
+        }
+    }
+    // --- HANDLE DELETE USER (GET) ---
+    else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'delete') {
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id === 0) {
+            throw new Exception("User ID is required.", 400);
+        }
+
+        // Prevent deleting the main admin account (assume admin has id=1)
+        if ($id === 1) {
+            throw new Exception("Cannot delete the main admin account.", 403);
+        }
+
+        $sql = "DELETE FROM users WHERE id = {$id}";
+        if (query_db($conn, $sql)) {
+            echo json_encode(["success" => true, "message" => "User deleted."]);
+        } else {
+            throw new Exception("Database error: Could not delete user.");
+        }
+    }
+    else {
+        throw new Exception("Invalid user action.", 400);
+    }
+
+} catch (Exception $e) {
+    http_response_code($e->getCode() ?: 500);
+    echo json_encode(["success" => false, "message" => $e->getMessage()]);
+}
+
+$conn->close();
+?>
