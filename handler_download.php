@@ -41,29 +41,32 @@ try {
     $settings_result = $conn->query($settings_sql);
     $settings = $settings_result->fetch_assoc();
 
-    // Generate PDF content using improved method
+    // Generate HTML content optimized for PDF conversion
     include 'simple_pdf.php';
     $htmlContent = createPDFDocument($doc, $settings);
     
     // Set headers for PDF download
     $filename = strtoupper($docType) . "_" . $docId . "_" . date('Y-m-d') . ".pdf";
     
-    // Try to generate actual PDF, fallback to HTML for browser conversion
-    $pdfContent = generatePDFFromHTML($htmlContent);
+    // Use browser's PDF generation with proper headers
+    header('Content-Type: text/html; charset=UTF-8');
+    header('Content-Disposition: inline; filename="' . $filename . '"');
+    header('Cache-Control: private, max-age=0, must-revalidate');
+    header('Pragma: public');
     
-    if (strpos($pdfContent, '<!DOCTYPE html>') !== false) {
-        // HTML content - set headers for browser PDF conversion
-        header('Content-Type: text/html; charset=UTF-8');
-        header('Content-Disposition: inline; filename="' . $filename . '"');
-        echo $htmlContent;
-    } else {
-        // Actual PDF content
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: private, max-age=0, must-revalidate');
-        header('Pragma: public');
-        echo $pdfContent;
-    }
+    // Add JavaScript to trigger PDF download
+    $htmlContent = str_replace('</body>', '
+    <script>
+        // Auto-trigger print dialog for PDF generation
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+    </body>', $htmlContent);
+    
+    echo $htmlContent;
     
 } catch (Exception $e) {
     http_response_code($e->getCode() ?: 500);

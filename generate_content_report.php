@@ -20,22 +20,25 @@ try {
     // Generate PDF content
     $htmlContent = generateContentReportPDF($client, $contents, $companyInfo);
     
-    // Try to generate actual PDF, fallback to HTML
-    $pdfContent = generatePDFFromHTML($htmlContent);
+    // Use browser's PDF generation with proper headers
+    header('Content-Type: text/html; charset=UTF-8');
+    header('Content-Disposition: inline; filename="Content_Report.pdf"');
+    header('Cache-Control: private, max-age=0, must-revalidate');
+    header('Pragma: public');
     
-    if (strpos($pdfContent, '<!DOCTYPE html>') !== false) {
-        // HTML content - set headers for browser PDF conversion
-        header('Content-Type: text/html; charset=UTF-8');
-        header('Content-Disposition: inline; filename="Content_Report.pdf"');
-        echo $htmlContent;
-    } else {
-        // Actual PDF content
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="Content_Report_' . date('Y-m-d') . '.pdf"');
-        header('Cache-Control: private, max-age=0, must-revalidate');
-        header('Pragma: public');
-        echo $pdfContent;
-    }
+    // Add JavaScript to trigger PDF download
+    $htmlContent = str_replace('</body>', '
+    <script>
+        // Auto-trigger print dialog for PDF generation
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+    </body>', $htmlContent);
+    
+    echo $htmlContent;
     
 } catch (Exception $e) {
     http_response_code(500);
