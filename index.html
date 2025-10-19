@@ -233,20 +233,6 @@
                             <p>Content Credits Used</p>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
-                            <i class="fas fa-bullhorn fa-2x mb-2"></i>
-                            <h3 id="totalCampaigns">0</h3>
-                            <p>Total Campaigns</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
-                            <i class="fas fa-dollar-sign fa-2x mb-2"></i>
-                            <h3 id="totalRevenue">0</h3>
-                            <p>Total Revenue (Rs.)</p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -1063,6 +1049,40 @@
         </div>
     </div>
 
+    <!-- Custom Notification System -->
+    <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;"></div>
+    
+    <!-- Custom Confirmation Modal -->
+    <div class="modal fade" id="customConfirmModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalTitle">
+                        <i class="fas fa-question-circle me-2"></i>Confirmation Required
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-start">
+                        <div class="me-3">
+                            <i id="confirmModalIcon" class="fas fa-exclamation-triangle text-warning" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <p id="confirmModalMessage" class="mb-0">Are you sure you want to proceed?</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="confirmModalCancel">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmModalConfirm">
+                        <i class="fas fa-check me-2"></i>Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -1168,7 +1188,7 @@
 
         async function loadAllDataFromPHP() {
             try {
-                showAlert('Loading data from server...', 'info');
+                showAlert('Loading latest data from server...', 'info', 2000);
                 const response = await fetch('handler_data.php');
                 const data = await response.json();
 
@@ -1191,7 +1211,7 @@
                 }
             } catch (error) {
                 console.error('❌ Error loading from PHP/SQL:', error);
-                showAlert('Error loading data from the server. Using cached local data.', 'danger');
+                showAlert('Unable to connect to server. Using cached data. Please check your connection.', 'warning');
                 loadFromLocalStorage(); // Fallback
             }
         }
@@ -1244,7 +1264,7 @@
                 console.error('Login error:', error);
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Login';
-                showAlert('Login failed: ' + error.message, 'danger');
+                showAlert('Login failed. Please check your username and password.', 'danger');
             }
         });
 
@@ -1257,7 +1277,9 @@
 
 
         async function logout() {
-            if (!confirm('Are you sure you want to logout?')) return;
+            const confirmed = await showConfirm('Are you sure you want to logout?', 'Logout Confirmation', 'warning');
+            if (!confirmed) return;
+            
             try {
                 await fetch('logout.php', { method: 'POST' });
             } catch (_) {}
@@ -1742,7 +1764,8 @@
                 showAlert('You cannot delete your own account while logged in.', 'danger');
                 return;
             }
-            if (!confirm(`Delete user ${username}?`)) return;
+            const confirmed = await showConfirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`, 'Delete User', 'danger');
+            if (!confirmed) return;
             try {
                 // Fetch id by listing users first
                 const res = await fetch('handler_users.php?action=list');
@@ -1818,7 +1841,7 @@
 				document.activeElement && typeof document.activeElement.blur === 'function' && document.activeElement.blur();
 				bootstrap.Modal.getInstance(document.getElementById('addClientModal')).hide();
                     this.reset();
-                    showAlert('Client added successfully! 🎉', 'success');
+                    showAlert('Client profile created successfully! 🎉', 'success');
                     loadDashboard();
                 } else {
                     showAlert('Failed to save client on server: ' + result.message, 'danger');
@@ -1963,7 +1986,8 @@
                 showAlert('Access Denied. Only Admins can delete clients.', 'warning');
                 return;
             }
-            if (confirm('Delete this client? All related data will be removed.')) {
+            const confirmed = await showConfirm('Are you sure you want to delete this client? All related data (content credits, campaigns, documents) will be permanently removed.', 'Delete Client', 'danger');
+            if (confirmed) {
                 try {
                     const response = await fetch(`handler_clients.php?action=delete&id=${id}`, { method: 'GET' });
                     const result = await response.json();
@@ -2103,7 +2127,7 @@
 					document.activeElement && typeof document.activeElement.blur === 'function' && document.activeElement.blur();
 					bootstrap.Modal.getInstance(document.getElementById('addContentModal')).hide();
                     this.reset();
-                    showAlert('Content added successfully! 📸', 'success');
+                    showAlert('Content credit added successfully! 📸', 'success');
                     loadDashboard();
                 } else {
                     showAlert('Failed to save content: ' + result.message, 'danger');
@@ -2121,7 +2145,8 @@
                 showAlert('Access Denied. Marketer/Admin role required.', 'warning');
                 return;
             }
-            if (confirm('Delete this content record? This will revert the used credits.')) {
+            const confirmed = await showConfirm('Are you sure you want to delete this content record? This will revert the used credits back to the client.', 'Delete Content', 'warning');
+            if (confirmed) {
                 try {
                     const response = await fetch(`handler_content.php?action=delete&id=${id}`, { method: 'GET', credentials: 'same-origin' });
                     if (!response.ok) {
@@ -2247,9 +2272,12 @@
             }
             
             // Confirm the action
-            if (!confirm(`Are you sure you want to process month-end for this client?\n\nThis will:\n- Reset used credits to 0\n- Carry forward ${creditsToCarry} credits\n- Update renewal date to ${newRenewalDate}\n\nThis action cannot be undone.`)) {
-                return;
-            }
+            const confirmed = await showConfirm(
+                `Are you sure you want to process month-end for this client?\n\nThis will:\n- Reset used credits to 0\n- Carry forward ${creditsToCarry} credits\n- Update renewal date to ${newRenewalDate}\n\nThis action cannot be undone.`,
+                'Month-End Process Confirmation',
+                'warning'
+            );
+            if (!confirmed) return;
             
             try {
                 const response = await fetch('handler_month_end.php?action=process', {
@@ -3052,9 +3080,6 @@
         function loadDashboard() {
             document.getElementById('totalClients').textContent = appData.clients.length;
             document.getElementById('totalContentUsed').textContent = appData.clients.reduce((sum, c) => sum + c.usedCredits, 0).toLocaleString();
-            document.getElementById('totalCampaigns').textContent = appData.campaigns.length;
-            // NOTE: Total revenue needs a complete finance handler to use actual figures
-            document.getElementById('totalRevenue').textContent = appData.documents.receipts.reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
         }
 
 
@@ -3084,25 +3109,156 @@
             return colors[status] || 'secondary';
         }
 
-        function showAlert(message, type = 'info') {
-            const alertContainer = document.createElement('div');
-            alertContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            document.body.appendChild(alertContainer);
-
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-            alertDiv.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-            alertDiv.innerHTML = `
-                <strong>${type === 'success' ? '✓' : type === 'danger' ? '✗' : 'ℹ'}</strong> ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        // ✅ Enhanced User-Friendly Notification System
+        function showAlert(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('notificationContainer');
+            const notificationId = 'notification-' + Date.now();
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.id = notificationId;
+            notification.className = 'notification-toast mb-3';
+            notification.style.cssText = `
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                border-left: 4px solid ${getNotificationColor(type)};
+                padding: 16px;
+                margin-bottom: 12px;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+                max-width: 100%;
+                word-wrap: break-word;
             `;
-            alertContainer.appendChild(alertDiv);
-
+            
+            // Get appropriate icon and title
+            const { icon, title, bgClass } = getNotificationConfig(type);
+            
+            notification.innerHTML = `
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <i class="${icon} ${bgClass}" style="font-size: 1.2rem;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold text-dark mb-1">${title}</div>
+                        <div class="text-muted small">${message}</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-sm" onclick="closeNotification('${notificationId}')" style="margin-left: 8px;"></button>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Animate in
             setTimeout(() => {
-                const alertInstance = bootstrap.Alert.getOrCreateInstance(alertDiv);
-                if (alertInstance) alertInstance.close();
-                setTimeout(() => alertContainer.remove(), 500);
-            }, 8000);
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Auto-close after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    closeNotification(notificationId);
+                }, duration);
+            }
+        }
+        
+        function closeNotification(notificationId) {
+            const notification = document.getElementById(notificationId);
+            if (notification) {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }
+        
+        function getNotificationColor(type) {
+            const colors = {
+                'success': '#28a745',
+                'danger': '#dc3545',
+                'warning': '#ffc107',
+                'info': '#17a2b8',
+                'primary': '#007bff'
+            };
+            return colors[type] || colors['info'];
+        }
+        
+        function getNotificationConfig(type) {
+            const configs = {
+                'success': {
+                    icon: 'fas fa-check-circle',
+                    title: 'Success!',
+                    bgClass: 'text-success'
+                },
+                'danger': {
+                    icon: 'fas fa-exclamation-circle',
+                    title: 'Error',
+                    bgClass: 'text-danger'
+                },
+                'warning': {
+                    icon: 'fas fa-exclamation-triangle',
+                    title: 'Warning',
+                    bgClass: 'text-warning'
+                },
+                'info': {
+                    icon: 'fas fa-info-circle',
+                    title: 'Information',
+                    bgClass: 'text-info'
+                },
+                'primary': {
+                    icon: 'fas fa-bell',
+                    title: 'Notification',
+                    bgClass: 'text-primary'
+                }
+            };
+            return configs[type] || configs['info'];
+        }
+        
+        // ✅ Custom Confirmation System
+        function showConfirm(message, title = 'Confirmation Required', type = 'warning') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('customConfirmModal');
+                const modalTitle = document.getElementById('confirmModalTitle');
+                const modalMessage = document.getElementById('confirmModalMessage');
+                const modalIcon = document.getElementById('confirmModalIcon');
+                const cancelBtn = document.getElementById('confirmModalCancel');
+                const confirmBtn = document.getElementById('confirmModalConfirm');
+                
+                // Set content
+                modalTitle.innerHTML = `<i class="fas fa-question-circle me-2"></i>${title}`;
+                modalMessage.textContent = message;
+                
+                // Set icon based on type
+                const iconConfig = getNotificationConfig(type);
+                modalIcon.className = `${iconConfig.icon} ${iconConfig.bgClass}`;
+                modalIcon.style.fontSize = '1.5rem';
+                
+                // Set button colors
+                confirmBtn.className = `btn btn-${type === 'danger' ? 'danger' : 'primary'}`;
+                
+                // Remove existing event listeners
+                const newCancelBtn = cancelBtn.cloneNode(true);
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+                
+                // Add new event listeners
+                newCancelBtn.addEventListener('click', () => {
+                    bootstrap.Modal.getInstance(modal).hide();
+                    resolve(false);
+                });
+                
+                newConfirmBtn.addEventListener('click', () => {
+                    bootstrap.Modal.getInstance(modal).hide();
+                    resolve(true);
+                });
+                
+                // Show modal
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+            });
         }
         
 
