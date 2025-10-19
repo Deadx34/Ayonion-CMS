@@ -2216,7 +2216,13 @@
                 return;
             }
 
-            tbody.innerHTML = contents.map(c => `
+            tbody.innerHTML = contents.map(c => {
+                // Debug logging
+                console.log('Content item:', c);
+                console.log('Image URL:', c.imageUrl);
+                console.log('Content URL:', c.contentUrl);
+                
+                return `
                 <tr onmouseover="this.style.cursor='default'">
                     <td>${c.creative}</td>
                     <td>${c.contentType}</td>
@@ -2240,7 +2246,8 @@
                         <button class="btn btn-sm btn-info me-1" onclick="viewContent(${c.id})" title="View Details"><i class="fas fa-eye"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="deleteContent(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
                     </td>
-                </tr>`).join('');
+                </tr>`;
+            }).join('');
         }
 
         function showAddContentModal() {
