@@ -2581,7 +2581,7 @@
             modal.show();
         }
 
-        function generateContentReport(reportClientId = null) {
+        async function generateContentReport(reportClientId = null) {
             // ... (Report generation remains purely front-end/local) ...
             const clientId = reportClientId || parseInt(document.getElementById('contentClientSelect').value);
             if (!clientId) { showAlert('Please select a client first.', 'warning'); return; }
