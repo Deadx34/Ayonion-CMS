@@ -774,26 +774,52 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Client:</strong> <span id="manageCreditsClientName"></span></p>
-                    <p><strong>Current Renewal Date:</strong> <span id="currentRenewalDate"></span></p>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Client:</strong> <span id="manageCreditsClientName"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Current Renewal Date:</strong> <span id="currentRenewalDate"></span></p>
+                        </div>
+                    </div>
                     
                     <div class="alert alert-info">
-                        <h6>Current Credit Status</h6>
-                        <p class="mb-1"><strong>Package Credits:</strong> <span id="managePackageCredits">0</span></p>
-                        <p class="mb-1"><strong>Extra Credits:</strong> <span id="manageExtraCredits">0</span></p>
-                        <p class="mb-1"><strong>Carried Forward (from last cycle):</strong> <span id="manageCarriedCredits">0</span></p>
-                        <p class="mb-1"><strong>Used Credits (This Cycle):</strong> <span id="manageUsedCredits">0</span></p>
+                        <h6><i class="fas fa-info-circle me-2"></i>Current Credit Status</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Package Credits:</strong> <span id="managePackageCredits">0</span></p>
+                                <p class="mb-1"><strong>Extra Credits:</strong> <span id="manageExtraCredits">0</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Carried Forward:</strong> <span id="manageCarriedCredits">0</span></p>
+                                <p class="mb-1"><strong>Used Credits:</strong> <span id="manageUsedCredits">0</span></p>
+                            </div>
+                        </div>
                         <hr>
-                        <p class="mb-0"><strong>Current Available Credits (Max Carry):</strong> <span class="fs-5 text-success fw-bold" id="manageCreditsAvailable">0</span></p>
+                        <p class="mb-0"><strong>Available Credits (Max Carry):</strong> <span class="fs-5 text-success fw-bold" id="manageCreditsAvailable">0</span></p>
                     </div>
                     
                     <form id="manageCreditsForm">
                         <div class="mb-3">
-                            <label class="form-label">Credits to Carry Forward for the **NEXT** Cycle</label>
+                            <label class="form-label"><i class="fas fa-forward me-2"></i>Credits to Carry Forward</label>
                             <input type="number" class="form-control" id="creditsToCarry" required min="0">
-                            <small class="text-muted">Enter **0** to expire all remaining credits. Max carry is the available amount above.</small>
+                            <small class="text-muted">Enter <strong>0</strong> to expire all remaining credits. Maximum: <span id="maxCreditsToCarry">0</span> credits</small>
                         </div>
-                        <button type="submit" class="btn btn-warning w-100">Process Month End</button>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-calendar-alt me-2"></i>New Renewal Date</label>
+                            <input type="date" class="form-control" id="newRenewalDate" required>
+                            <small class="text-muted">Set the renewal date for the next billing cycle</small>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Warning:</strong> This process will reset used credits to 0 and update the renewal date. This action cannot be undone.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="fas fa-recycle me-2"></i>Process Month End
+                        </button>
                     </form>
                 </div>
             </div>
@@ -2183,6 +2209,7 @@
             const totalCredits = client.packageCredits + client.extraCredits + client.carriedForwardCredits;
             const available = totalCredits - client.usedCredits;
 
+            // Populate client information
             document.getElementById('manageCreditsClientName').textContent = client.companyName;
             document.getElementById('currentRenewalDate').textContent = formatDate(client.renewalDate);
             document.getElementById('managePackageCredits').textContent = client.packageCredits;
@@ -2190,25 +2217,107 @@
             document.getElementById('manageCarriedCredits').textContent = client.carriedForwardCredits;
             document.getElementById('manageUsedCredits').textContent = client.usedCredits;
             document.getElementById('manageCreditsAvailable').textContent = available;
-            document.getElementById('creditsToCarry').max = Math.max(0, available);
-            document.getElementById('creditsToCarry').value = Math.max(0, available);
-            document.getElementById('creditsToCarry').placeholder = `Max ${Math.max(0, available)}`;
+            
+            // Set up credits to carry field
+            const creditsToCarryField = document.getElementById('creditsToCarry');
+            const maxCreditsSpan = document.getElementById('maxCreditsToCarry');
+            creditsToCarryField.max = Math.max(0, available);
+            creditsToCarryField.value = Math.max(0, available);
+            maxCreditsSpan.textContent = Math.max(0, available);
+            
+            // Set up new renewal date (default to next month from current renewal date)
+            const currentRenewalDate = new Date(client.renewalDate);
+            const nextRenewalDate = new Date(currentRenewalDate);
+            nextRenewalDate.setMonth(nextRenewalDate.getMonth() + 1);
+            document.getElementById('newRenewalDate').value = nextRenewalDate.toISOString().split('T')[0];
 
             new bootstrap.Modal(document.getElementById('manageCreditsModal')).show();
         }
 
-        // NOTE: This needs a PHP handler update (handler_clients.php?action=month_end)
-        document.getElementById('manageCreditsForm').addEventListener('submit', function(e) {
+        // ✅ IMPLEMENTED: Month-end form submission
+        document.getElementById('manageCreditsForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            showAlert('Month End Process needs PHP handler implementation.', 'warning');
+            
+            const clientId = parseInt(document.getElementById('contentClientSelect').value);
+            const creditsToCarry = parseInt(document.getElementById('creditsToCarry').value);
+            const newRenewalDate = document.getElementById('newRenewalDate').value;
+            
+            // Validation
+            if (!clientId) {
+                showAlert('Please select a client first.', 'warning');
+                return;
+            }
+            
+            if (creditsToCarry < 0) {
+                showAlert('Credits to carry cannot be negative.', 'warning');
+                return;
+            }
+            
+            if (!newRenewalDate) {
+                showAlert('Please select a new renewal date.', 'warning');
+                return;
+            }
+            
+            // Confirm the action
+            if (!confirm(`Are you sure you want to process month-end for this client?\n\nThis will:\n- Reset used credits to 0\n- Carry forward ${creditsToCarry} credits\n- Update renewal date to ${newRenewalDate}\n\nThis action cannot be undone.`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('handler_month_end.php?action=process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        clientId: clientId,
+                        creditsToCarry: creditsToCarry,
+                        newRenewalDate: newRenewalDate
+                    })
+                });
+                
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || `HTTP ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Close modal and refresh data
+                    bootstrap.Modal.getInstance(document.getElementById('manageCreditsModal')).hide();
+                    
+                    // Reload all data to reflect changes
+                    await loadAllDataFromPHP();
+                    loadContentCredits();
+                    loadClientsTable();
+                    loadDashboard();
+                    
+                    // Show success message with details
+                    const details = result.details;
+                    showAlert(`Month-end process completed successfully!\n\nCredits carried forward: ${details.creditsCarried}\nCredits expired: ${details.creditsExpired}\nNew renewal date: ${formatDate(details.newRenewalDate)}`, 'success');
+                } else {
+                    showAlert('Failed to process month-end: ' + result.message, 'danger');
+                }
+                
+            } catch (error) {
+                console.error('Month-end process error:', error);
+                showAlert('Error processing month-end: ' + error.message, 'danger');
+            }
         });
 
-        function processMonthEnd(client, carry) {
-            showAlert('Month End Process needs PHP handler implementation.', 'warning');
-        }
-
         function checkRenewalDates() {
-            showAlert('Renewal Date check is currently local-only and does not sync. Full implementation required.', 'info');
+            // Check for clients with upcoming renewal dates
+            const today = new Date();
+            const upcomingRenewals = appData.clients.filter(client => {
+                const renewalDate = new Date(client.renewalDate);
+                const daysUntilRenewal = Math.ceil((renewalDate - today) / (1000 * 60 * 60 * 24));
+                return daysUntilRenewal <= 7 && daysUntilRenewal >= 0;
+            });
+            
+            if (upcomingRenewals.length > 0) {
+                const clientNames = upcomingRenewals.map(c => c.companyName).join(', ');
+                showAlert(`Upcoming renewals in the next 7 days: ${clientNames}`, 'info');
+            }
         }
 
         // Helper function to show document modal with proper ARIA handling
