@@ -658,6 +658,22 @@
                             <label class="form-label">Published Date (Optional)</label>
                             <input type="date" class="form-control" id="publishedDate">
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-link me-2"></i>Content URL (Optional)</label>
+                            <input type="url" class="form-control" id="contentUrl" placeholder="https://example.com/content">
+                            <small class="text-muted">Link to the published content (social media post, video, etc.)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-image me-2"></i>Content Image (Optional)</label>
+                            <input type="file" class="form-control" id="contentImageUpload" accept="image/*" onchange="handleContentImageUpload(this)">
+                            <small class="text-muted">Upload an image related to this content (Max: 5MB)</small>
+                            <div id="contentImagePreview" class="mt-2" style="display: none;">
+                                <img id="contentImagePreviewImg" src="" alt="Content Preview" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeContentImage()">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-primary w-100">Save Content</button>
                     </form>
                 </div>
@@ -727,6 +743,26 @@
                                             <strong>Partner ID:</strong><br>
                                             <span id="viewPartnerId" class="text-dark"></span>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3" id="contentMediaSection" style="display: none;">
+                        <div class="col-12">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary"><i class="fas fa-images me-2"></i>Content Media</h6>
+                                    <div id="contentImageSection" style="display: none;">
+                                        <strong>Content Image:</strong><br>
+                                        <img id="viewContentImage" src="" alt="Content Image" class="img-thumbnail mt-2" style="max-width: 300px; max-height: 300px;">
+                                    </div>
+                                    <div id="contentUrlSection" style="display: none;" class="mt-3">
+                                        <strong>Content URL:</strong><br>
+                                        <a id="viewContentUrl" href="" target="_blank" class="text-primary">
+                                            <i class="fas fa-external-link-alt me-1"></i>View Content
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -1541,6 +1577,68 @@
             document.getElementById('logoPreview').style.display = 'none';
         }
 
+        // ✅ NEW: Content image upload handler
+        async function handleContentImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showAlert('Please select a valid image file.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('Image file is too large. Please choose an image smaller than 5MB.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            // Upload file to server
+            const formData = new FormData();
+            formData.append('contentImage', file);
+            
+            try {
+                const response = await fetch('upload_content_image.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store the image URL in a hidden field or data attribute
+                    input.dataset.imageUrl = result.image_url;
+                    
+                    // Show preview
+                    const preview = document.getElementById('contentImagePreview');
+                    const previewImg = document.getElementById('contentImagePreviewImg');
+                    previewImg.src = result.image_url;
+                    preview.style.display = 'block';
+                    
+                    showAlert('Content image uploaded successfully!', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                    input.value = '';
+                }
+            } catch (error) {
+                showAlert('Upload error: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        function removeContentImage() {
+            const input = document.getElementById('contentImageUpload');
+            const preview = document.getElementById('contentImagePreview');
+            
+            input.value = '';
+            input.dataset.imageUrl = '';
+            preview.style.display = 'none';
+        }
+
         function updateSidebarHeader(companyName, logoUrl) {
             const sidebarCompanyName = document.getElementById('sidebarCompanyName');
             const sidebarLogo = document.getElementById('sidebarLogo');
@@ -2102,7 +2200,9 @@
                 contentType: document.getElementById('contentType').value,
                 startDate: new Date().toISOString().split('T')[0], // Use current date as default
                 status: 'In Progress', // Default status
-                publishedDate: document.getElementById('publishedDate').value || null
+                publishedDate: document.getElementById('publishedDate').value || null,
+                contentUrl: document.getElementById('contentUrl').value || null,
+                imageUrl: document.getElementById('contentImageUpload').dataset.imageUrl || null
             };
 
             try {
@@ -2205,6 +2305,33 @@
             // Populate client information
             document.getElementById('viewClientName').textContent = client.companyName;
             document.getElementById('viewPartnerId').textContent = client.partnerId;
+
+            // Handle content media (image and URL)
+            const mediaSection = document.getElementById('contentMediaSection');
+            const imageSection = document.getElementById('contentImageSection');
+            const urlSection = document.getElementById('contentUrlSection');
+            const viewContentImage = document.getElementById('viewContentImage');
+            const viewContentUrl = document.getElementById('viewContentUrl');
+
+            // Reset media sections
+            imageSection.style.display = 'none';
+            urlSection.style.display = 'none';
+            mediaSection.style.display = 'none';
+
+            // Show image if available
+            if (content.imageUrl) {
+                viewContentImage.src = content.imageUrl;
+                imageSection.style.display = 'block';
+                mediaSection.style.display = 'block';
+            }
+
+            // Show URL if available
+            if (content.contentUrl) {
+                viewContentUrl.href = content.contentUrl;
+                viewContentUrl.textContent = content.contentUrl;
+                urlSection.style.display = 'block';
+                mediaSection.style.display = 'block';
+            }
 
             // Show the modal
             new bootstrap.Modal(document.getElementById('viewContentModal')).show();

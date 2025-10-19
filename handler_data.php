@@ -52,8 +52,10 @@ if ($content_result) {
             'contentType' => $row['credit_type'],
             'credits' => (int)$row['credits'],
             'startDate' => $row['date'],
-            'status' => 'In Progress', // Default status
-            'publishedDate' => null
+            'status' => $row['status'] ?? 'In Progress',
+            'publishedDate' => $row['published_date'],
+            'contentUrl' => $row['content_url'],
+            'imageUrl' => $row['image_url']
         ];
     }
 }

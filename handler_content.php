@@ -25,9 +25,11 @@ try {
         $creative = $conn->real_escape_string($input['creative'] ?? $contentType);
         $status = $conn->real_escape_string($input['status'] ?? 'In Progress');
         $publishedDate = $conn->real_escape_string($input['publishedDate'] ?? '');
+        $contentUrl = $conn->real_escape_string($input['contentUrl'] ?? '');
+        $imageUrl = $conn->real_escape_string($input['imageUrl'] ?? '');
         
         // Insert content credit record
-        $insertSql = "INSERT INTO content_credits (client_id, credit_type, credits, date) VALUES ($clientId, '$creative', $credits, '$startDate')";
+        $insertSql = "INSERT INTO content_credits (client_id, credit_type, credits, date, status, published_date, content_url, image_url) VALUES ($clientId, '$creative', $credits, '$startDate', '$status', '$publishedDate', '$contentUrl', '$imageUrl')";
         if (!$conn->query($insertSql)) {
             http_response_code(500);
             echo json_encode(["success" => false, "message" => "Failed to insert content credit: " . $conn->error]);
