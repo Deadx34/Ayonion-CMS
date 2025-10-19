@@ -41,20 +41,29 @@ try {
     $settings_result = $conn->query($settings_sql);
     $settings = $settings_result->fetch_assoc();
 
-    // Generate PDF content
-    $pdfContent = generateDocumentPDF($doc, $settings);
+    // Generate PDF content using improved method
+    include 'simple_pdf.php';
+    $htmlContent = createPDFDocument($doc, $settings);
     
     // Set headers for PDF download
     $filename = strtoupper($docType) . "_" . $docId . "_" . date('Y-m-d') . ".pdf";
     
-    header('Content-Type: application/pdf');
-    header('Content-Disposition: attachment; filename="' . $filename . '"');
-    header('Cache-Control: private, max-age=0, must-revalidate');
-    header('Pragma: public');
+    // Try to generate actual PDF, fallback to HTML for browser conversion
+    $pdfContent = generatePDFFromHTML($htmlContent);
     
-    // For now, we'll return the HTML content that can be converted to PDF by the browser
-    // In a production environment, you'd use a library like TCPDF or mPDF
-    echo $pdfContent;
+    if (strpos($pdfContent, '<!DOCTYPE html>') !== false) {
+        // HTML content - set headers for browser PDF conversion
+        header('Content-Type: text/html; charset=UTF-8');
+        header('Content-Disposition: inline; filename="' . $filename . '"');
+        echo $htmlContent;
+    } else {
+        // Actual PDF content
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: private, max-age=0, must-revalidate');
+        header('Pragma: public');
+        echo $pdfContent;
+    }
     
 } catch (Exception $e) {
     http_response_code($e->getCode() ?: 500);

@@ -2607,6 +2607,43 @@
                 tableRows = '<tr><td colspan="6" style="padding: 20px; text-align: center;">No content records found.</td></tr>';
             }
 
+            // Generate PDF using server-side generation
+            const reportData = {
+                client: client,
+                contents: contents,
+                companyInfo: COMPANY_INFO
+            };
+            
+            // Send data to server for PDF generation
+            try {
+                const response = await fetch('generate_content_report.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reportData)
+                });
+                
+                if (response.ok) {
+                    // Create download link for PDF
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `Content_Report_${client.companyName}_${new Date().toISOString().split('T')[0]}.pdf`;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                    showAlert('Content report generated successfully! 📄', 'success');
+                    return;
+                }
+            } catch (error) {
+                console.log('Server PDF generation failed, falling back to browser print');
+            }
+            
+            // Fallback to browser print
             const html = `
                 <div style="font-family: Arial; padding: 20px;">
                     <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
