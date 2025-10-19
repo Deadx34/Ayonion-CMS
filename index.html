@@ -344,7 +344,7 @@
                                 <thead>
                                     <tr>
                                         <th>Creative</th><th>Content Type</th><th>Credits</th>
-                                        <th>Start Date</th><th>Status</th><th>Published Date</th><th>Actions</th>
+                                        <th>Published Date</th><th>Preview</th><th>Link</th><th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="contentTableBody"></tbody>
@@ -1639,6 +1639,69 @@
             preview.style.display = 'none';
         }
 
+        // ✅ NEW: Clear content image preview function
+        function clearContentImagePreview() {
+            const input = document.getElementById('contentImageUpload');
+            const preview = document.getElementById('contentImagePreview');
+            const previewImg = document.getElementById('contentImagePreviewImg');
+            
+            // Reset input
+            input.value = '';
+            input.dataset.imageUrl = '';
+            
+            // Hide preview
+            preview.style.display = 'none';
+            
+            // Clear image source
+            previewImg.src = '';
+        }
+
+        // ✅ NEW: Add modal event listener to clear image preview when modal is hidden
+        document.addEventListener('DOMContentLoaded', function() {
+            const addContentModal = document.getElementById('addContentModal');
+            if (addContentModal) {
+                addContentModal.addEventListener('hidden.bs.modal', function() {
+                    clearContentImagePreview();
+                });
+            }
+        });
+
+        // ✅ NEW: View full content image
+        function viewContentImage(imageUrl) {
+            // Create a modal to show the full image
+            const imageModal = document.createElement('div');
+            imageModal.className = 'modal fade';
+            imageModal.id = 'imageModal';
+            imageModal.innerHTML = `
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-image me-2"></i>Content Image</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="${imageUrl}" alt="Content Image" class="img-fluid" style="max-height: 70vh; object-fit: contain;">
+                        </div>
+                        <div class="modal-footer">
+                            <a href="${imageUrl}" target="_blank" class="btn btn-primary">
+                                <i class="fas fa-external-link-alt me-2"></i>Open in New Tab
+                            </a>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(imageModal);
+            const bsModal = new bootstrap.Modal(imageModal);
+            bsModal.show();
+            
+            // Remove modal from DOM when hidden
+            imageModal.addEventListener('hidden.bs.modal', function() {
+                document.body.removeChild(imageModal);
+            });
+        }
+
         function updateSidebarHeader(companyName, logoUrl) {
             const sidebarCompanyName = document.getElementById('sidebarCompanyName');
             const sidebarLogo = document.getElementById('sidebarLogo');
@@ -2158,9 +2221,21 @@
                     <td>${c.creative}</td>
                     <td>${c.contentType}</td>
                     <td><span class="badge bg-warning">${c.credits}</span></td>
-                    <td>${formatDate(c.startDate)}</td>
-                    <td><span class="badge bg-${getStatusColor(c.status)}">${c.status}</span></td>
                     <td>${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
+                    <td>
+                        ${c.imageUrl ? 
+                            `<img src="${c.imageUrl}" alt="Content Preview" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: cover; cursor: pointer;" onclick="viewContentImage('${c.imageUrl}')" title="Click to view full image">` : 
+                            '<span class="text-muted">-</span>'
+                        }
+                    </td>
+                    <td>
+                        ${c.contentUrl ? 
+                            `<a href="${c.contentUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="View Content">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>` : 
+                            '<span class="text-muted">-</span>'
+                        }
+                    </td>
                     <td>
                         <button class="btn btn-sm btn-info me-1" onclick="viewContent(${c.id})" title="View Details"><i class="fas fa-eye"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="deleteContent(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
@@ -2175,7 +2250,11 @@
             }
             const clientId = document.getElementById('contentClientSelect').value;
             if(!clientId) { showAlert('Please select a client first', 'warning'); return; }
+            
+            // Reset form and clear image preview
             document.getElementById('addContentForm').reset();
+            clearContentImagePreview();
+            
             new bootstrap.Modal(document.getElementById('addContentModal')).show();
         }
 
@@ -2227,6 +2306,10 @@
 					document.activeElement && typeof document.activeElement.blur === 'function' && document.activeElement.blur();
 					bootstrap.Modal.getInstance(document.getElementById('addContentModal')).hide();
                     this.reset();
+                    
+                    // ✅ NEW: Clear image preview and reset image upload
+                    clearContentImagePreview();
+                    
                     showAlert('Content credit added successfully! 📸', 'success');
                     loadDashboard();
                 } else {
