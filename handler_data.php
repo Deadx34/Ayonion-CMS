@@ -53,9 +53,9 @@ if ($content_result) {
             'credits' => (int)$row['credits'],
             'startDate' => $row['date'],
             'status' => $row['status'] ?? 'In Progress',
-            'publishedDate' => $row['published_date'],
-            'contentUrl' => $row['content_url'],
-            'imageUrl' => $row['image_url']
+            'publishedDate' => $row['published_date'] ?? null,
+            'contentUrl' => $row['content_url'] ?? null,
+            'imageUrl' => $row['image_url'] ?? null
         ];
     }
 }
