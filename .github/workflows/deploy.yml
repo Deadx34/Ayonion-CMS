@@ -25,7 +25,7 @@ jobs:
           protocol: ftp                   # force plain FTP
           port: 21
           local-dir: ./                   # root of your repository
-          server-dir: /htdocs/            # target directory on Byet.Host
+          server-dir: /htdocs/ayonion-cms/            # target directory on Byet.Host
           exclude: |
             **/.git*
             **/.github*

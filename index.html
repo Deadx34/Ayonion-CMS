@@ -669,18 +669,6 @@
                             <input type="number" class="form-control" id="creditsAllocated" required min="1">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="contentStartDate" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <select class="form-select" id="contentStatus" required>
-                                <option value="Pending">Pending</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Published">Published</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
                             <label class="form-label">Published Date (Optional)</label>
                             <input type="date" class="form-control" id="publishedDate">
                         </div>
@@ -2088,8 +2076,8 @@
                 credits: credits,
                 creative: document.getElementById('creativeName').value,
                 contentType: document.getElementById('contentType').value,
-                startDate: document.getElementById('contentStartDate').value,
-                status: document.getElementById('contentStatus').value,
+                startDate: new Date().toISOString().split('T')[0], // Use current date as default
+                status: 'In Progress', // Default status
                 publishedDate: document.getElementById('publishedDate').value || null
             };
 
