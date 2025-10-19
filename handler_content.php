@@ -1,5 +1,5 @@
 <?php
-// AYONION-CMS/handler_clients.php - Handles CRUD operations for clients
+// AYONION-CMS/handler_content.php - Handles content credit add/delete and updates client used credits
 
 header('Content-Type: application/json');
 include 'includes/config.php';
@@ -8,60 +8,88 @@ $conn = connect_db();
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents("php://input"), true);
 
-// --- 1. HANDLE ADD CLIENT (POST) ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
-    
-    // Generate a more unique ID
-    $id = time() . mt_rand(100, 999); 
-    
-    $partnerId = $conn->real_escape_string($input['partnerId'] ?? '');
-    $companyName = $conn->real_escape_string($input['companyName'] ?? '');
-    $renewalDate = $conn->real_escape_string($input['renewalDate'] ?? null);
-    $packageCredits = (int)($input['packageCredits'] ?? 0);
-    $managingPlatforms = $conn->real_escape_string($input['managingPlatforms'] ?? '');
-    $industry = $conn->real_escape_string($input['industry'] ?? '');
-    $logoUrl = $conn->real_escape_string($input['logoUrl'] ?? '');
+try {
+    // --- ADD CONTENT CREDIT (POST) ---
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
+        $clientId = (int)($input['clientId'] ?? 0);
+        $credits = (int)($input['credits'] ?? 0);
+        $contentType = $conn->real_escape_string($input['contentType'] ?? '');
+        $startDate = $conn->real_escape_string($input['startDate'] ?? '');
 
-    if (empty($logoUrl) && !empty($companyName)) {
-        $firstChar = strtoupper(substr($companyName, 0, 1));
-        $logoUrl = "https://via.placeholder.com/150/6c757d/ffffff?text=" . urlencode($firstChar);
-    }
-    
-    $sql = "INSERT INTO clients (
-        id, partner_id, company_name, renewal_date, package_credits, managing_platforms, industry, logo_url,
-        extra_credits, carried_forward_credits, used_credits, total_ad_budget, total_spent
-    ) VALUES (
-        '$id', '$partnerId', '$companyName', " . ($renewalDate ? "'$renewalDate'" : "NULL") . ", $packageCredits, 
-        '$managingPlatforms', '$industry', '$logoUrl', 
-        0, 0, 0, 0.00, 0.00
-    )";
+        if ($clientId <= 0 || $credits <= 0 || $contentType === '' || $startDate === '') {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "clientId, credits, contentType, startDate are required."]);
+            exit;
+        }
 
-    // ✅ FIXED: Passed the $conn object to the query_db function
-    if (query_db($conn, $sql)) {
-        echo json_encode(["success" => true, "message" => "Client added successfully."]);
-    } else {
-        http_response_code(500);
-        $error_msg = strpos($conn->error, 'Duplicate entry') !== false ? "Partner ID already exists." : "Failed to save client: Database Error.";
-        echo json_encode(["success" => false, "message" => $error_msg]);
+        $creative = $conn->real_escape_string($input['creative'] ?? $contentType);
+        $status = $conn->real_escape_string($input['status'] ?? 'In Progress');
+        $publishedDate = $conn->real_escape_string($input['publishedDate'] ?? '');
+        
+        // Insert content credit record
+        $insertSql = "INSERT INTO content_credits (client_id, credit_type, credits, date) VALUES ($clientId, '$creative', $credits, '$startDate')";
+        if (!$conn->query($insertSql)) {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Failed to insert content credit: " . $conn->error]);
+            exit;
+        }
+
+        // Update client's used_credits
+        $updateSql = "UPDATE clients SET used_credits = COALESCE(used_credits,0) + $credits WHERE id = $clientId";
+        if (!$conn->query($updateSql)) {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Failed to update client's used credits: " . $conn->error]);
+            exit;
+        }
+
+        echo json_encode(["success" => true, "message" => "Content credit added and client credits updated."]);
     }
-} 
-// --- 2. HANDLE DELETE CLIENT (GET) ---
-else if ($action === 'delete') {
-    $clientId = (int)($_GET['id'] ?? 0);
-    $sql = "DELETE FROM clients WHERE id = $clientId";
-    
-    // ✅ FIXED: Passed the $conn object to the query_db function
-    if (query_db($conn, $sql)) {
-        echo json_encode(["success" => true, "message" => "Client and all related data deleted."]);
-    } else {
-        http_response_code(500);
-        echo json_encode(["success" => false, "message" => "Failed to delete client: " . $conn->error]);
+    // --- DELETE CONTENT CREDIT (GET) ---
+    else if ($action === 'delete') {
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Content id is required."]);
+            exit;
+        }
+
+        // Find the record to get clientId and credits for rollback
+        $selSql = "SELECT client_id, credits FROM content_credits WHERE id = $id LIMIT 1";
+        $res = $conn->query($selSql);
+        if (!$res || $res->num_rows === 0) {
+            http_response_code(404);
+            echo json_encode(["success" => false, "message" => "Content record not found."]);
+            exit;
+        }
+        $row = $res->fetch_assoc();
+        $clientId = (int)$row['client_id'];
+        $credits = (int)$row['credits'];
+
+        // Delete the content credit
+        $delSql = "DELETE FROM content_credits WHERE id = $id";
+        if (!$conn->query($delSql)) {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Failed to delete content credit: " . $conn->error]);
+            exit;
+        }
+
+        // Rollback used_credits on clients (ensure non-negative)
+        $rollbackSql = "UPDATE clients SET used_credits = GREATEST(COALESCE(used_credits,0) - $credits, 0) WHERE id = $clientId";
+        if (!$conn->query($rollbackSql)) {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Failed to update client's used credits: " . $conn->error]);
+            exit;
+        }
+
+        echo json_encode(["success" => true, "message" => "Content credit deleted and client credits updated."]);
     }
-}
-// --- 3. ERROR HANDLING ---
-else {
-    http_response_code(400);
-    echo json_encode(["success" => false, "message" => "Invalid API endpoint request."]);
+    else {
+        http_response_code(400);
+        echo json_encode(["success" => false, "message" => "Invalid content action."]);
+    }
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "Server error: " . $e->getMessage()]);
 }
 
 $conn->close();

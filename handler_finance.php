@@ -1,9 +1,19 @@
 <?php
 // AYONION-CMS/handler_finance.php - Handles financial documents
 
+// Ensure we always return JSON, even on errors
 header('Content-Type: application/json');
-include 'includes/config.php';
-$conn = connect_db();
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors in output
+
+try {
+    include 'includes/config.php';
+    $conn = connect_db();
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "Database connection failed: " . $e->getMessage()]);
+    exit;
+}
 
 $action = $_GET['action'] ?? '';
 

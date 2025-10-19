@@ -28,6 +28,8 @@
         .nav-link.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
         .nav-link i { width: 20px; text-align: center; }
         .content-area { margin-left: 260px; padding: 30px; min-height: 100vh; transition: margin-left 0.3s ease; }
+        /* Adjust content area when warning banner is shown */
+        body:has(#tempPasswordWarning[style*="display: block"]) .content-area { padding-top: 60px; }
         .top-bar { background: rgba(255,255,255,0.9); padding: 16px 24px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 900; backdrop-filter: saturate(180%) blur(8px); border: 1px solid rgba(99,102,241,0.08); }
         .page-title { font-size: 1.6rem; font-weight: 700; color: var(--dark); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-info { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
@@ -59,7 +61,54 @@
         .section.active { display: block; }
         .action-btn { margin: 0 3px; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; transition: all 0.3s; }
         .action-btn:hover { transform: translateY(-2px); }
-        .document-preview { background: white; padding: 40px; border-radius: 10px; max-width: 800px; margin: 20px auto; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .document-preview { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 10px; 
+            max-width: 800px; 
+            margin: 20px auto; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #333;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+        .document-preview * {
+            pointer-events: none;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+        .document-preview input,
+        .document-preview textarea,
+        .document-preview select {
+            pointer-events: none;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            resize: none !important;
+        }
+        .document-preview {
+            position: relative;
+        }
+        .document-preview::before {
+            content: "📄 Document View - Read Only";
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 10;
+        }
         .logo-preview { width: 60px; height: 60px; object-fit: contain; border: 2px solid #e2e8f0; border-radius: 8px; padding: 5px; cursor: pointer; transition: all 0.3s; }
         .logo-preview:hover { transform: scale(1.1); border-color: var(--primary); }
         .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
@@ -118,7 +167,7 @@
                 <div class="mb-3">
                     <label class="form-label">User Role</label>
                     <select class="form-select" id="userRole" required>
-                        <option value="">Select Your Role</option>
+                        <option value="" disabled selected hidden>Select Your Role</option>
                         <option value="admin">Admin</option>
                         <option value="marketer">Digital Marketer</option>
                         <option value="finance">Finance Manager</option>
@@ -136,19 +185,16 @@
                     <i class="fas fa-sign-in-alt me-2"></i>Login
                 </button>
             </form>
-            <div style="margin-top: 20px; padding: 15px; background: #f0f1ff; border-radius: 8px; font-size: 0.85rem; color: #64748b;">
-                <p style="margin: 5px 0;"><strong>Demo Credentials:</strong></p>
-                <p style="margin: 5px 0;">Admin: admin / password</p>
-                <p style="margin: 5px 0;">Marketer: marketer / password</p>
-                <p style="margin: 5px 0;">Finance: finance / password</p>
-            </div>
         </div>
     </div>
 
     <div id="mainApp" style="display: none;">
         <nav class="sidebar">
             <div class="sidebar-header">
-                <h3><i class="fas fa-palette me-2"></i>Ayonion</h3>
+                <div class="d-flex align-items-center mb-2">
+                    <img id="sidebarLogo" src="" alt="Logo" style="width: 32px; height: 32px; object-fit: contain; margin-right: 10px; display: none;">
+                    <h3 id="sidebarCompanyName">Ayonion</h3>
+                </div>
                 <p>Management System</p>
             </div>
             <ul class="nav flex-column mt-4" id="navMenu"></ul>
@@ -200,6 +246,46 @@
                             <h3 id="totalRevenue">0</h3>
                             <p>Total Revenue (Rs.)</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings" class="section">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-gear me-2"></i>Settings</span>
+                    </div>
+                    <div class="card-body">
+                        <form id="settingsForm" class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" class="form-control" id="settingsCompanyName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Company Logo</label>
+                                <input type="file" class="form-control" id="settingsLogoFile" accept="image/*" onchange="handleLogoUpload(this)">
+                                <input type="hidden" id="settingsLogoUrl">
+                                <div id="logoPreview" class="mt-2" style="display: none;">
+                                    <img id="logoPreviewImg" src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;">
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeLogo()">Remove</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="settingsEmail" placeholder="info@company.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" id="settingsPhone" placeholder="+1 555 0123">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" id="settingsAddress" rows="3"></textarea>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save Settings</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -340,17 +426,17 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4">
-                                <button class="btn btn-primary w-100 mb-2" onclick="showDocumentModal('quotation')">
+                                <button class="btn btn-primary w-100 mb-2" onclick="showCreateDocumentModal('quotation')">
                                     <i class="fas fa-file-alt me-2"></i>Create Quotation
                                 </button>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-success w-100 mb-2" onclick="showDocumentModal('invoice')">
+                                <button class="btn btn-success w-100 mb-2" onclick="showCreateDocumentModal('invoice')">
                                     <i class="fas fa-file-invoice me-2"></i>Create Invoice
                                 </button>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-warning w-100 mb-2" onclick="showDocumentModal('receipt')">
+                                <button class="btn btn-warning w-100 mb-2" onclick="showCreateDocumentModal('receipt')">
                                     <i class="fas fa-receipt me-2"></i>Create Receipt
                                 </button>
                             </div>
@@ -824,13 +910,16 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Document Preview</h5>
+                    <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Document View</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div id="documentPreview" class="document-preview"></div>
                 </div>
                 <div class="modal-footer">
+                    <div class="me-auto">
+                        <small class="text-muted"><i class="fas fa-eye me-1"></i>Read-only document view</small>
+                    </div>
                     <button class="btn btn-primary" onclick="printDocument()"><i class="fas fa-print me-2"></i>Print</button>
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
@@ -873,28 +962,14 @@
         </div>
     </div>
     
-    <div class="modal fade" id="changePasswordModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Mandatory Password Change</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-danger">
-                        Your account has been set up with a temporary password. You must set a new permanent password to continue.
-                    </div>
-                    <form id="changePasswordForm">
-                        <div class="mb-3">
-                            <label class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="newPassword" required minlength="6">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirmPassword" required minlength="6">
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Set New Password & Login</button>
-                    </form>
-                </div>
+    <!-- Temporary Password Warning Banner -->
+    <div id="tempPasswordWarning" class="alert alert-warning alert-dismissible fade show" style="display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 1050; margin: 0; border-radius: 0;">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-shield-alt me-2"></i>
+                <strong>Security Recommendation:</strong>
+                <span class="ms-2">You're using a temporary password. For account security, please change it to a permanent one.</span>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </div>
     </div>
@@ -910,7 +985,7 @@
         // --- RBAC DEFINITION ---
         const permissions = {
             admin: {
-                sections: ['dashboard', 'clients', 'content', 'campaigns', 'finances', 'users'],
+                sections: ['dashboard', 'clients', 'content', 'campaigns', 'finances', 'users', 'settings'],
                 canAddClient: true,
                 canDeleteClient: true,
                 canManageContent: true,
@@ -957,7 +1032,8 @@
         let selectedClientCampaignId = null;
         let campaignImageFiles = [];
 
-        const AYONION_STUDIOS_INFO = {
+        // Default company info (fallback)
+        const DEFAULT_COMPANY_INFO = {
             name: 'Ayonion Studios',
             tagline: 'Creative Digital Solutions',
             email: 'info@ayonionstudios.com',
@@ -967,6 +1043,9 @@
             account: '101001037178',
             accountName: 'Ayonion Studios (pvt) Ltd'
         };
+
+        // Dynamic company info (loaded from settings)
+        let COMPANY_INFO = { ...DEFAULT_COMPANY_INFO };
 
         // ============================================
         // STORAGE & DATA SYNC FUNCTIONS (PHP/MySQL)
@@ -1046,6 +1125,7 @@
                 const response = await fetch('handler_login.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
                     body: JSON.stringify({ username, password, role })
                 });
                 
@@ -1060,10 +1140,9 @@
                     document.getElementById('currentUser').textContent = user.username.charAt(0).toUpperCase() + user.username.slice(1);
                     document.getElementById('currentRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
 
+                    await initializeApp();
                     if (currentUser.isTempPassword) {
-                        showChangePasswordModal();
-                    } else {
-                        await initializeApp();
+                        showTempPasswordWarning();
                     }
                 } else {
                     throw new Error(result.message);
@@ -1080,43 +1159,13 @@
             }
         });
 
-        function showChangePasswordModal() {
-            const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'), { backdrop: 'static', keyboard: false });
-            modal.show();
+        function showTempPasswordWarning() {
+            const warning = document.getElementById('tempPasswordWarning');
+            if (warning) {
+                warning.style.display = 'block';
+            }
         }
 
-        // NOTE: Password change should also call a handler (handler_users.php?action=update_password)
-        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            // NOTE: PHP handler implementation is required for persistence.
-            if (newPassword !== confirmPassword) {
-                showAlert('New passwords do not match.', 'danger');
-                return;
-            }
-            if (newPassword.length < 6) {
-                showAlert('Password must be at least 6 characters.', 'danger');
-                return;
-            }
-
-            // MOCK UPDATE: Update local data model for immediate access
-            const userIndex = appData.users.findIndex(u => u.username === currentUser.username && u.role === currentUser.role);
-            if (userIndex !== -1) {
-                appData.users[userIndex].password = newPassword;
-                appData.users[userIndex].isTempPassword = false;
-                currentUser.isTempPassword = false;
-                saveToLocalStorage();
-				// Prevent focus staying on elements inside an aria-hidden modal
-				document.activeElement && typeof document.activeElement.blur === 'function' && document.activeElement.blur();
-				bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
-                showAlert('Password updated successfully. You are now logged in. 🎉', 'success');
-                initializeApp();
-            } else {
-                showAlert('Error updating password. Please try again.', 'danger');
-            }
-        });
 
         async function logout() {
             if (!confirm('Are you sure you want to logout?')) return;
@@ -1147,6 +1196,14 @@
             if (actionsHeader) {
                 actionsHeader.style.display = userPermissions.canDeleteClient ? 'table-cell' : 'none';
             }
+
+            // Hide Settings tab if not admin
+            if (currentUser.role !== 'admin') {
+                const settingsLink = document.querySelector('[data-section="settings"]');
+                if (settingsLink) {
+                    settingsLink.parentElement.style.display = 'none';
+                }
+            }
         }
 
         function checkNavigationAccess(sectionId) {
@@ -1170,6 +1227,34 @@
             checkRenewalDates();
             document.getElementById('currentUser').textContent = currentUser.username ? (currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1)) : '';
             document.getElementById('currentRole').textContent = currentUser.role ? (currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)) : '';
+            
+            // Load company settings for sidebar header and reports
+            await loadCompanySettings();
+        }
+
+        // Load company settings for reports and sidebar
+        async function loadCompanySettings() {
+            try {
+                const res = await fetch('handler_settings.php?action=get', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.success && data.settings) {
+                    const settings = data.settings;
+                    // Update COMPANY_INFO for reports
+                    COMPANY_INFO = {
+                        ...DEFAULT_COMPANY_INFO,
+                        name: settings.company_name || DEFAULT_COMPANY_INFO.name,
+                        email: settings.email || DEFAULT_COMPANY_INFO.email,
+                        tel: settings.phone || DEFAULT_COMPANY_INFO.tel,
+                        address: settings.address || DEFAULT_COMPANY_INFO.address,
+                        logoUrl: settings.logo_url || ''
+                    };
+                    // Update sidebar header
+                    updateSidebarHeader(settings.company_name, settings.logo_url);
+                }
+            } catch (_) {
+                // Use default company info if settings can't be loaded
+                COMPANY_INFO = { ...DEFAULT_COMPANY_INFO };
+            }
         }
 
         // Restore session on refresh
@@ -1182,10 +1267,9 @@
                     currentUser = { username: user.username, role: user.role, isTempPassword: user.isTempPassword };
                     document.getElementById('loginPage').style.display = 'none';
                     document.getElementById('mainApp').style.display = 'block';
+                    await initializeApp();
                     if (currentUser.isTempPassword) {
-                        showChangePasswordModal();
-                    } else {
-                        await initializeApp();
+                        showTempPasswordWarning();
                     }
                 }
             } catch (_) {
@@ -1201,7 +1285,8 @@
                 { id: 'content', icon: 'file-alt', label: 'Content Credits' },
                 { id: 'campaigns', icon: 'bullhorn', label: 'Ad Campaigns' },
                 { id: 'finances', icon: 'file-invoice-dollar', label: 'Financial Management' },
-                { id: 'users', icon: 'user-cog', label: 'Manage Users' }
+                { id: 'users', icon: 'user-cog', label: 'Manage Users' },
+                { id: 'settings', icon: 'gear', label: 'Settings' }
             ];
 
             const userPermissions = permissions[currentUser.role];
@@ -1222,6 +1307,162 @@
                     navigateToSection(this.dataset.section);
                 });
             });
+        }
+
+        async function loadSettings() {
+            if (currentUser.role !== 'admin') { showAlert('Access denied to Settings', 'danger'); return; }
+            try {
+                const res = await fetch('handler_settings.php?action=get', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.success) {
+                    const s = data.settings || {};
+                    document.getElementById('settingsCompanyName').value = s.company_name || '';
+                    document.getElementById('settingsLogoUrl').value = s.logo_url || '';
+                    document.getElementById('settingsEmail').value = s.email || '';
+                    document.getElementById('settingsPhone').value = s.phone || '';
+                    document.getElementById('settingsAddress').value = s.address || '';
+                    
+                    // Show existing logo if available
+                    if (s.logo_url) {
+                        document.getElementById('logoPreviewImg').src = s.logo_url;
+                        document.getElementById('logoPreview').style.display = 'block';
+                    }
+                    
+                    // Update sidebar immediately
+                    updateSidebarHeader(s.company_name, s.logo_url);
+                } else {
+                    showAlert('Failed to load settings: ' + (data.message || ''), 'danger');
+                }
+            } catch (_) {
+                showAlert('Network error loading settings', 'danger');
+            }
+        }
+
+        document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (currentUser.role !== 'admin') { showAlert('Access denied', 'danger'); return; }
+            const payload = {
+                companyName: document.getElementById('settingsCompanyName').value.trim(),
+                logoUrl: document.getElementById('settingsLogoUrl').value.trim(),
+                email: document.getElementById('settingsEmail').value.trim(),
+                phone: document.getElementById('settingsPhone').value.trim(),
+                address: document.getElementById('settingsAddress').value.trim()
+            };
+            try {
+                const res = await fetch('handler_settings.php?action=update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('Settings saved', 'success');
+                    // Update sidebar immediately after saving
+                    const companyName = document.getElementById('settingsCompanyName').value;
+                    const logoUrl = document.getElementById('settingsLogoUrl').value;
+                    updateSidebarHeader(companyName, logoUrl);
+                    // Reload company settings for reports
+                    await loadCompanySettings();
+                } else {
+                    showAlert('Failed to save settings: ' + (data.message || ''), 'danger');
+                }
+            } catch (_) {
+                showAlert('Network error saving settings', 'danger');
+            }
+        });
+
+        // Logo upload handler - File System Storage
+        async function handleLogoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showAlert('Please select a valid image file.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showAlert('Logo file is too large. Please choose an image smaller than 2MB.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            // Upload file to server
+            const formData = new FormData();
+            formData.append('logo', file);
+            
+            try {
+                const response = await fetch('upload_logo_handler_simple.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('settingsLogoUrl').value = result.logo_url;
+                    
+                    // Show preview
+                    const preview = document.getElementById('logoPreview');
+                    const previewImg = document.getElementById('logoPreviewImg');
+                    previewImg.src = result.logo_url;
+                    preview.style.display = 'block';
+                    
+                    showAlert('Logo uploaded successfully!', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                    input.value = '';
+                }
+            } catch (error) {
+                showAlert('Upload error: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        function removeLogo() {
+            document.getElementById('settingsLogoFile').value = '';
+            document.getElementById('settingsLogoUrl').value = '';
+            document.getElementById('logoPreview').style.display = 'none';
+        }
+
+        function updateSidebarHeader(companyName, logoUrl) {
+            const sidebarCompanyName = document.getElementById('sidebarCompanyName');
+            const sidebarLogo = document.getElementById('sidebarLogo');
+            
+            if (sidebarCompanyName) {
+                sidebarCompanyName.textContent = companyName || 'Ayonion';
+            }
+            
+            if (sidebarLogo) {
+                if (logoUrl && (logoUrl.startsWith('data:image/') || logoUrl.startsWith('uploads/'))) {
+                    // Clear any previous error handlers
+                    sidebarLogo.onerror = null;
+                    sidebarLogo.onload = null;
+                    
+                    // Set up error handling before setting src
+                    sidebarLogo.onerror = function() {
+                        console.warn('Failed to load logo image - hiding logo');
+                        sidebarLogo.style.display = 'none';
+                        sidebarLogo.onerror = null; // Remove handler to prevent multiple calls
+                    };
+                    
+                    sidebarLogo.onload = function() {
+                        console.log('Logo loaded successfully');
+                        sidebarLogo.style.display = 'block';
+                        sidebarLogo.onload = null; // Remove handler
+                    };
+                    
+                    // Set the source after handlers are in place
+                    sidebarLogo.src = logoUrl;
+                } else {
+                    sidebarLogo.style.display = 'none';
+                }
+            }
         }
         
         function navigateToSection(sectionId) {
@@ -1265,6 +1506,9 @@
             }
             if(sectionId === 'users') {
                 loadUsersTable();
+            }
+            if(sectionId === 'settings') {
+                loadSettings();
             }
         }
 
@@ -1751,9 +1995,15 @@
                 const response = await fetch('handler_content.php?action=add', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
                     body: JSON.stringify(newContentData)
                 });
-                
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || `HTTP ${response.status}`);
+                }
+
                 const result = await response.json();
 
                 if (result.success) {
@@ -1783,7 +2033,11 @@
             }
             if (confirm('Delete this content record? This will revert the used credits.')) {
                 try {
-                    const response = await fetch(`handler_content.php?action=delete&id=${id}`, { method: 'GET' });
+                    const response = await fetch(`handler_content.php?action=delete&id=${id}`, { method: 'GET', credentials: 'same-origin' });
+                    if (!response.ok) {
+                        const text = await response.text();
+                        throw new Error(text || `HTTP ${response.status}`);
+                    }
                     const result = await response.json();
                     if (result.success) {
                         await loadAllDataFromPHP();
@@ -1839,6 +2093,34 @@
             showAlert('Renewal Date check is currently local-only and does not sync. Full implementation required.', 'info');
         }
 
+        // Helper function to show document modal with proper ARIA handling
+        function showDocumentModal() {
+            const modalElement = document.getElementById('viewDocumentModal');
+            const modal = new bootstrap.Modal(modalElement);
+            
+            // Fix ARIA accessibility issue (only add listeners once)
+            if (!modalElement.hasAttribute('data-aria-fixed')) {
+                modalElement.addEventListener('shown.bs.modal', function() {
+                    modalElement.removeAttribute('aria-hidden');
+                    // Ensure document preview is read-only
+                    const documentPreview = document.getElementById('documentPreview');
+                    if (documentPreview) {
+                        documentPreview.setAttribute('contenteditable', 'false');
+                        documentPreview.style.userSelect = 'text';
+                        documentPreview.style.webkitUserSelect = 'text';
+                        documentPreview.style.mozUserSelect = 'text';
+                        documentPreview.style.msUserSelect = 'text';
+                    }
+                });
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    modalElement.setAttribute('aria-hidden', 'true');
+                });
+                modalElement.setAttribute('data-aria-fixed', 'true');
+            }
+            
+            modal.show();
+        }
+
         function generateContentReport(reportClientId = null) {
             // ... (Report generation remains purely front-end/local) ...
             const clientId = reportClientId || parseInt(document.getElementById('contentClientSelect').value);
@@ -1867,9 +2149,12 @@
 
             const html = `
                 <div style="font-family: Arial; padding: 20px;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #6366f1; margin: 0;">${AYONION_STUDIOS_INFO.name}</h1>
-                        <p style="color: #666;">Content Credit Usage Report</p>
+                    <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
+                        ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 60px; margin-right: 20px; object-fit: contain;">` : ''}
+                        <div>
+                            <h1 style="color: #6366f1; margin: 0; font-size: 2rem;">${COMPANY_INFO.name}</h1>
+                            <p style="color: #666; margin: 5px 0;">Content Credit Usage Report</p>
+                        </div>
                     </div>
                     <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
                         <h3 style="color: #6366f1; margin-bottom: 15px;">${client.companyName} (${client.partnerId})</h3>
@@ -1902,14 +2187,20 @@
                         <tbody>${tableRows}</tbody>
                     </table>
                     <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 14px;">
-                        <p>${AYONION_STUDIOS_INFO.name} | ${AYONION_STUDIOS_INFO.tagline}</p>
+                        <p>${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}</p>
                         <p style="margin: 5px 0;">Generated on ${formatDate(new Date())}</p>
                     </div>
                 </div>
             `;
 
-            document.getElementById('documentPreview').innerHTML = html;
-            new bootstrap.Modal(document.getElementById('viewDocumentModal')).show();
+            // Add read-only header to document
+            const readOnlyHeader = `
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 8px 12px; margin-bottom: 20px; font-size: 14px; color: #6c757d;">
+                    <i class="fas fa-lock me-2"></i>Document View - Read Only
+                </div>
+            `;
+            document.getElementById('documentPreview').innerHTML = readOnlyHeader + html;
+            showDocumentModal();
         }
 
         // ============================================
@@ -2205,9 +2496,12 @@
 
             const html = `
                 <div style="font-family: Arial; padding: 20px;">
-                    <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #6366f1; margin: 0;">${AYONION_STUDIOS_INFO.name}</h1>
-                        <p style="color: #666;">Ad Campaign Performance Report</p>
+                    <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
+                        ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 60px; margin-right: 20px; object-fit: contain;">` : ''}
+                        <div>
+                            <h1 style="color: #6366f1; margin: 0; font-size: 2rem;">${COMPANY_INFO.name}</h1>
+                            <p style="color: #666; margin: 5px 0;">Ad Campaign Performance Report</p>
+                        </div>
                     </div>
                     <h4 style="margin-top: 30px; margin-bottom: 15px;">Campaign Details (In Range)</h4>
                     <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
@@ -2236,21 +2530,27 @@
                     </table>
                     ${evidenceSection}
                     <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 14px;">
-                        <p>${AYONION_STUDIOS_INFO.name} | ${AYONION_STUDIOS_INFO.tagline}</p>
+                        <p>${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}</p>
                         <p style="margin: 5px 0;">Generated on ${formatDate(new Date())}</p>
                     </div>
                 </div>
             `;
 
-            document.getElementById('documentPreview').innerHTML = html;
-            new bootstrap.Modal(document.getElementById('viewDocumentModal')).show();
+            // Add read-only header to document
+            const readOnlyHeader = `
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 8px 12px; margin-bottom: 20px; font-size: 14px; color: #6c757d;">
+                    <i class="fas fa-lock me-2"></i>Document View - Read Only
+                </div>
+            `;
+            document.getElementById('documentPreview').innerHTML = readOnlyHeader + html;
+            showDocumentModal();
         }
 
         // ============================================
         // FINANCIAL MANAGEMENT (Mock Handlers)
         // ============================================
 
-        function showDocumentModal(type) {
+        function showCreateDocumentModal(type) {
             // NOTE: This needs a PHP handler update (handler_finance.php)
             if (!hasPermission('canManageFinances')) {
                 showAlert('Access Denied. Finance Manager/Admin role required.', 'warning');
@@ -2351,8 +2651,14 @@
                     const response = await fetch('handler_finance.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
                         body: JSON.stringify(formData)
                     });
+
+                    if (!response.ok) {
+                        const text = await response.text();
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    }
 
                     const result = await response.json();
 
@@ -2396,9 +2702,12 @@
                 <div style="font-family: Arial; padding: 30px; max-width: 800px; margin: 0 auto;">
                     <div style="border-bottom: 4px solid ${colors[type]}; padding-bottom: 20px; margin-bottom: 30px;">
                         <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div>
-                                <h1 style="color: ${colors[type]}; margin: 0; font-size: 2.5rem;">${AYONION_STUDIOS_INFO.name}</h1>
-                                <p style="color: #666; margin: 5px 0;">${AYONION_STUDIOS_INFO.tagline}</p>
+                            <div style="display: flex; align-items: center;">
+                                ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 80px; margin-right: 20px; object-fit: contain;">` : ''}
+                                <div>
+                                    <h1 style="color: ${colors[type]}; margin: 0; font-size: 2.5rem;">${COMPANY_INFO.name}</h1>
+                                    <p style="color: #666; margin: 5px 0;">${COMPANY_INFO.tagline}</p>
+                                </div>
                             </div>
                             <div style="text-align: right;">
                                 <h2 style="color: ${colors[type]}; margin: 0;">${titles[type]}</h2>
@@ -2411,7 +2720,7 @@
                             <h3 style="color: ${colors[type]}; margin-top: 0;">Bill To:</h3>
                             <p style="font-size: 18px; font-weight: bold; margin: 5px 0;">${clientName}</p>
                             <p style="margin: 5px 0;">Partner ID: ${doc.clientPartnerId}</p>
-                            <p style="margin: 5px 0;">${AYONION_STUDIOS_INFO.address}</p>
+                            <p style="margin: 5px 0;">${COMPANY_INFO.address}</p>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin: 20px 0;">
                             <div>
@@ -2445,13 +2754,19 @@
                     </div>
                     <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 14px;">
                         <p>Thank you for your business!</p>
-                        <p style="margin: 5px 0;">Bank: ${AYONION_STUDIOS_INFO.bank} | A/C: ${AYONION_STUDIOS_INFO.account}</p>
-                        <p>A/C Name: ${AYONION_STUDIOS_INFO.accountName}</p>
+                        <p style="margin: 5px 0;">Bank: ${COMPANY_INFO.bank} | A/C: ${COMPANY_INFO.account}</p>
+                        <p>A/C Name: ${COMPANY_INFO.accountName}</p>
                     </div>
                 </div>
             `;
-            document.getElementById('documentPreview').innerHTML = html;
-            new bootstrap.Modal(document.getElementById('viewDocumentModal')).show();
+            // Add read-only header to document
+            const readOnlyHeader = `
+                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 8px 12px; margin-bottom: 20px; font-size: 14px; color: #6c757d;">
+                    <i class="fas fa-lock me-2"></i>Document View - Read Only
+                </div>
+            `;
+            document.getElementById('documentPreview').innerHTML = readOnlyHeader + html;
+            showDocumentModal();
         }
 
         function deleteDocument(type, id) {

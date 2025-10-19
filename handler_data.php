@@ -45,7 +45,16 @@ $content_sql = "SELECT * FROM content_credits";
 $content_result = $conn->query($content_sql);
 if ($content_result) {
     while ($row = $content_result->fetch_assoc()) {
-        $response_data['contentCredits'][] = $row;
+        $response_data['contentCredits'][] = [
+            'id' => (int)$row['id'],
+            'clientId' => (int)$row['client_id'],
+            'creative' => $row['credit_type'], // Map credit_type to creative
+            'contentType' => $row['credit_type'],
+            'credits' => (int)$row['credits'],
+            'startDate' => $row['date'],
+            'status' => 'In Progress', // Default status
+            'publishedDate' => null
+        ];
     }
 }
 
@@ -54,9 +63,24 @@ $campaign_sql = "SELECT * FROM campaigns";
 $campaign_result = $conn->query($campaign_sql);
 if ($campaign_result) {
     while ($row = $campaign_result->fetch_assoc()) {
-        $row['evidenceUrls'] = json_decode($row['evidence_urls'] ?? '[]');
-        $row['evidenceFiles'] = json_decode($row['evidence_files'] ?? '[]');
-        $response_data['campaigns'][] = $row;
+        $response_data['campaigns'][] = [
+            'id' => (int)$row['id'],
+            'clientId' => (int)$row['client_id'],
+            'platform' => $row['platform'],
+            'adName' => $row['ad_name'],
+            'adId' => $row['ad_id'],
+            'resultType' => $row['result_type'],
+            'results' => (int)$row['results'],
+            'cpr' => (float)$row['cpr'],
+            'reach' => (int)$row['reach'],
+            'impressions' => (int)$row['impressions'],
+            'spend' => (float)$row['spend'],
+            'qualityRanking' => $row['quality_ranking'],
+            'conversionRanking' => $row['conversion_ranking'],
+            'evidenceUrls' => json_decode($row['evidence_urls'] ?? '[]'),
+            'evidenceFiles' => json_decode($row['evidence_files'] ?? '[]'),
+            'dateAdded' => date('Y-m-d H:i:s') // Add current timestamp for display
+        ];
     }
 }
 

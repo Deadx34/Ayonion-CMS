@@ -1,0 +1,25 @@
+# Allow access to uploads directory
+<Directory "uploads">
+    Options -Indexes
+    AllowOverride None
+    Require all granted
+</Directory>
+
+# Security: Prevent execution of PHP files in uploads
+<Directory "uploads/logos">
+    <Files "*.php">
+        Require all denied
+    </Files>
+    <Files "*.phtml">
+        Require all denied
+    </Files>
+    <Files "*.php3">
+        Require all denied
+    </Files>
+    <Files "*.php4">
+        Require all denied
+    </Files>
+    <Files "*.php5">
+        Require all denied
+    </Files>
+</Directory>

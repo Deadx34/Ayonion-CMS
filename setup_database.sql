@@ -1,6 +1,6 @@
 -- Create the database
-CREATE DATABASE IF NOT EXISTS ayonion_db;
-USE ayonion_db;
+-- CREATE DATABASE IF NOT EXISTS ayonion_db;
+-- USE ayonion_db;
 
 -- Table: clients
 CREATE TABLE IF NOT EXISTS clients (
@@ -71,6 +71,16 @@ CREATE TABLE IF NOT EXISTS content_credits (
     credits INT DEFAULT 0,
     date DATE,
     FOREIGN KEY (client_id) REFERENCES clients(id)
+);
+
+-- Table: settings (singleton row id=1)
+CREATE TABLE IF NOT EXISTS settings (
+    id TINYINT PRIMARY KEY,
+    company_name VARCHAR(255) NOT NULL,
+    logo_url TEXT DEFAULT '',
+    email VARCHAR(255) DEFAULT '',
+    phone VARCHAR(100) DEFAULT '',
+    address TEXT
 );
 
 -- Demo credentials for users table (bcrypt-hashed: password = "password")

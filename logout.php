@@ -5,14 +5,17 @@ header('Content-Type: application/json');
 
 // Harden session cookie scope and destroy session
 if (session_status() === PHP_SESSION_NONE) {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || ((string)($_SERVER['SERVER_PORT'] ?? '') === '443')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
     if (function_exists('session_set_cookie_params')) {
         session_set_cookie_params([
             'lifetime' => 0,
             'path' => '/',
             'domain' => '',
-            'secure' => true, // set true in production over HTTPS
+            'secure' => $isHttps,
             'httponly' => true,
-            'samesite' => 'Strict'
+            'samesite' => 'Lax'
         ]);
     }
     @ini_set('session.use_strict_mode', '1');
