@@ -140,7 +140,11 @@ try {
 
     // If everything was successful, commit the changes
     $conn->commit();
-    echo json_encode(["success" => true, "message" => ucfirst($docType) . " created successfully!"]);
+    echo json_encode([
+        "success" => true, 
+        "message" => ucfirst($docType) . " created successfully!",
+        "documentId" => $id
+    ]);
 
 } catch (Exception $e) {
     // If anything failed, roll back all changes

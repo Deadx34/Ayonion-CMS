@@ -2787,6 +2787,14 @@
 						document.activeElement && typeof document.activeElement.blur === 'function' && document.activeElement.blur();
 						bootstrap.Modal.getInstance(document.getElementById('documentModal')).hide();
                         this.reset();
+                        
+                        // ✅ NEW: Trigger automatic download after successful creation
+                        const docId = result.documentId || result.id;
+                        if (docId) {
+                            setTimeout(() => {
+                                downloadDocument(formData.docType, docId);
+                            }, 1000); // Small delay to ensure data is loaded
+                        }
                     } else {
                         showAlert(result.message || 'Failed to create document.', 'danger');
                     }
@@ -2915,6 +2923,30 @@
 
         function printDocument() {
             window.print();
+        }
+
+        // ✅ NEW: Download document function
+        function downloadDocument(docType, docId) {
+            try {
+                // Create a temporary link to trigger download
+                const downloadUrl = `handler_download.php?action=download&type=${docType}&id=${docId}`;
+                
+                // Create a temporary anchor element
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = `${docType}_${docId}_${new Date().toISOString().split('T')[0]}.pdf`;
+                link.style.display = 'none';
+                
+                // Add to DOM, click, and remove
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showAlert(`${docType.charAt(0).toUpperCase() + docType.slice(1)} download started! 📄`, 'info');
+            } catch (error) {
+                console.error('Download error:', error);
+                showAlert('Failed to download document. Please try again.', 'warning');
+            }
         }
 
         // ============================================
