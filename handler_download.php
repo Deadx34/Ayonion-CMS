@@ -18,30 +18,14 @@ try {
         throw new Exception("Document ID and type are required.", 400);
     }
 
-    // Check if item_order column exists
-    $check_column_sql = "SHOW COLUMNS FROM documents LIKE 'item_order'";
-    $column_check = $conn->query($check_column_sql);
-    
-    if ($column_check->num_rows > 0) {
-        // Column exists, use full query with item_order
-        $doc_sql = "SELECT d.*, c.company_name, c.partner_id, c.industry, c.managing_platforms 
-                    FROM documents d 
-                    JOIN clients c ON d.client_id = c.id 
-                    WHERE (d.id = ? OR d.id LIKE ?) AND d.doc_type = ?
-                    ORDER BY d.item_order ASC";
-    } else {
-        // Column doesn't exist, use basic query
-        $doc_sql = "SELECT d.*, c.company_name, c.partner_id, c.industry, c.managing_platforms 
-                    FROM documents d 
-                    JOIN clients c ON d.client_id = c.id 
-                    WHERE (d.id = ? OR d.id LIKE ?) AND d.doc_type = ?
-                    ORDER BY d.id ASC";
-    }
-    
-    $docIdPattern = $docId . '_line_%';
+    // Fetch document details
+    $doc_sql = "SELECT d.*, c.company_name, c.partner_id, c.industry, c.managing_platforms 
+                FROM documents d 
+                JOIN clients c ON d.client_id = c.id 
+                WHERE d.id = ? AND d.doc_type = ?";
     
     $stmt = $conn->prepare($doc_sql);
-    $stmt->bind_param("sss", $docId, $docIdPattern, $docType);
+    $stmt->bind_param("ss", $docId, $docType);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -49,15 +33,8 @@ try {
         throw new Exception("Document not found.", 404);
     }
     
-    // Get all items for this document
-    $docItems = [];
-    while ($row = $result->fetch_assoc()) {
-        $docItems[] = $row;
-    }
+    $doc = $result->fetch_assoc();
     $stmt->close();
-    
-    // Use the first item for basic document info (client, date, etc.)
-    $doc = $docItems[0];
 
     // Fetch company settings
     $settings_sql = "SELECT * FROM settings WHERE id = 1";
@@ -66,7 +43,7 @@ try {
 
     // Generate HTML content optimized for PDF conversion
     include 'simple_pdf.php';
-    $htmlContent = createPDFDocument($doc, $settings, $docItems);
+    $htmlContent = createPDFDocument($doc, $settings);
     
     // Set headers for PDF download
     $filename = strtoupper($docType) . "_" . $docId . "_" . date('Y-m-d') . ".pdf";

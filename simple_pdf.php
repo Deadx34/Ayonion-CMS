@@ -24,7 +24,7 @@ function generatePDFFromHTML($html) {
     return $html;
 }
 
-function createPDFDocument($doc, $settings, $docItems = null) {
+function createPDFDocument($doc, $settings) {
     $docType = $doc['doc_type'];
     $docNumber = strtoupper(substr($docType, 0, 1)) . substr($doc['id'], -6);
     $title = strtoupper($docType);
@@ -173,44 +173,20 @@ function createPDFDocument($doc, $settings, $docItems = null) {
                     <th style='width: 15%; text-align: right;'>Total</th>
                 </tr>
             </thead>
-            <tbody>";
-    
-    // Generate rows for all items
-    $grandTotal = 0;
-    if ($docItems && count($docItems) > 1) {
-        // Multiple items
-        foreach ($docItems as $item) {
-            $grandTotal += (float)$item['total'];
-            $html .= "
+            <tbody>
                 <tr>
-                    <td>{$item['item_type']}</td>
-                    <td>{$item['description']}</td>
-                    <td style='text-align: center;'>{$item['quantity']}</td>
-                    <td class='amount'>Rs. " . number_format($item['unit_price'], 2) . "</td>
-                    <td class='amount'>Rs. " . number_format($item['total'], 2) . "</td>
-                </tr>";
-        }
-    } else {
-        // Single item (backward compatibility)
-        $item = $docItems ? $docItems[0] : $doc;
-        $grandTotal = (float)$item['total'];
-        $html .= "
-                <tr>
-                    <td>{$item['item_type']}</td>
-                    <td>{$item['description']}</td>
-                    <td style='text-align: center;'>{$item['quantity']}</td>
-                    <td class='amount'>Rs. " . number_format($item['unit_price'], 2) . "</td>
-                    <td class='amount'>Rs. " . number_format($item['total'], 2) . "</td>
-                </tr>";
-    }
-    
-    $html .= "
+                    <td>{$doc['item_type']}</td>
+                    <td>{$doc['description']}</td>
+                    <td style='text-align: center;'>{$doc['quantity']}</td>
+                    <td class='amount'>Rs. " . number_format($doc['unit_price'], 2) . "</td>
+                    <td class='amount'>Rs. " . number_format($doc['total'], 2) . "</td>
+                </tr>
                 <tr class='total-row'>
                     <td colspan='4' style='text-align: right; font-size: 16px;'>Total Amount:</td>
-                    <td class='amount' style='font-size: 16px;'>Rs. " . number_format($grandTotal, 2) . "</td>
+                    <td class='amount' style='font-size: 16px;'>Rs. " . number_format($doc['total'], 2) . "</td>
                 </tr>
             </tbody>
-        </table>";
+        </table>
         
         <div class='footer'>
             <p style='margin: 10px 0; font-size: 14px;'><strong>Thank you for your business!</strong></p>
