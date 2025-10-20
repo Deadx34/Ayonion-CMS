@@ -89,15 +89,15 @@ try {
     $id = time() . mt_rand(100, 999);
     $clientId = (int)($input['clientId'] ?? 0);
     $docType = $conn->real_escape_string($input['docType'] ?? '');
-    $itemType = $conn->real_escape_string($input['itemType'] ?? '');
+    $itemTypes = $input['itemTypes'] ?? [];
     $description = $conn->real_escape_string($input['description'] ?? '');
     $quantity = (int)($input['quantity'] ?? 0);
     $unitPrice = (float)($input['unitPrice'] ?? 0.0);
     $date = $conn->real_escape_string($input['date'] ?? '');
     $total = $quantity * $unitPrice;
 
-    if ($clientId === 0 || empty($docType) || empty($date)) {
-        throw new Exception("Client, Document Type, and Date are required.", 400);
+    if ($clientId === 0 || empty($docType) || empty($date) || empty($itemTypes) || !is_array($itemTypes)) {
+        throw new Exception("Client, Document Type, Date, and Item Types are required.", 400);
     }
 
     // Fetch client name for storage in the document
@@ -110,31 +110,46 @@ try {
     $clientName = $conn->real_escape_string($client_row['company_name']);
 
 
-    // --- 1. Insert the document into the 'documents' table ---
+    // --- 1. Insert a single document with multiple line items ---
+    // Create a single document with all selected item types as line items
+    $itemTypesJson = json_encode($itemTypes);
     $sql_insert_doc = "INSERT INTO documents 
         (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
         VALUES 
-        ('$id', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
+        ('$id', $clientId, '$clientName', '$docType', '$itemTypesJson', '$description', $quantity, $unitPrice, $total, '$date')";
 
     if (!query_db($conn, $sql_insert_doc)) {
         throw new Exception("Failed to save document to the database.");
     }
 
 
-    // --- 2. If it's a RECEIPT, update the client's profile ---
+    // --- 2. If it's a RECEIPT, update the client's profile for each item type ---
     if ($docType === 'receipt') {
-        $update_sql = null;
-
-        if ($itemType === 'Ad Budget') {
-            // Add the amount to the client's total ad budget
-            $update_sql = "UPDATE clients SET total_ad_budget = total_ad_budget + $total WHERE id = $clientId";
-        } elseif ($itemType === 'Extra Content Credits') {
-            // Add the quantity to the client's extra credits
-            $update_sql = "UPDATE clients SET extra_credits = extra_credits + $quantity WHERE id = $clientId";
+        $adBudgetTotal = 0;
+        $creditsTotal = 0;
+        
+        foreach ($itemTypes as $itemType) {
+            if ($itemType === 'Ad Budget') {
+                $adBudgetTotal += $total;
+            } elseif ($itemType === 'Extra Content Credits') {
+                $creditsTotal += $quantity;
+            }
         }
         
-        if ($update_sql && !query_db($conn, $update_sql)) {
-            throw new Exception("Document was saved, but failed to update client profile.");
+        // Update ad budget if applicable
+        if ($adBudgetTotal > 0) {
+            $update_ad_sql = "UPDATE clients SET total_ad_budget = total_ad_budget + $adBudgetTotal WHERE id = $clientId";
+            if (!query_db($conn, $update_ad_sql)) {
+                throw new Exception("Document was saved, but failed to update client ad budget.");
+            }
+        }
+        
+        // Update credits if applicable
+        if ($creditsTotal > 0) {
+            $update_credits_sql = "UPDATE clients SET extra_credits = extra_credits + $creditsTotal WHERE id = $clientId";
+            if (!query_db($conn, $update_credits_sql)) {
+                throw new Exception("Document was saved, but failed to update client credits.");
+            }
         }
     }
 
@@ -142,8 +157,9 @@ try {
     $conn->commit();
     echo json_encode([
         "success" => true, 
-        "message" => ucfirst($docType) . " created successfully!",
-        "documentId" => $id
+        "message" => ucfirst($docType) . " created successfully with " . count($itemTypes) . " item type(s)!",
+        "documentId" => $id,
+        "itemTypes" => $itemTypes
     ]);
 
 } catch (Exception $e) {

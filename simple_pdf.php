@@ -173,20 +173,43 @@ function createPDFDocument($doc, $settings) {
                     <th style='width: 15%; text-align: right;'>Total</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody>";
+    
+    // Check if item_type contains JSON array (multiple item types)
+    $itemTypes = json_decode($doc['item_type'], true);
+    if (is_array($itemTypes)) {
+        // Multiple item types - create a row for each
+        foreach ($itemTypes as $itemType) {
+            $html .= "
+                <tr>
+                    <td>{$itemType}</td>
+                    <td>{$doc['description']}</td>
+                    <td style='text-align: center;'>{$doc['quantity']}</td>
+                    <td class='amount'>Rs. " . number_format($doc['unit_price'], 2) . "</td>
+                    <td class='amount'>Rs. " . number_format($doc['total'], 2) . "</td>
+                </tr>";
+        }
+        $grandTotal = $doc['total'] * count($itemTypes);
+    } else {
+        // Single item type (backward compatibility)
+        $html .= "
                 <tr>
                     <td>{$doc['item_type']}</td>
                     <td>{$doc['description']}</td>
                     <td style='text-align: center;'>{$doc['quantity']}</td>
                     <td class='amount'>Rs. " . number_format($doc['unit_price'], 2) . "</td>
                     <td class='amount'>Rs. " . number_format($doc['total'], 2) . "</td>
-                </tr>
+                </tr>";
+        $grandTotal = $doc['total'];
+    }
+    
+    $html .= "
                 <tr class='total-row'>
                     <td colspan='4' style='text-align: right; font-size: 16px;'>Total Amount:</td>
-                    <td class='amount' style='font-size: 16px;'>Rs. " . number_format($doc['total'], 2) . "</td>
+                    <td class='amount' style='font-size: 16px;'>Rs. " . number_format($grandTotal, 2) . "</td>
                 </tr>
             </tbody>
-        </table>
+        </table>";
         
         <div class='footer'>
             <p style='margin: 10px 0; font-size: 14px;'><strong>Thank you for your business!</strong></p>
