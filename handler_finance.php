@@ -99,13 +99,16 @@ try {
     $input = json_decode(file_get_contents("php://input"), true);
 
     // --- Data Validation and Sanitization ---
-    // Generate unique ID with collision checking
-    do {
-        $id = time() . mt_rand(10000, 99999) . mt_rand(100, 999);
-        $check_sql = "SELECT COUNT(*) as count FROM documents WHERE id = '$id'";
-        $check_result = $conn->query($check_sql);
-        $exists = $check_result->fetch_assoc()['count'] > 0;
-    } while ($exists);
+    // Generate unique ID with microtime and better randomness
+    $id = (int)(microtime(true) * 1000000) . mt_rand(100000, 999999);
+    
+    // Double-check for uniqueness (very unlikely but safe)
+    $check_sql = "SELECT COUNT(*) as count FROM documents WHERE id = '$id'";
+    $check_result = $conn->query($check_sql);
+    if ($check_result && $check_result->fetch_assoc()['count'] > 0) {
+        // If somehow still duplicate, add more randomness
+        $id = $id . mt_rand(1000, 9999);
+    }
     
     $clientId = (int)($input['clientId'] ?? 0);
     $docType = $conn->real_escape_string($input['docType'] ?? '');
