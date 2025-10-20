@@ -57,6 +57,9 @@
         .form-label { font-weight: 600; color: var(--dark); margin-bottom: 8px; }
         .form-control, .form-select { border-radius: 8px; border: 2px solid #e2e8f0; padding: 10px 15px; transition: all 0.3s; }
         .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.15); }
+        .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
+        .form-check-input:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.15); }
+        .form-check-label { font-weight: 500; color: var(--dark); }
         .section { display: none; }
         .section.active { display: block; }
         .action-btn { margin: 0 3px; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; transition: all 0.3s; }
@@ -988,14 +991,44 @@
                                 <label class="form-label">Date</label>
                                 <input type="date" class="form-control" id="docDate" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Document Item Type</label>
-                                <select class="form-select" id="docItemType" required>
-                                    <option value="Monthly Payment">Monthly Payment</option>
-                                    <option value="Extra Content Credits">Extra Content Credits</option>
-                                    <option value="Ad Budget">Ad Budget</option>
-                                    <option value="Other Service">Other Service</option>
-                                </select>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Document Item Types</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="itemType1" value="Monthly Payment">
+                                            <label class="form-check-label" for="itemType1">
+                                                Monthly Payment
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="itemType2" value="Extra Content Credits">
+                                            <label class="form-check-label" for="itemType2">
+                                                Extra Content Credits
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="itemType3" value="Ad Budget">
+                                            <label class="form-check-label" for="itemType3">
+                                                Ad Budget
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="itemType4" value="Other Service">
+                                            <label class="form-check-label" for="itemType4">
+                                                Other Service
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Select one or more item types for this document</small>
+                                <div class="mt-2">
+                                    <span class="badge bg-primary" id="selectedCount" style="display: none;">
+                                        <span id="countNumber">0</span> item type(s) selected
+                                    </span>
+                                </div>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Description</label>
@@ -3116,28 +3149,61 @@
                 console.error('Document form not found');
                 return;
             }
+
+            // Add event listeners for item type checkboxes
+            const itemTypeCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="itemType"]');
+            const selectedCount = document.getElementById('selectedCount');
+            const countNumber = document.getElementById('countNumber');
+            
+            function updateSelectedCount() {
+                const checkedBoxes = document.querySelectorAll('input[type="checkbox"][id^="itemType"]:checked');
+                const count = checkedBoxes.length;
+                
+                if (count > 0) {
+                    countNumber.textContent = count;
+                    selectedCount.style.display = 'inline-block';
+                } else {
+                    selectedCount.style.display = 'none';
+                }
+            }
+            
+            itemTypeCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedCount);
+            });
             
 			documentForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
 				const form = this;
 				const clientSelect = form.querySelector('#docClientSelect');
-				const itemType = form.querySelector('#docItemType');
 				const description = form.querySelector('#docDescription');
 				const quantity = form.querySelector('#docQuantity');
 				const unitPrice = form.querySelector('#docUnitPrice');
 				const date = form.querySelector('#docDate');
                 
-                // Check if all elements exist
-				if (!clientSelect || !itemType || !description || !quantity || !unitPrice || !date) {
+                // Get selected item types
+                const selectedItemTypes = [];
+                const itemTypeCheckboxes = form.querySelectorAll('input[type="checkbox"][id^="itemType"]:checked');
+                
+                itemTypeCheckboxes.forEach(checkbox => {
+                    selectedItemTypes.push(checkbox.value);
+                });
+                
+                // Check if all elements exist and at least one item type is selected
+				if (!clientSelect || !description || !quantity || !unitPrice || !date) {
                     console.error('One or more form elements not found');
                     showAlert('Form error: Missing form elements', 'danger');
+                    return;
+                }
+                
+                if (selectedItemTypes.length === 0) {
+                    showAlert('Please select at least one item type.', 'warning');
                     return;
                 }
                 
                 const formData = {
 					clientId: parseInt(clientSelect.value),
 					docType: form.dataset.docType,
-					itemType: itemType.value,
+					itemTypes: selectedItemTypes,
 					description: description.value,
 					quantity: parseInt(quantity.value),
 					unitPrice: parseFloat(unitPrice.value),
