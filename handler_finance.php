@@ -98,7 +98,14 @@ try {
     $input = json_decode(file_get_contents("php://input"), true);
 
     // --- Data Validation and Sanitization ---
-    $id = time() . mt_rand(100, 999);
+    // Generate unique base ID with collision checking
+    do {
+        $baseId = time() . mt_rand(10000, 99999);
+        $check_sql = "SELECT COUNT(*) as count FROM documents WHERE id = '$baseId' OR id LIKE '$baseId\_%'";
+        $check_result = $conn->query($check_sql);
+        $exists = $check_result && $check_result->fetch_assoc()['count'] > 0;
+    } while ($exists);
+    
     $clientId = (int)($input['clientId'] ?? 0);
     $docType = $conn->real_escape_string($input['docType'] ?? '');
     $itemTypes = $input['itemTypes'] ?? [];
@@ -126,7 +133,7 @@ try {
     $documentIds = [];
     foreach ($itemTypes as $index => $itemType) {
         $itemType = $conn->real_escape_string($itemType);
-        $documentId = $id . '_' . $index;
+        $documentId = $baseId . '_' . $index;
         $documentIds[] = $documentId;
         
         $sql_insert_doc = "INSERT INTO documents 

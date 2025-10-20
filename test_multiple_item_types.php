@@ -23,7 +23,7 @@ try {
     // Test creating documents with multiple item types
     echo "<strong>Testing multiple item types functionality:</strong><br><br>";
     
-    $baseId = time() . mt_rand(100, 999);
+    $baseId = time() . mt_rand(10000, 99999);
     $clientId = 1; // Assuming client ID 1 exists
     $docType = 'quotation';
     $date = date('Y-m-d');
