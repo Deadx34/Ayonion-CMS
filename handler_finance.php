@@ -28,48 +28,36 @@ if ($action === 'delete') {
             throw new Exception("Document ID and type are required.", 400);
         }
 
-        // Get all documents with the same base ID (handle multiple item types)
-        $baseId = str_replace('_' . substr($docId, strrpos($docId, '_') + 1), '', $docId);
-        $doc_sql = "SELECT * FROM documents WHERE (id = '$docId' OR id LIKE '$baseId\_%') AND doc_type = '$docType'";
+        // Get document details before deletion
+        $doc_sql = "SELECT * FROM documents WHERE id = '$docId' AND doc_type = '$docType'";
         $doc_result = $conn->query($doc_sql);
         
-        if ($doc_result->num_rows === 0) {
+        if ($doc_result->num_rows !== 1) {
             throw new Exception("Document not found.", 404);
         }
         
-        $docs = [];
-        $clientId = null;
-        $adBudgetTotal = 0;
-        $creditsTotal = 0;
-        
-        while ($row = $doc_result->fetch_assoc()) {
-            $docs[] = $row;
-            if ($clientId === null) $clientId = (int)$row['client_id'];
-            
-            if ($row['item_type'] === 'Ad Budget') {
-                $adBudgetTotal += (float)$row['total'];
-            } elseif ($row['item_type'] === 'Extra Content Credits') {
-                $creditsTotal += (int)$row['quantity'];
-            }
-        }
+        $doc = $doc_result->fetch_assoc();
+        $clientId = (int)$doc['client_id'];
+        $itemType = $doc['item_type'];
+        $quantity = (int)$doc['quantity'];
+        $total = (float)$doc['total'];
 
-        // Delete all related documents
-        $delete_sql = "DELETE FROM documents WHERE (id = '$docId' OR id LIKE '$baseId\_%') AND doc_type = '$docType'";
+        // Delete the document
+        $delete_sql = "DELETE FROM documents WHERE id = '$docId'";
         if (!query_db($conn, $delete_sql)) {
-            throw new Exception("Failed to delete documents.");
+            throw new Exception("Failed to delete document.");
         }
 
         // If it was a receipt, revert the client profile updates
         if ($docType === 'receipt') {
-            if ($adBudgetTotal > 0) {
-                $revert_ad_sql = "UPDATE clients SET total_ad_budget = total_ad_budget - $adBudgetTotal WHERE id = $clientId";
-                if (!query_db($conn, $revert_ad_sql)) {
+            if ($itemType === 'Ad Budget') {
+                $revert_sql = "UPDATE clients SET total_ad_budget = total_ad_budget - $total WHERE id = $clientId";
+                if (!query_db($conn, $revert_sql)) {
                     throw new Exception("Failed to revert client ad budget.");
                 }
-            }
-            if ($creditsTotal > 0) {
-                $revert_credits_sql = "UPDATE clients SET extra_credits = extra_credits - $creditsTotal WHERE id = $clientId";
-                if (!query_db($conn, $revert_credits_sql)) {
+            } elseif ($itemType === 'Extra Content Credits') {
+                $revert_sql = "UPDATE clients SET extra_credits = extra_credits - $quantity WHERE id = $clientId";
+                if (!query_db($conn, $revert_sql)) {
                     throw new Exception("Failed to revert client credits.");
                 }
             }
@@ -98,25 +86,18 @@ try {
     $input = json_decode(file_get_contents("php://input"), true);
 
     // --- Data Validation and Sanitization ---
-    // Generate unique base ID with collision checking
-    do {
-        $baseId = time() . mt_rand(10000, 99999);
-        $check_sql = "SELECT COUNT(*) as count FROM documents WHERE id = '$baseId' OR id LIKE '$baseId\_%'";
-        $check_result = $conn->query($check_sql);
-        $exists = $check_result && $check_result->fetch_assoc()['count'] > 0;
-    } while ($exists);
-    
+    $id = time() . mt_rand(100, 999);
     $clientId = (int)($input['clientId'] ?? 0);
     $docType = $conn->real_escape_string($input['docType'] ?? '');
-    $itemTypes = $input['itemTypes'] ?? [];
+    $itemType = $conn->real_escape_string($input['itemType'] ?? '');
     $description = $conn->real_escape_string($input['description'] ?? '');
     $quantity = (int)($input['quantity'] ?? 0);
     $unitPrice = (float)($input['unitPrice'] ?? 0.0);
     $date = $conn->real_escape_string($input['date'] ?? '');
     $total = $quantity * $unitPrice;
 
-    if ($clientId === 0 || empty($docType) || empty($date) || empty($itemTypes) || !is_array($itemTypes)) {
-        throw new Exception("Client, Document Type, Date, and Item Types are required.", 400);
+    if ($clientId === 0 || empty($docType) || empty($date)) {
+        throw new Exception("Client, Document Type, and Date are required.", 400);
     }
 
     // Fetch client name for storage in the document
@@ -129,51 +110,31 @@ try {
     $clientName = $conn->real_escape_string($client_row['company_name']);
 
 
-    // --- 1. Insert documents for each selected item type ---
-    $documentIds = [];
-    foreach ($itemTypes as $index => $itemType) {
-        $itemType = $conn->real_escape_string($itemType);
-        $documentId = $baseId . '_' . $index;
-        $documentIds[] = $documentId;
-        
-        $sql_insert_doc = "INSERT INTO documents 
-            (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
-            VALUES 
-            ('$documentId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
+    // --- 1. Insert the document into the 'documents' table ---
+    $sql_insert_doc = "INSERT INTO documents 
+        (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+        VALUES 
+        ('$id', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
 
-        if (!query_db($conn, $sql_insert_doc)) {
-            throw new Exception("Failed to save document for item type: $itemType");
-        }
+    if (!query_db($conn, $sql_insert_doc)) {
+        throw new Exception("Failed to save document to the database.");
     }
 
 
-    // --- 2. If it's a RECEIPT, update the client's profile for each item type ---
+    // --- 2. If it's a RECEIPT, update the client's profile ---
     if ($docType === 'receipt') {
-        $adBudgetTotal = 0;
-        $creditsTotal = 0;
-        
-        foreach ($itemTypes as $itemType) {
-            if ($itemType === 'Ad Budget') {
-                $adBudgetTotal += $total;
-            } elseif ($itemType === 'Extra Content Credits') {
-                $creditsTotal += $quantity;
-            }
+        $update_sql = null;
+
+        if ($itemType === 'Ad Budget') {
+            // Add the amount to the client's total ad budget
+            $update_sql = "UPDATE clients SET total_ad_budget = total_ad_budget + $total WHERE id = $clientId";
+        } elseif ($itemType === 'Extra Content Credits') {
+            // Add the quantity to the client's extra credits
+            $update_sql = "UPDATE clients SET extra_credits = extra_credits + $quantity WHERE id = $clientId";
         }
         
-        // Update ad budget if applicable
-        if ($adBudgetTotal > 0) {
-            $update_ad_sql = "UPDATE clients SET total_ad_budget = total_ad_budget + $adBudgetTotal WHERE id = $clientId";
-            if (!query_db($conn, $update_ad_sql)) {
-                throw new Exception("Document was saved, but failed to update client ad budget.");
-            }
-        }
-        
-        // Update credits if applicable
-        if ($creditsTotal > 0) {
-            $update_credits_sql = "UPDATE clients SET extra_credits = extra_credits + $creditsTotal WHERE id = $clientId";
-            if (!query_db($conn, $update_credits_sql)) {
-                throw new Exception("Document was saved, but failed to update client credits.");
-            }
+        if ($update_sql && !query_db($conn, $update_sql)) {
+            throw new Exception("Document was saved, but failed to update client profile.");
         }
     }
 
@@ -181,9 +142,8 @@ try {
     $conn->commit();
     echo json_encode([
         "success" => true, 
-        "message" => ucfirst($docType) . " created successfully for " . count($itemTypes) . " item type(s)!",
-        "documentIds" => $documentIds,
-        "itemTypes" => $itemTypes
+        "message" => ucfirst($docType) . " created successfully!",
+        "documentId" => $id
     ]);
 
 } catch (Exception $e) {
