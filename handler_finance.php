@@ -99,7 +99,14 @@ try {
     $input = json_decode(file_get_contents("php://input"), true);
 
     // --- Data Validation and Sanitization ---
-    $id = time() . mt_rand(100, 999);
+    // Generate unique ID with collision checking
+    do {
+        $id = time() . mt_rand(10000, 99999) . mt_rand(100, 999);
+        $check_sql = "SELECT COUNT(*) as count FROM documents WHERE id = '$id'";
+        $check_result = $conn->query($check_sql);
+        $exists = $check_result->fetch_assoc()['count'] > 0;
+    } while ($exists);
+    
     $clientId = (int)($input['clientId'] ?? 0);
     $docType = $conn->real_escape_string($input['docType'] ?? '');
     $items = $input['items'] ?? [];
