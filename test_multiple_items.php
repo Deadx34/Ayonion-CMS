@@ -35,7 +35,7 @@ try {
     // Test creating a document with multiple items
     echo "<br><strong>Testing document creation with multiple items:</strong><br>";
     
-    $testId = time() . '_test';
+    $testId = (int)(microtime(true) * 1000000) . mt_rand(100000, 999999) . '_test';
     $clientId = 1; // Assuming client ID 1 exists
     $docType = 'quotation';
     $date = date('Y-m-d');
