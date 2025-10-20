@@ -18,11 +18,12 @@ try {
         throw new Exception("Document ID and type are required.", 400);
     }
 
-    // Fetch document details
+    // Fetch document details with all items
     $doc_sql = "SELECT d.*, c.company_name, c.partner_id, c.industry, c.managing_platforms 
                 FROM documents d 
                 JOIN clients c ON d.client_id = c.id 
-                WHERE d.id = ? AND d.doc_type = ?";
+                WHERE d.id = ? AND d.doc_type = ?
+                ORDER BY d.item_order ASC";
     
     $stmt = $conn->prepare($doc_sql);
     $stmt->bind_param("ss", $docId, $docType);
@@ -33,8 +34,15 @@ try {
         throw new Exception("Document not found.", 404);
     }
     
-    $doc = $result->fetch_assoc();
+    // Get all items for this document
+    $docItems = [];
+    while ($row = $result->fetch_assoc()) {
+        $docItems[] = $row;
+    }
     $stmt->close();
+    
+    // Use the first item for basic document info (client, date, etc.)
+    $doc = $docItems[0];
 
     // Fetch company settings
     $settings_sql = "SELECT * FROM settings WHERE id = 1";
@@ -43,7 +51,7 @@ try {
 
     // Generate HTML content optimized for PDF conversion
     include 'simple_pdf.php';
-    $htmlContent = createPDFDocument($doc, $settings);
+    $htmlContent = createPDFDocument($doc, $settings, $docItems);
     
     // Set headers for PDF download
     $filename = strtoupper($docType) . "_" . $docId . "_" . date('Y-m-d') . ".pdf";

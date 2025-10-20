@@ -28,21 +28,33 @@ if ($action === 'delete') {
             throw new Exception("Document ID and type are required.", 400);
         }
 
-        // Get document details before deletion
+        // Get all document items before deletion
         $doc_sql = "SELECT * FROM documents WHERE id = '$docId' AND doc_type = '$docType'";
         $doc_result = $conn->query($doc_sql);
         
-        if ($doc_result->num_rows !== 1) {
+        if ($doc_result->num_rows === 0) {
             throw new Exception("Document not found.", 404);
         }
         
-        $doc = $doc_result->fetch_assoc();
-        $clientId = (int)$doc['client_id'];
-        $itemType = $doc['item_type'];
-        $quantity = (int)$doc['quantity'];
-        $total = (float)$doc['total'];
+        $docItems = [];
+        while ($row = $doc_result->fetch_assoc()) {
+            $docItems[] = $row;
+        }
+        
+        $clientId = (int)$docItems[0]['client_id'];
+        $adBudgetTotal = 0;
+        $creditsTotal = 0;
+        
+        // Calculate totals for reverting
+        foreach ($docItems as $item) {
+            if ($item['item_type'] === 'Ad Budget') {
+                $adBudgetTotal += (float)$item['total'];
+            } elseif ($item['item_type'] === 'Extra Content Credits') {
+                $creditsTotal += (int)$item['quantity'];
+            }
+        }
 
-        // Delete the document
+        // Delete all document items
         $delete_sql = "DELETE FROM documents WHERE id = '$docId'";
         if (!query_db($conn, $delete_sql)) {
             throw new Exception("Failed to delete document.");
@@ -50,14 +62,15 @@ if ($action === 'delete') {
 
         // If it was a receipt, revert the client profile updates
         if ($docType === 'receipt') {
-            if ($itemType === 'Ad Budget') {
-                $revert_sql = "UPDATE clients SET total_ad_budget = total_ad_budget - $total WHERE id = $clientId";
-                if (!query_db($conn, $revert_sql)) {
+            if ($adBudgetTotal > 0) {
+                $revert_ad_sql = "UPDATE clients SET total_ad_budget = total_ad_budget - $adBudgetTotal WHERE id = $clientId";
+                if (!query_db($conn, $revert_ad_sql)) {
                     throw new Exception("Failed to revert client ad budget.");
                 }
-            } elseif ($itemType === 'Extra Content Credits') {
-                $revert_sql = "UPDATE clients SET extra_credits = extra_credits - $quantity WHERE id = $clientId";
-                if (!query_db($conn, $revert_sql)) {
+            }
+            if ($creditsTotal > 0) {
+                $revert_credits_sql = "UPDATE clients SET extra_credits = extra_credits - $creditsTotal WHERE id = $clientId";
+                if (!query_db($conn, $revert_credits_sql)) {
                     throw new Exception("Failed to revert client credits.");
                 }
             }
@@ -89,15 +102,21 @@ try {
     $id = time() . mt_rand(100, 999);
     $clientId = (int)($input['clientId'] ?? 0);
     $docType = $conn->real_escape_string($input['docType'] ?? '');
-    $itemType = $conn->real_escape_string($input['itemType'] ?? '');
-    $description = $conn->real_escape_string($input['description'] ?? '');
-    $quantity = (int)($input['quantity'] ?? 0);
-    $unitPrice = (float)($input['unitPrice'] ?? 0.0);
+    $items = $input['items'] ?? [];
     $date = $conn->real_escape_string($input['date'] ?? '');
-    $total = $quantity * $unitPrice;
 
-    if ($clientId === 0 || empty($docType) || empty($date)) {
-        throw new Exception("Client, Document Type, and Date are required.", 400);
+    if ($clientId === 0 || empty($docType) || empty($date) || empty($items) || !is_array($items)) {
+        throw new Exception("Client, Document Type, Date, and Items are required.", 400);
+    }
+
+    // Validate items
+    $totalAmount = 0;
+    foreach ($items as $item) {
+        if (empty($item['itemType']) || empty($item['description']) || 
+            $item['quantity'] <= 0 || $item['unitPrice'] <= 0) {
+            throw new Exception("All item fields are required and must be valid.", 400);
+        }
+        $totalAmount += (float)$item['total'];
     }
 
     // Fetch client name for storage in the document
@@ -110,31 +129,52 @@ try {
     $clientName = $conn->real_escape_string($client_row['company_name']);
 
 
-    // --- 1. Insert the document into the 'documents' table ---
-    $sql_insert_doc = "INSERT INTO documents 
-        (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
-        VALUES 
-        ('$id', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
+    // --- 1. Insert the document items into the 'documents' table ---
+    foreach ($items as $index => $item) {
+        $itemType = $conn->real_escape_string($item['itemType']);
+        $description = $conn->real_escape_string($item['description']);
+        $quantity = (int)$item['quantity'];
+        $unitPrice = (float)$item['unitPrice'];
+        $total = (float)$item['total'];
+        
+        $sql_insert_doc = "INSERT INTO documents 
+            (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date, item_order) 
+            VALUES 
+            ('$id', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date', $index)";
 
-    if (!query_db($conn, $sql_insert_doc)) {
-        throw new Exception("Failed to save document to the database.");
+        if (!query_db($conn, $sql_insert_doc)) {
+            throw new Exception("Failed to save document item to the database.");
+        }
     }
 
 
     // --- 2. If it's a RECEIPT, update the client's profile ---
     if ($docType === 'receipt') {
-        $update_sql = null;
-
-        if ($itemType === 'Ad Budget') {
-            // Add the amount to the client's total ad budget
-            $update_sql = "UPDATE clients SET total_ad_budget = total_ad_budget + $total WHERE id = $clientId";
-        } elseif ($itemType === 'Extra Content Credits') {
-            // Add the quantity to the client's extra credits
-            $update_sql = "UPDATE clients SET extra_credits = extra_credits + $quantity WHERE id = $clientId";
+        $adBudgetTotal = 0;
+        $creditsTotal = 0;
+        
+        foreach ($items as $item) {
+            if ($item['itemType'] === 'Ad Budget') {
+                $adBudgetTotal += (float)$item['total'];
+            } elseif ($item['itemType'] === 'Extra Content Credits') {
+                $creditsTotal += (int)$item['quantity'];
+            }
         }
         
-        if ($update_sql && !query_db($conn, $update_sql)) {
-            throw new Exception("Document was saved, but failed to update client profile.");
+        // Update ad budget if applicable
+        if ($adBudgetTotal > 0) {
+            $update_ad_sql = "UPDATE clients SET total_ad_budget = total_ad_budget + $adBudgetTotal WHERE id = $clientId";
+            if (!query_db($conn, $update_ad_sql)) {
+                throw new Exception("Document was saved, but failed to update client ad budget.");
+            }
+        }
+        
+        // Update credits if applicable
+        if ($creditsTotal > 0) {
+            $update_credits_sql = "UPDATE clients SET extra_credits = extra_credits + $creditsTotal WHERE id = $clientId";
+            if (!query_db($conn, $update_credits_sql)) {
+                throw new Exception("Document was saved, but failed to update client credits.");
+            }
         }
     }
 

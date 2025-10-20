@@ -988,26 +988,62 @@
                                 <label class="form-label">Date</label>
                                 <input type="date" class="form-control" id="docDate" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Document Item Type</label>
-                                <select class="form-select" id="docItemType" required>
-                                    <option value="Monthly Payment">Monthly Payment</option>
-                                    <option value="Extra Content Credits">Extra Content Credits</option>
-                                    <option value="Ad Budget">Ad Budget</option>
-                                    <option value="Other Service">Other Service</option>
-                                </select>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Document Items</label>
+                                <div id="documentItems">
+                                    <div class="document-item border rounded p-3 mb-3" data-item-index="0">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Item Type</label>
+                                                <select class="form-select item-type" required>
+                                                    <option value="Monthly Payment">Monthly Payment</option>
+                                                    <option value="Extra Content Credits">Extra Content Credits</option>
+                                                    <option value="Ad Budget">Ad Budget</option>
+                                                    <option value="Other Service">Other Service</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Description</label>
+                                                <input type="text" class="form-control item-description" required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Quantity</label>
+                                                <input type="number" class="form-control item-quantity" value="1" required min="0">
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Unit Price (Rs.)</label>
+                                                <input type="number" step="0.01" class="form-control item-unit-price" required min="0">
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Total</label>
+                                                <input type="number" step="0.01" class="form-control item-total" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-item" style="display: none;">
+                                                <i class="fas fa-trash"></i> Remove Item
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="addDocumentItem">
+                                    <i class="fas fa-plus"></i> Add Another Item
+                                </button>
                             </div>
                             <div class="col-md-12 mb-3">
-                                <label class="form-label">Description</label>
-                                <input type="text" class="form-control" id="docDescription" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Quantity (Credits or Units)</label>
-                                <input type="number" class="form-control" id="docQuantity" value="1" required min="0">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Unit Price (Rs.)</label>
-                                <input type="number" step="0.01" class="form-control" id="docUnitPrice" required min="0">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Document Summary</h6>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <strong>Total Items:</strong> <span id="totalItems">1</span>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Grand Total:</strong> <span id="grandTotal">Rs. 0.00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Generate Document</button>
@@ -3108,6 +3144,115 @@
                 </tr>`).join('');
         }
 
+        // Multiple document items functionality
+        function addDocumentItem() {
+            const container = document.getElementById('documentItems');
+            const itemCount = container.children.length;
+            const newItem = document.createElement('div');
+            newItem.className = 'document-item border rounded p-3 mb-3';
+            newItem.setAttribute('data-item-index', itemCount);
+            
+            newItem.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Item Type</label>
+                        <select class="form-select item-type" required>
+                            <option value="Monthly Payment">Monthly Payment</option>
+                            <option value="Extra Content Credits">Extra Content Credits</option>
+                            <option value="Ad Budget">Ad Budget</option>
+                            <option value="Other Service">Other Service</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-control item-description" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control item-quantity" value="1" required min="0">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Unit Price (Rs.)</label>
+                        <input type="number" step="0.01" class="form-control item-unit-price" required min="0">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Total</label>
+                        <input type="number" step="0.01" class="form-control item-total" readonly>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-item">
+                        <i class="fas fa-trash"></i> Remove Item
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(newItem);
+            updateItemIndexes();
+            updateSummary();
+            attachItemEventListeners(newItem);
+        }
+
+        function removeDocumentItem(button) {
+            const item = button.closest('.document-item');
+            if (document.getElementById('documentItems').children.length > 1) {
+                item.remove();
+                updateItemIndexes();
+                updateSummary();
+            }
+        }
+
+        function updateItemIndexes() {
+            const items = document.querySelectorAll('.document-item');
+            items.forEach((item, index) => {
+                item.setAttribute('data-item-index', index);
+                const removeBtn = item.querySelector('.remove-item');
+                removeBtn.style.display = items.length > 1 ? 'inline-block' : 'none';
+            });
+        }
+
+        function calculateItemTotal(item) {
+            const quantity = parseFloat(item.querySelector('.item-quantity').value) || 0;
+            const unitPrice = parseFloat(item.querySelector('.item-unit-price').value) || 0;
+            const total = quantity * unitPrice;
+            item.querySelector('.item-total').value = total.toFixed(2);
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const items = document.querySelectorAll('.document-item');
+            const totalItems = items.length;
+            let grandTotal = 0;
+            
+            items.forEach(item => {
+                const total = parseFloat(item.querySelector('.item-total').value) || 0;
+                grandTotal += total;
+            });
+            
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('grandTotal').textContent = `Rs. ${grandTotal.toFixed(2)}`;
+        }
+
+        function attachItemEventListeners(item) {
+            const quantityInput = item.querySelector('.item-quantity');
+            const unitPriceInput = item.querySelector('.item-unit-price');
+            const removeBtn = item.querySelector('.remove-item');
+            
+            quantityInput.addEventListener('input', () => calculateItemTotal(item));
+            unitPriceInput.addEventListener('input', () => calculateItemTotal(item));
+            removeBtn.addEventListener('click', () => removeDocumentItem(removeBtn));
+        }
+
+        function initializeDocumentItems() {
+            const items = document.querySelectorAll('.document-item');
+            items.forEach(item => {
+                attachItemEventListeners(item);
+                calculateItemTotal(item);
+            });
+            updateItemIndexes();
+            updateSummary();
+        }
+
         // FIX: Document form submission using PHP handler (wrapped to ensure DOM is ready)
         function initDocumentForm() {
             const documentForm = document.getElementById('documentForm');
@@ -3115,31 +3260,60 @@
                 console.error('Document form not found');
                 return;
             }
+
+            // Initialize document items functionality
+            initializeDocumentItems();
+            
+            // Add item button
+            document.getElementById('addDocumentItem').addEventListener('click', addDocumentItem);
             
 			documentForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
 				const form = this;
 				const clientSelect = form.querySelector('#docClientSelect');
-				const itemType = form.querySelector('#docItemType');
-				const description = form.querySelector('#docDescription');
-				const quantity = form.querySelector('#docQuantity');
-				const unitPrice = form.querySelector('#docUnitPrice');
 				const date = form.querySelector('#docDate');
                 
                 // Check if all elements exist
-				if (!clientSelect || !itemType || !description || !quantity || !unitPrice || !date) {
+				if (!clientSelect || !date) {
                     console.error('One or more form elements not found');
                     showAlert('Form error: Missing form elements', 'danger');
+                    return;
+                }
+
+                // Collect all document items
+                const items = [];
+                const documentItems = form.querySelectorAll('.document-item');
+                
+                for (let item of documentItems) {
+                    const itemType = item.querySelector('.item-type').value;
+                    const description = item.querySelector('.item-description').value;
+                    const quantity = parseFloat(item.querySelector('.item-quantity').value);
+                    const unitPrice = parseFloat(item.querySelector('.item-unit-price').value);
+                    const total = parseFloat(item.querySelector('.item-total').value);
+                    
+                    if (!itemType || !description || quantity <= 0 || unitPrice <= 0) {
+                        showAlert('Please fill in all item details correctly.', 'warning');
+                        return;
+                    }
+                    
+                    items.push({
+                        itemType: itemType,
+                        description: description,
+                        quantity: quantity,
+                        unitPrice: unitPrice,
+                        total: total
+                    });
+                }
+                
+                if (items.length === 0) {
+                    showAlert('Please add at least one item to the document.', 'warning');
                     return;
                 }
                 
                 const formData = {
 					clientId: parseInt(clientSelect.value),
 					docType: form.dataset.docType,
-					itemType: itemType.value,
-					description: description.value,
-					quantity: parseInt(quantity.value),
-					unitPrice: parseFloat(unitPrice.value),
+					items: items,
 					date: date.value
                 };
 
