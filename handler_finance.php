@@ -54,8 +54,8 @@ if ($action === 'delete') {
             }
         }
 
-        // Delete all document items (handle both old single-item and new multi-item formats)
-        $delete_sql = "DELETE FROM documents WHERE id = '$docId' OR id LIKE '$docId\_%'";
+        // Delete all document line items (handle both old single-item and new multi-item formats)
+        $delete_sql = "DELETE FROM documents WHERE id = '$docId' OR id LIKE '$docId\_line\_%'";
         if (!query_db($conn, $delete_sql)) {
             throw new Exception("Failed to delete document.");
         }
@@ -139,7 +139,14 @@ try {
     $clientName = $conn->real_escape_string($client_row['company_name']);
 
 
-    // --- 1. Insert the document items into the 'documents' table ---
+    // --- 1. Insert the document as a single document with multiple line items ---
+    // Calculate grand total
+    $grandTotal = 0;
+    foreach ($items as $item) {
+        $grandTotal += (float)$item['total'];
+    }
+    
+    // Insert each item as a line item in the same document
     foreach ($items as $index => $item) {
         $itemType = $conn->real_escape_string($item['itemType']);
         $description = $conn->real_escape_string($item['description']);
@@ -147,8 +154,8 @@ try {
         $unitPrice = (float)$item['unitPrice'];
         $total = (float)$item['total'];
         
-        // Create unique ID for each item by appending index
-        $itemId = $id . '_' . $index;
+        // Use the same document ID for all items, but with line item index
+        $lineItemId = $id . '_line_' . $index;
         
         // Check if item_order column exists, if not use basic insert
         $check_column_sql = "SHOW COLUMNS FROM documents LIKE 'item_order'";
@@ -159,17 +166,17 @@ try {
             $sql_insert_doc = "INSERT INTO documents 
                 (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date, item_order) 
                 VALUES 
-                ('$itemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date', $index)";
+                ('$lineItemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date', $index)";
         } else {
             // Column doesn't exist, use basic insert
             $sql_insert_doc = "INSERT INTO documents 
                 (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
                 VALUES 
-                ('$itemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
+                ('$lineItemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
         }
 
         if (!query_db($conn, $sql_insert_doc)) {
-            throw new Exception("Failed to save document item to the database.");
+            throw new Exception("Failed to save document line item to the database.");
         }
     }
 

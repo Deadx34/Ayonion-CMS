@@ -71,7 +71,7 @@ try {
     $conn->begin_transaction();
     
     try {
-        // Insert each item (same logic as application)
+        // Insert each item as line items in the same document
         foreach ($items as $index => $item) {
             $itemType = $conn->real_escape_string($item['itemType']);
             $description = $conn->real_escape_string($item['description']);
@@ -79,9 +79,9 @@ try {
             $unitPrice = (float)$item['unitPrice'];
             $total = (float)$item['total'];
             
-            // Create unique ID for each item
-            $itemId = $id . '_' . $index;
-            echo "Creating item $index with ID: $itemId<br>";
+            // Create line item ID for each item
+            $lineItemId = $id . '_line_' . $index;
+            echo "Creating line item $index with ID: $lineItemId<br>";
             
             // Check if item_order column exists
             $check_column_sql = "SHOW COLUMNS FROM documents LIKE 'item_order'";
@@ -91,12 +91,12 @@ try {
                 $sql = "INSERT INTO documents 
                     (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date, item_order) 
                     VALUES 
-                    ('$itemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date', $index)";
+                    ('$lineItemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date', $index)";
             } else {
                 $sql = "INSERT INTO documents 
                     (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
                     VALUES 
-                    ('$itemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
+                    ('$lineItemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
             }
             
             if ($conn->query($sql) === TRUE) {
@@ -112,7 +112,7 @@ try {
         
         // Test document retrieval
         echo "<br><strong>Testing document retrieval:</strong><br>";
-        $docIdPattern = $id . '_%';
+        $docIdPattern = $id . '_line_%';
         $retrieve_sql = "SELECT * FROM documents WHERE id = '$id' OR id LIKE '$docIdPattern' ORDER BY item_order ASC";
         $retrieve_result = $conn->query($retrieve_sql);
         

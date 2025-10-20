@@ -38,7 +38,7 @@ try {
                     ORDER BY d.id ASC";
     }
     
-    $docIdPattern = $docId . '_%';
+    $docIdPattern = $docId . '_line_%';
     
     $stmt = $conn->prepare($doc_sql);
     $stmt->bind_param("sss", $docId, $docIdPattern, $docType);
