@@ -24,7 +24,7 @@ try {
     echo "<strong>Simulating real document creation process:</strong><br><br>";
     
     // Generate ID using the same method as the application
-    $id = (int)(microtime(true) * 1000000) . mt_rand(100000, 999999);
+    $id = time() . mt_rand(100000, 999999);
     echo "Generated ID: $id<br>";
     
     // Double-check for uniqueness (same as application)
