@@ -18,15 +18,30 @@ try {
         throw new Exception("Document ID and type are required.", 400);
     }
 
-    // Fetch document details with all items
-    $doc_sql = "SELECT d.*, c.company_name, c.partner_id, c.industry, c.managing_platforms 
-                FROM documents d 
-                JOIN clients c ON d.client_id = c.id 
-                WHERE d.id = ? AND d.doc_type = ?
-                ORDER BY d.item_order ASC";
+    // Check if item_order column exists
+    $check_column_sql = "SHOW COLUMNS FROM documents LIKE 'item_order'";
+    $column_check = $conn->query($check_column_sql);
+    
+    if ($column_check->num_rows > 0) {
+        // Column exists, use full query with item_order
+        $doc_sql = "SELECT d.*, c.company_name, c.partner_id, c.industry, c.managing_platforms 
+                    FROM documents d 
+                    JOIN clients c ON d.client_id = c.id 
+                    WHERE (d.id = ? OR d.id LIKE ?) AND d.doc_type = ?
+                    ORDER BY d.item_order ASC";
+    } else {
+        // Column doesn't exist, use basic query
+        $doc_sql = "SELECT d.*, c.company_name, c.partner_id, c.industry, c.managing_platforms 
+                    FROM documents d 
+                    JOIN clients c ON d.client_id = c.id 
+                    WHERE (d.id = ? OR d.id LIKE ?) AND d.doc_type = ?
+                    ORDER BY d.id ASC";
+    }
+    
+    $docIdPattern = $docId . '_%';
     
     $stmt = $conn->prepare($doc_sql);
-    $stmt->bind_param("ss", $docId, $docType);
+    $stmt->bind_param("sss", $docId, $docIdPattern, $docType);
     $stmt->execute();
     $result = $stmt->get_result();
     

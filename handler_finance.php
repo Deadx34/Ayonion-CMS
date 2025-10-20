@@ -54,8 +54,8 @@ if ($action === 'delete') {
             }
         }
 
-        // Delete all document items
-        $delete_sql = "DELETE FROM documents WHERE id = '$docId'";
+        // Delete all document items (handle both old single-item and new multi-item formats)
+        $delete_sql = "DELETE FROM documents WHERE id = '$docId' OR id LIKE '$docId\_%'";
         if (!query_db($conn, $delete_sql)) {
             throw new Exception("Failed to delete document.");
         }
@@ -144,10 +144,26 @@ try {
         $unitPrice = (float)$item['unitPrice'];
         $total = (float)$item['total'];
         
-        $sql_insert_doc = "INSERT INTO documents 
-            (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date, item_order) 
-            VALUES 
-            ('$id', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date', $index)";
+        // Create unique ID for each item by appending index
+        $itemId = $id . '_' . $index;
+        
+        // Check if item_order column exists, if not use basic insert
+        $check_column_sql = "SHOW COLUMNS FROM documents LIKE 'item_order'";
+        $column_check = $conn->query($check_column_sql);
+        
+        if ($column_check->num_rows > 0) {
+            // Column exists, use full insert with item_order
+            $sql_insert_doc = "INSERT INTO documents 
+                (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date, item_order) 
+                VALUES 
+                ('$itemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date', $index)";
+        } else {
+            // Column doesn't exist, use basic insert
+            $sql_insert_doc = "INSERT INTO documents 
+                (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+                VALUES 
+                ('$itemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $total, '$date')";
+        }
 
         if (!query_db($conn, $sql_insert_doc)) {
             throw new Exception("Failed to save document item to the database.");
