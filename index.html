@@ -2699,7 +2699,6 @@
                 if (response.ok) {
                     const htmlContent = await response.text();
                     printWindow.document.write(htmlContent);
-                    printWindow.document.close();
                     
                     // Wait for content to load, then trigger print
                     printWindow.onload = function() {
