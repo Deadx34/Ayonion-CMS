@@ -3794,35 +3794,30 @@
             // Create a new window for PDF generation
             const printWindow = window.open('', '_blank');
             const invoiceHTML = document.getElementById('invoicePreviewContent').innerHTML;
+            const clientName = currentInvoiceData.client.company_name || currentInvoiceData.client.partner_id;
             
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Invoice - ${currentInvoiceData.client.company_name || currentInvoiceData.client.partner_id}</title>
-                    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-                    <style>
-                        @media print {
-                            body { margin: 0; }
-                            .no-print { display: none; }
-                        }
-                        .invoice-header { border-bottom: 2px solid #6f42c1; padding-bottom: 20px; margin-bottom: 30px; }
-                        .invoice-footer { border-top: 2px solid #6f42c1; padding-top: 20px; margin-top: 30px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container-fluid">
-                        ${invoiceHTML}
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                        }
-                    </script>
-                </body>
-                </html>
-            `);
+            const htmlContent = '<!DOCTYPE html>' +
+                '<html>' +
+                '<head>' +
+                '<title>Invoice - ' + clientName + '</title>' +
+                '<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">' +
+                '<style>' +
+                '@media print { body { margin: 0; } .no-print { display: none; } }' +
+                '.invoice-header { border-bottom: 2px solid #6f42c1; padding-bottom: 20px; margin-bottom: 30px; }' +
+                '.invoice-footer { border-top: 2px solid #6f42c1; padding-top: 20px; margin-top: 30px; }' +
+                '</style>' +
+                '</head>' +
+                '<body>' +
+                '<div class="container-fluid">' +
+                invoiceHTML +
+                '</div>' +
+                '<script>' +
+                'window.onload = function() { window.print(); }' +
+                '</script>' +
+                '</body>' +
+                '</html>';
             
+            printWindow.document.write(htmlContent);
             printWindow.document.close();
         }
 
