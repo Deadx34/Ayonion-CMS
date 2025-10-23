@@ -90,14 +90,22 @@ try {
     $clientId = (int)($input['clientId'] ?? 0);
     $docType = $conn->real_escape_string($input['docType'] ?? '');
     $itemTypes = $input['itemTypes'] ?? [];
+    $itemDetails = $input['itemDetails'] ?? [];
     $description = $conn->real_escape_string($input['description'] ?? '');
-    $quantity = (int)($input['quantity'] ?? 0);
-    $unitPrice = (float)($input['unitPrice'] ?? 0.0);
     $date = $conn->real_escape_string($input['date'] ?? '');
-    $total = $quantity * $unitPrice;
 
     if ($clientId === 0 || empty($docType) || empty($date) || empty($itemTypes) || !is_array($itemTypes)) {
         throw new Exception("Client, Document Type, Date, and Item Types are required.", 400);
+    }
+    
+    if (empty($itemDetails) || !is_array($itemDetails)) {
+        throw new Exception("Item details are required.", 400);
+    }
+    
+    // Calculate total from all item details
+    $total = 0;
+    foreach ($itemDetails as $item) {
+        $total += (float)($item['total'] ?? 0);
     }
 
     // Fetch client name for storage in the document
@@ -110,16 +118,27 @@ try {
     $clientName = $conn->real_escape_string($client_row['company_name']);
 
 
-    // --- 1. Insert a single document with multiple line items ---
-    // Create a single document with all selected item types as line items
-    $itemTypesJson = json_encode($itemTypes);
-    $sql_insert_doc = "INSERT INTO documents 
-        (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
-        VALUES 
-        ('$id', $clientId, '$clientName', '$docType', '$itemTypesJson', '$description', $quantity, $unitPrice, $total, '$date')";
+    // --- 1. Insert multiple documents for each item detail ---
+    $documentsCreated = 0;
+    foreach ($itemDetails as $item) {
+        $itemType = $conn->real_escape_string($item['itemType']);
+        $quantity = (int)$item['quantity'];
+        $unitPrice = (float)$item['unitPrice'];
+        $itemTotal = (float)$item['total'];
+        
+        // Create unique ID for each item document
+        $itemId = $id . '_' . $documentsCreated;
+        
+        $sql_insert_doc = "INSERT INTO documents 
+            (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+            VALUES 
+            ('$itemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $itemTotal, '$date')";
 
-    if (!query_db($conn, $sql_insert_doc)) {
-        throw new Exception("Failed to save document to the database.");
+        if (!query_db($conn, $sql_insert_doc)) {
+            throw new Exception("Failed to save document item to the database.");
+        }
+        
+        $documentsCreated++;
     }
 
 
@@ -128,11 +147,15 @@ try {
         $adBudgetTotal = 0;
         $creditsTotal = 0;
         
-        foreach ($itemTypes as $itemType) {
+        foreach ($itemDetails as $item) {
+            $itemType = $item['itemType'];
+            $itemTotal = (float)$item['total'];
+            $itemQuantity = (int)$item['quantity'];
+            
             if ($itemType === 'Ad Budget') {
-                $adBudgetTotal += $total;
+                $adBudgetTotal += $itemTotal;
             } elseif ($itemType === 'Extra Content Credits') {
-                $creditsTotal += $quantity;
+                $creditsTotal += $itemQuantity;
             }
         }
         
@@ -157,9 +180,11 @@ try {
     $conn->commit();
     echo json_encode([
         "success" => true, 
-        "message" => ucfirst($docType) . " created successfully with " . count($itemTypes) . " item type(s)!",
+        "message" => ucfirst($docType) . " created successfully with " . $documentsCreated . " item(s) and total amount Rs. " . number_format($total, 2) . "!",
         "documentId" => $id,
-        "itemTypes" => $itemTypes
+        "itemTypes" => $itemTypes,
+        "itemDetails" => $itemDetails,
+        "totalAmount" => $total
     ]);
 
 } catch (Exception $e) {

@@ -1035,16 +1035,107 @@
                                         <span id="countNumber">0</span> item type(s) selected
                                     </span>
                                 </div>
+                                
+                                <!-- JavaScript to handle item type selection -->
+                                <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const itemTypeCheckboxes = document.querySelectorAll('input[type="checkbox"][id^="itemType"]');
+                                    const selectedCount = document.getElementById('selectedCount');
+                                    const countNumber = document.getElementById('countNumber');
+                                    const itemAmountsSection = document.getElementById('itemAmountsSection');
+                                    const itemAmountsContainer = document.getElementById('itemAmountsContainer');
+                                    const singleQuantityField = document.getElementById('singleQuantityField');
+                                    const singleUnitPriceField = document.getElementById('singleUnitPriceField');
+                                    
+                                    function updateItemAmounts() {
+                                        const selectedItems = Array.from(itemTypeCheckboxes).filter(cb => cb.checked);
+                                        const count = selectedItems.length;
+                                        
+                                        // Update count display
+                                        if (count > 0) {
+                                            selectedCount.style.display = 'inline-block';
+                                            countNumber.textContent = count;
+                                        } else {
+                                            selectedCount.style.display = 'none';
+                                        }
+                                        
+                                        // Show/hide appropriate input sections
+                                        if (count > 1) {
+                                            // Multiple items selected - show dynamic inputs
+                                            itemAmountsSection.style.display = 'block';
+                                            singleQuantityField.style.display = 'none';
+                                            singleUnitPriceField.style.display = 'none';
+                                            
+                                            // Clear and rebuild dynamic inputs
+                                            itemAmountsContainer.innerHTML = '';
+                                            
+                                            selectedItems.forEach((checkbox, index) => {
+                                                const itemDiv = document.createElement('div');
+                                                itemDiv.className = 'row mb-3 p-3 border rounded';
+                                                itemDiv.innerHTML = `
+                                                    <div class="col-12">
+                                                        <h6 class="mb-2 text-primary">${checkbox.value}</h6>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Quantity</label>
+                                                        <input type="number" class="form-control item-quantity" 
+                                                               data-item-type="${checkbox.value}" 
+                                                               value="1" required min="0" 
+                                                               placeholder="Enter quantity">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Unit Price (Rs.)</label>
+                                                        <input type="number" step="0.01" class="form-control item-unit-price" 
+                                                               data-item-type="${checkbox.value}" 
+                                                               required min="0" 
+                                                               placeholder="Enter unit price">
+                                                    </div>
+                                                `;
+                                                itemAmountsContainer.appendChild(itemDiv);
+                                            });
+                                        } else if (count === 1) {
+                                            // Single item selected - show regular inputs
+                                            itemAmountsSection.style.display = 'none';
+                                            singleQuantityField.style.display = 'block';
+                                            singleUnitPriceField.style.display = 'block';
+                                        } else {
+                                            // No items selected
+                                            itemAmountsSection.style.display = 'none';
+                                            singleQuantityField.style.display = 'block';
+                                            singleUnitPriceField.style.display = 'block';
+                                        }
+                                    }
+                                    
+                                    // Add event listeners to all checkboxes
+                                    itemTypeCheckboxes.forEach(checkbox => {
+                                        checkbox.addEventListener('change', updateItemAmounts);
+                                    });
+                                    
+                                    // Initial call
+                                    updateItemAmounts();
+                                });
+                                </script>
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">Description</label>
                                 <input type="text" class="form-control" id="docDescription" required>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            
+                            <!-- Dynamic Item Amounts Section -->
+                            <div class="col-md-12 mb-3" id="itemAmountsSection" style="display: none;">
+                                <label class="form-label">Item Amounts</label>
+                                <div id="itemAmountsContainer">
+                                    <!-- Dynamic inputs will be added here -->
+                                </div>
+                                <small class="text-muted">Enter quantity and unit price for each selected item type</small>
+                            </div>
+                            
+                            <!-- Fallback for single item type -->
+                            <div class="col-md-6 mb-3" id="singleQuantityField">
                                 <label class="form-label">Quantity (Credits or Units)</label>
                                 <input type="number" class="form-control" id="docQuantity" value="1" required min="0">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-3" id="singleUnitPriceField">
                                 <label class="form-label">Unit Price (Rs.)</label>
                                 <input type="number" step="0.01" class="form-control" id="docUnitPrice" required min="0">
                             </div>
@@ -3234,7 +3325,7 @@
                 });
                 
                 // Check if all elements exist and at least one item type is selected
-				if (!clientSelect || !description || !quantity || !unitPrice || !date) {
+				if (!clientSelect || !description || !date) {
                     console.error('One or more form elements not found');
                     showAlert('Form error: Missing form elements', 'danger');
                     return;
@@ -3245,13 +3336,58 @@
                     return;
                 }
                 
+                // Handle different input scenarios
+                let itemDetails = [];
+                
+                if (selectedItemTypes.length > 1) {
+                    // Multiple items - get individual amounts
+                    selectedItemTypes.forEach(itemType => {
+                        const quantityInput = form.querySelector(`input[data-item-type="${itemType}"].item-quantity`);
+                        const unitPriceInput = form.querySelector(`input[data-item-type="${itemType}"].item-unit-price`);
+                        
+                        if (quantityInput && unitPriceInput) {
+                            const qty = parseInt(quantityInput.value) || 0;
+                            const price = parseFloat(unitPriceInput.value) || 0;
+                            
+                            if (qty > 0 && price > 0) {
+                                itemDetails.push({
+                                    itemType: itemType,
+                                    quantity: qty,
+                                    unitPrice: price,
+                                    total: qty * price
+                                });
+                            }
+                        }
+                    });
+                    
+                    if (itemDetails.length === 0) {
+                        showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
+                        return;
+                    }
+                } else {
+                    // Single item - use regular inputs
+                    const qty = parseInt(quantity.value) || 0;
+                    const price = parseFloat(unitPrice.value) || 0;
+                    
+                    if (qty <= 0 || price <= 0) {
+                        showAlert('Please enter valid quantity and unit price.', 'warning');
+                        return;
+                    }
+                    
+                    itemDetails.push({
+                        itemType: selectedItemTypes[0],
+                        quantity: qty,
+                        unitPrice: price,
+                        total: qty * price
+                    });
+                }
+                
                 const formData = {
 					clientId: parseInt(clientSelect.value),
 					docType: form.dataset.docType,
 					itemTypes: selectedItemTypes,
+					itemDetails: itemDetails,
 					description: description.value,
-					quantity: parseInt(quantity.value),
-					unitPrice: parseFloat(unitPrice.value),
 					date: date.value
                 };
 
