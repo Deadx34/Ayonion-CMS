@@ -1,12 +1,19 @@
 # AYONION-CMS .htaccess Configuration
 
-# Enable proper MIME types
-AddType text/html .html
+# Force proper MIME types
+AddType text/html .html .htm
 AddType application/javascript .js
 AddType text/css .css
+AddType application/json .json
 
 # Set default charset
 AddDefaultCharset UTF-8
+
+# Force HTML content type for .html files
+<FilesMatch "\.(html|htm)$">
+    ForceType text/html
+    Header set Content-Type "text/html; charset=UTF-8"
+</FilesMatch>
 
 # Enable compression
 <IfModule mod_deflate.c>
