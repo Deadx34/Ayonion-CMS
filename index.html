@@ -1066,6 +1066,12 @@
                                             singleQuantityField.style.display = 'none';
                                             singleUnitPriceField.style.display = 'none';
                                             
+                                            // Remove required attributes from single fields
+                                            const singleQuantity = document.getElementById('docQuantity');
+                                            const singleUnitPrice = document.getElementById('docUnitPrice');
+                                            if (singleQuantity) singleQuantity.removeAttribute('required');
+                                            if (singleUnitPrice) singleUnitPrice.removeAttribute('required');
+                                            
                                             // Clear and rebuild dynamic inputs
                                             itemAmountsContainer.innerHTML = '';
                                             
@@ -1098,11 +1104,23 @@
                                             itemAmountsSection.style.display = 'none';
                                             singleQuantityField.style.display = 'block';
                                             singleUnitPriceField.style.display = 'block';
+                                            
+                                            // Add required attributes back to single fields
+                                            const singleQuantity = document.getElementById('docQuantity');
+                                            const singleUnitPrice = document.getElementById('docUnitPrice');
+                                            if (singleQuantity) singleQuantity.setAttribute('required', 'required');
+                                            if (singleUnitPrice) singleUnitPrice.setAttribute('required', 'required');
                                         } else {
                                             // No items selected
                                             itemAmountsSection.style.display = 'none';
                                             singleQuantityField.style.display = 'block';
                                             singleUnitPriceField.style.display = 'block';
+                                            
+                                            // Add required attributes back to single fields
+                                            const singleQuantity = document.getElementById('docQuantity');
+                                            const singleUnitPrice = document.getElementById('docUnitPrice');
+                                            if (singleQuantity) singleQuantity.setAttribute('required', 'required');
+                                            if (singleUnitPrice) singleUnitPrice.setAttribute('required', 'required');
                                         }
                                     }
                                     
@@ -3334,6 +3352,31 @@
                 if (selectedItemTypes.length === 0) {
                     showAlert('Please select at least one item type.', 'warning');
                     return;
+                }
+                
+                // Validate form based on current state
+                if (selectedItemTypes.length > 1) {
+                    // Multiple items - validate dynamic inputs
+                    const dynamicInputs = form.querySelectorAll('.item-quantity, .item-unit-price');
+                    for (let input of dynamicInputs) {
+                        if (!input.value || input.value <= 0) {
+                            showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
+                            input.focus();
+                            return;
+                        }
+                    }
+                } else {
+                    // Single item - validate regular inputs
+                    const quantity = form.querySelector('#docQuantity');
+                    const unitPrice = form.querySelector('#docUnitPrice');
+                    
+                    if (!quantity || !unitPrice || !quantity.value || !unitPrice.value || 
+                        parseInt(quantity.value) <= 0 || parseFloat(unitPrice.value) <= 0) {
+                        showAlert('Please enter valid quantity and unit price.', 'warning');
+                        if (quantity && !quantity.value) quantity.focus();
+                        else if (unitPrice && !unitPrice.value) unitPrice.focus();
+                        return;
+                    }
                 }
                 
                 // Handle different input scenarios
