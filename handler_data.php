@@ -91,13 +91,36 @@ $document_sql = "SELECT * FROM documents ORDER BY date DESC";
 $document_result = $conn->query($document_sql);
 if ($document_result) {
      while ($row = $document_result->fetch_assoc()) {
+        // Format document data for frontend consistency
+        $item_type = $row['item_type'];
+        // Handle JSON-encoded item types (from multiple item selection)
+        if (is_string($item_type) && (strpos($item_type, '[') === 0 || strpos($item_type, '{') === 0)) {
+            $decoded_items = json_decode($item_type, true);
+            if (is_array($decoded_items)) {
+                $item_type = implode(', ', $decoded_items);
+            }
+        }
+        
+        $formatted_doc = [
+            'id' => (int)$row['id'],
+            'clientId' => (int)$row['client_id'],
+            'clientName' => $row['client_name'] ?: 'Unknown Client',
+            'docType' => $row['doc_type'],
+            'itemType' => $item_type ?: 'General',
+            'description' => $row['description'] ?: '',
+            'quantity' => (int)$row['quantity'],
+            'unitPrice' => (float)$row['unit_price'],
+            'total' => (float)$row['total'],
+            'date' => $row['date']
+        ];
+        
         // Sort documents into their respective types for the frontend
         if ($row['doc_type'] === 'quotation') {
-            $response_data['documents']['quotations'][] = $row;
+            $response_data['documents']['quotations'][] = $formatted_doc;
         } elseif ($row['doc_type'] === 'invoice') {
-            $response_data['documents']['invoices'][] = $row;
+            $response_data['documents']['invoices'][] = $formatted_doc;
         } elseif ($row['doc_type'] === 'receipt') {
-            $response_data['documents']['receipts'][] = $row;
+            $response_data['documents']['receipts'][] = $formatted_doc;
         }
     }
 }
