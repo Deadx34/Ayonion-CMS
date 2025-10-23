@@ -93,11 +93,21 @@ if ($document_result) {
      while ($row = $document_result->fetch_assoc()) {
         // Format document data for frontend consistency
         $item_type = $row['item_type'];
-        // Handle JSON-encoded item types (from multiple item selection)
+        $item_details = null;
+        
+        // Handle JSON-encoded item details (from multiple item selection)
         if (is_string($item_type) && (strpos($item_type, '[') === 0 || strpos($item_type, '{') === 0)) {
             $decoded_items = json_decode($item_type, true);
             if (is_array($decoded_items)) {
-                $item_type = implode(', ', $decoded_items);
+                // Check if it's the new format with item details
+                if (isset($decoded_items[0]['itemType'])) {
+                    // New format with detailed item information
+                    $item_details = $decoded_items;
+                    $item_type = implode(', ', array_column($decoded_items, 'itemType'));
+                } else {
+                    // Old format with just item types
+                    $item_type = implode(', ', $decoded_items);
+                }
             }
         }
         
@@ -107,6 +117,7 @@ if ($document_result) {
             'clientName' => $row['client_name'] ?: 'Unknown Client',
             'docType' => $row['doc_type'],
             'itemType' => $item_type ?: 'General',
+            'itemDetails' => $item_details, // Include detailed item information
             'description' => $row['description'] ?: '',
             'quantity' => (int)$row['quantity'],
             'unitPrice' => (float)$row['unit_price'],

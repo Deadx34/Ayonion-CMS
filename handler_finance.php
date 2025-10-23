@@ -118,28 +118,25 @@ try {
     $clientName = $conn->real_escape_string($client_row['company_name']);
 
 
-    // --- 1. Insert multiple documents for each item detail ---
-    $documentsCreated = 0;
-    foreach ($itemDetails as $item) {
-        $itemType = $conn->real_escape_string($item['itemType']);
-        $quantity = (int)$item['quantity'];
-        $unitPrice = (float)$item['unitPrice'];
-        $itemTotal = (float)$item['total'];
-        
-        // Create unique ID for each item document
-        $itemId = $id . '_' . $documentsCreated;
-        
-        $sql_insert_doc = "INSERT INTO documents 
-            (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
-            VALUES 
-            ('$itemId', $clientId, '$clientName', '$docType', '$itemType', '$description', $quantity, $unitPrice, $itemTotal, '$date')";
+    // --- 1. Insert a single document with all item details as JSON ---
+    // Encode all item details as JSON for storage
+    $itemDetailsJson = json_encode($itemDetails);
+    $itemTypesJson = json_encode($itemTypes);
+    
+    // Calculate average quantity and unit price for display purposes
+    $avgQuantity = array_sum(array_column($itemDetails, 'quantity')) / count($itemDetails);
+    $avgUnitPrice = array_sum(array_column($itemDetails, 'unitPrice')) / count($itemDetails);
+    
+    $sql_insert_doc = "INSERT INTO documents 
+        (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+        VALUES 
+        ('$id', $clientId, '$clientName', '$docType', '$itemDetailsJson', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
 
-        if (!query_db($conn, $sql_insert_doc)) {
-            throw new Exception("Failed to save document item to the database.");
-        }
-        
-        $documentsCreated++;
+    if (!query_db($conn, $sql_insert_doc)) {
+        throw new Exception("Failed to save document to the database.");
     }
+    
+    $documentsCreated = 1;
 
 
     // --- 2. If it's a RECEIPT, update the client's profile for each item type ---
@@ -180,7 +177,7 @@ try {
     $conn->commit();
     echo json_encode([
         "success" => true, 
-        "message" => ucfirst($docType) . " created successfully with " . $documentsCreated . " item(s) and total amount Rs. " . number_format($total, 2) . "!",
+        "message" => ucfirst($docType) . " created successfully with " . count($itemDetails) . " item type(s) and total amount Rs. " . number_format($total, 2) . "!",
         "documentId" => $id,
         "itemTypes" => $itemTypes,
         "itemDetails" => $itemDetails,
