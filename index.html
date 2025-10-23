@@ -1177,8 +1177,8 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-2"></i>Cancel
                     </button>
-                    <button type="button" class="btn btn-success" onclick="downloadInvoicePDF()">
-                        <i class="fas fa-download me-2"></i>Download PDF
+                    <button type="button" class="btn btn-success" onclick="printInvoicePDF()">
+                        <i class="fas fa-print me-2"></i>Print
                     </button>
                     <button type="button" class="btn btn-primary" onclick="saveInvoice()">
                         <i class="fas fa-save me-2"></i>Save Invoice
@@ -3276,11 +3276,11 @@
 						bootstrap.Modal.getInstance(document.getElementById('documentModal')).hide();
                         this.reset();
                         
-                        // ✅ NEW: Trigger automatic download after successful creation
+                        // ✅ NEW: Trigger automatic print after successful creation
                         const docId = result.documentId || result.id;
                         if (docId) {
                             setTimeout(() => {
-                                downloadDocument(formData.docType, docId);
+                                printDocument(formData.docType, docId);
                             }, 1000); // Small delay to ensure data is loaded
                         }
                     } else {
@@ -3409,23 +3409,18 @@
             }
         }
 
-        function printDocument() {
-            window.print();
-        }
-
-        // ✅ NEW: Download document function
-        function downloadDocument(docType, docId) {
+        // ✅ Print document function
+        function printDocument(docType, docId) {
             try {
-                // Open in new window for better PDF generation
-                const downloadUrl = `handler_download.php?action=download&type=${docType}&id=${docId}`;
-                const printWindow = window.open(downloadUrl, '_blank', 'width=800,height=600');
+                // Open in new window for printing
+                const printUrl = `handler_download.php?action=print&type=${docType}&id=${docId}`;
+                const printWindow = window.open(printUrl, '_blank', 'width=800,height=600');
                 
                 // The server will automatically trigger the print dialog
-                // This ensures the PDF is generated properly by the browser
-                showAlert(`${docType.charAt(0).toUpperCase() + docType.slice(1)} PDF opening in new window! 📄`, 'info');
+                showAlert(`${docType.charAt(0).toUpperCase() + docType.slice(1)} opening for printing! 🖨️`, 'info');
             } catch (error) {
-                console.error('Download error:', error);
-                showAlert('Failed to download document. Please try again.', 'warning');
+                console.error('Print error:', error);
+                showAlert('Failed to open document for printing. Please try again.', 'warning');
             }
         }
 
@@ -3785,13 +3780,13 @@
             }
         }
 
-        function downloadInvoicePDF() {
+        function printInvoicePDF() {
             if (!currentInvoiceData) {
                 showAlert('No invoice data available.', 'error');
                 return;
             }
 
-            // Create a new window for PDF generation
+            // Create a new window for printing
             const printWindow = window.open('', '_blank');
             const invoiceHTML = document.getElementById('invoicePreviewContent').innerHTML;
             const clientName = currentInvoiceData.client.company_name || currentInvoiceData.client.partner_id;
@@ -3819,6 +3814,7 @@
             
             printWindow.document.write(htmlContent);
             printWindow.document.close();
+            showAlert('Invoice opening for printing! 🖨️', 'info');
         }
 
     </script>

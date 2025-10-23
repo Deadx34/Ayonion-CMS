@@ -10,8 +10,8 @@ $docId = $_GET['id'] ?? '';
 $docType = $_GET['type'] ?? '';
 
 try {
-    if ($action !== 'download') {
-        throw new Exception("Invalid action. Use 'download' action.", 400);
+    if ($action !== 'download' && $action !== 'print') {
+        throw new Exception("Invalid action. Use 'download' or 'print' action.", 400);
     }
     
     if (empty($docId) || empty($docType)) {
@@ -45,19 +45,19 @@ try {
     include 'simple_pdf.php';
     $htmlContent = createPDFDocument($doc, $settings);
     
-    // Set headers for PDF download
-    $filename = strtoupper($docType) . "_" . $docId . "_" . date('Y-m-d') . ".pdf";
+    // Set headers for document display
+    $filename = strtoupper($docType) . "_" . $docId . "_" . date('Y-m-d') . ".html";
     
-    // Use browser's PDF generation with proper headers
+    // Use browser's HTML generation with proper headers
     header('Content-Type: text/html; charset=UTF-8');
     header('Content-Disposition: inline; filename="' . $filename . '"');
     header('Cache-Control: private, max-age=0, must-revalidate');
     header('Pragma: public');
     
-    // Add JavaScript to trigger PDF download
+    // Add JavaScript to trigger print dialog
     $htmlContent = str_replace('</body>', '
     <script>
-        // Auto-trigger print dialog for PDF generation
+        // Auto-trigger print dialog
         window.onload = function() {
             setTimeout(function() {
                 window.print();
