@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AYONION-CMS</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; }
+        .navbar-brand { font-weight: bold; color: #6f42c1 !important; }
+        .sidebar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .sidebar .nav-link { color: rgba(255,255,255,0.8); transition: all 0.3s; }
+        .sidebar .nav-link:hover { color: white; background: rgba(255,255,255,0.1); }
+        .sidebar .nav-link.active { color: white; background: rgba(255,255,255,0.2); }
+        .main-content { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card { border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
+        .btn-primary:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); }
+        .table th { background: #f8f9fa; border-top: none; }
+        .badge { font-size: 0.8em; }
+        .notification-toast { position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px; }
+        .empty-state { text-align: center; padding: 40px; color: #6c757d; }
+        .empty-state i { font-size: 3rem; margin-bottom: 20px; color: #dee2e6; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><i class="fas fa-cube me-2"></i>AYONION-CMS</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Welcome, <span id="currentUser">Admin</span></span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h5 class="text-white mb-3">Navigation</h5>
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('dashboard')">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('clients')">
+                                <i class="fas fa-users me-2"></i>Clients
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('content')">
+                                <i class="fas fa-file-alt me-2"></i>Content Credits
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('campaigns')">
+                                <i class="fas fa-bullhorn me-2"></i>Campaigns
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('finance')">
+                                <i class="fas fa-dollar-sign me-2"></i>Financial Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('users')">
+                                <i class="fas fa-user-cog me-2"></i>User Management
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <div class="main-content p-4">
+                    <!-- Dashboard Section -->
+                    <div id="dashboardSection" class="content-section">
+                        <h2 class="mb-4">Dashboard</h2>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                                        <h5 class="card-title">Total Clients</h5>
+                                        <h3 class="text-primary" id="totalClients">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-file-alt fa-2x text-success mb-3"></i>
+                                        <h5 class="card-title">Content Used</h5>
+                                        <h3 class="text-success" id="totalContentUsed">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Other sections would go here -->
+                    <div id="clientsSection" class="content-section" style="display: none;">
+                        <h2 class="mb-4">Clients Management</h2>
+                        <p>Client management functionality will be loaded here.</p>
+                    </div>
+
+                    <div id="contentSection" class="content-section" style="display: none;">
+                        <h2 class="mb-4">Content Credits</h2>
+                        <p>Content credits management will be loaded here.</p>
+                    </div>
+
+                    <div id="campaignsSection" class="content-section" style="display: none;">
+                        <h2 class="mb-4">Campaigns</h2>
+                        <p>Campaign management will be loaded here.</p>
+                    </div>
+
+                    <div id="financeSection" class="content-section" style="display: none;">
+                        <h2 class="mb-4">Financial Management</h2>
+                        <p>Financial management will be loaded here.</p>
+                    </div>
+
+                    <div id="usersSection" class="content-section" style="display: none;">
+                        <h2 class="mb-4">User Management</h2>
+                        <p>User management will be loaded here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="notification-toast"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Basic application functionality
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + 'Section').style.display = 'block';
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'logout.php';
+            }
+        }
+
+        // Initialize dashboard
+        function loadDashboard() {
+            document.getElementById('totalClients').textContent = '0';
+            document.getElementById('totalContentUsed').textContent = '0';
+        }
+
+        // Show alert function
+        function showAlert(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-' + type + ' alert-dismissible fade show';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            showAlert('AYONION-CMS loaded successfully!', 'success');
+        });
+    </script>
+</body>
+</html>
