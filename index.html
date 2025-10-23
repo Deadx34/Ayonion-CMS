@@ -3492,11 +3492,41 @@
             const titles = { quotation: 'QUOTATION', invoice: 'INVOICE', receipt: 'RECEIPT' };
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
 
-            // ... (HTML generation remains local) ...
-            const qty = parseFloat(doc.quantity || 0);
-            const unit = parseFloat(doc.unitPrice || doc.unit_price || 0);
-            const total = parseFloat(doc.total || 0);
+            // Handle multiple line items or single item
             const clientName = doc.clientName || doc.client_name || 'Unknown Client';
+            const total = parseFloat(doc.total || 0);
+            
+            // Check if we have detailed item information (new format)
+            let lineItems = [];
+            if (doc.itemDetails && Array.isArray(doc.itemDetails)) {
+                // New format with detailed item information
+                lineItems = doc.itemDetails.map(item => ({
+                    description: `${item.itemType} - ${doc.description}`,
+                    quantity: parseFloat(item.quantity || 0),
+                    unitPrice: parseFloat(item.unitPrice || 0),
+                    total: parseFloat(item.total || 0)
+                }));
+            } else {
+                // Old format with single item
+                const qty = parseFloat(doc.quantity || 0);
+                const unit = parseFloat(doc.unitPrice || doc.unit_price || 0);
+                lineItems = [{
+                    description: doc.description || 'Service',
+                    quantity: qty,
+                    unitPrice: unit,
+                    total: total
+                }];
+            }
+
+            // Generate table rows for all line items
+            const tableRows = lineItems.map(item => `
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 15px;">${item.description}</td>
+                    <td style="padding: 15px; text-align: center;">${item.quantity.toLocaleString()}</td>
+                    <td style="padding: 15px; text-align: right;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 15px; text-align: right; font-weight: bold;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `).join('');
 
             const html = `
                 <div style="font-family: Arial; padding: 30px; max-width: 800px; margin: 0 auto;">
@@ -3519,13 +3549,14 @@
                         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                             <h3 style="color: ${colors[type]}; margin-top: 0;">Bill To:</h3>
                             <p style="font-size: 18px; font-weight: bold; margin: 5px 0;">${clientName}</p>
-                            <p style="margin: 5px 0;">Partner ID: ${doc.clientPartnerId}</p>
+                            <p style="margin: 5px 0;">Partner ID: ${doc.clientPartnerId || 'N/A'}</p>
                             <p style="margin: 5px 0;">${COMPANY_INFO.address}</p>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin: 20px 0;">
                             <div>
                                 <p style="margin: 5px 0;"><strong>Date:</strong> ${formatDate(doc.date)}</p>
-                                <p style="margin: 5px 0;"><strong>Item:</strong> ${doc.itemType || doc.item_type || 'General'}</p>
+                                <p style="margin: 5px 0;"><strong>Items:</strong> ${doc.itemType || doc.item_type || 'General'}</p>
+                                <p style="margin: 5px 0;"><strong>Total Items:</strong> ${lineItems.length}</p>
                             </div>
                         </div>
                     </div>
@@ -3539,12 +3570,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr style="border-bottom: 2px solid #e5e7eb;">
-                                <td style="padding: 15px;">${doc.description}</td>
-                                <td style="padding: 15px; text-align: center;">${qty.toLocaleString()}</td>
-                                <td style="padding: 15px; text-align: right;">${unit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                <td style="padding: 15px; text-align: right; font-weight: bold;">${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                            </tr>
+                            ${tableRows}
                         </tbody>
                     </table>
                     <div style="text-align: right; padding: 20px; background: ${colors[type]}15; border-radius: 8px; margin-top: 30px;">
