@@ -2,14 +2,23 @@
 // AYONION-CMS/handler_invoices.php - Handles invoice operations
 
 header('Content-Type: application/json');
-include 'includes/config.php';
-$conn = connect_db();
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors in output
 
-// Use transactions for data integrity
-$conn->begin_transaction();
+try {
+    include 'includes/config.php';
+    $conn = connect_db();
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "Database connection failed: " . $e->getMessage()]);
+    exit;
+}
 
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents("php://input"), true);
+
+// Use transactions for data integrity
+$conn->begin_transaction();
 
 try {
     // --- 1. HANDLE CREATE INVOICE (POST) ---
@@ -54,10 +63,13 @@ try {
         $dueDate = date('Y-m-d', strtotime('+30 days'));
 
         // 1. Create Invoice Record
+        $invoiceNumberEscaped = $conn->real_escape_string($invoiceNumber);
+        $dueDateEscaped = $conn->real_escape_string($dueDate);
+        
         $sql_invoice = "INSERT INTO invoices (
             id, client_id, total_amount, invoice_number, due_date, notes, status
         ) VALUES (
-            '$invoiceId', '$clientId', '$totalAmount', '$invoiceNumber', '$dueDate', '$notes', 'draft'
+            '$invoiceId', $clientId, $totalAmount, '$invoiceNumberEscaped', '$dueDateEscaped', '$notes', 'draft'
         )";
 
         if (!query_db($conn, $sql_invoice)) {
@@ -66,14 +78,18 @@ try {
 
         // 2. Create Invoice Items
         foreach ($campaignDetails as $campaign) {
+            $campaignId = (int)$campaign['id'];
+            $campaignSpend = (float)$campaign['spend'];
+            $description = $conn->real_escape_string($campaign['platform'] . ' - ' . $campaign['ad_name']);
+            
             $sql_item = "INSERT INTO invoice_items (
                 invoice_id, campaign_id, amount, description
             ) VALUES (
-                '$invoiceId', '{$campaign['id']}', '{$campaign['spend']}', '{$campaign['platform']} - {$campaign['ad_name']}'
+                '$invoiceId', $campaignId, $campaignSpend, '$description'
             )";
             
             if (!query_db($conn, $sql_item)) {
-                throw new Exception("Failed to create invoice item for campaign {$campaign['id']}.");
+                throw new Exception("Failed to create invoice item for campaign {$campaignId}.");
             }
         }
 
