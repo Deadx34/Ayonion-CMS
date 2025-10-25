@@ -29,6 +29,7 @@ function createPDFDocument($doc, $settings) {
     $docNumber = strtoupper(substr($docType, 0, 1)) . substr($doc['id'], -6);
     $title = strtoupper($docType);
     
+    $companyLogo = $settings['logo_url'] ?? '';
     $companyName = $settings['company_name'] ?? 'AYONION STUDIOS';
     $companyEmail = $settings['email'] ?? 'info@ayonionstudios.com';
     $companyPhone = $settings['phone'] ?? '+94 (70) 610 1035';
@@ -278,6 +279,7 @@ function createPDFDocument($doc, $settings) {
     <body>
         <div class='sidebar'>
             <div class='company-logo'>
+                " . ($companyLogo ? "<img src='{$companyLogo}' alt='Logo' style='height: 60px; margin-bottom: 15px; object-fit: contain;'>" : "") . "
                 <div class='company-name'>{$companyName}</div>
                 <div class='company-tagline'>{$companyTagline}</div>
             </div>
