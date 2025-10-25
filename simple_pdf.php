@@ -73,6 +73,7 @@ function createPDFDocument($doc, $settings) {
     <head>
         <meta charset='UTF-8'>
         <title>{$title} - {$docNumber}</title>
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'>
         <style>
             @page { margin: 0; }
             * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -100,6 +101,7 @@ function createPDFDocument($doc, $settings) {
             }
             .company-logo {
                 margin-bottom: 30px;
+                text-align: center;
             }
             .company-name {
                 font-size: 28px;
@@ -308,9 +310,11 @@ function createPDFDocument($doc, $settings) {
                 <div class='social-title'>Find us on social media:</div>
                 <div class='social-handle'>ayonionstudios</div>
                 <div class='social-icons'>
-                    <div class='social-icon' style='background: #ff0000;'>📺</div>
-                    <div class='social-icon' style='background: #3b5998;'>📘</div>
-                    <div class='social-icon' style='background: #0077b5;'>💼</div>
+                    <div class='social-icon' style='background: #ff0000;'><i class='fab fa-youtube'></i></div>
+                    <div class='social-icon' style='background: #e4405f;'><i class='fab fa-instagram'></i></div>
+                    <div class='social-icon' style='background: #3b5998;'><i class='fab fa-facebook-f'></i></div>
+                    <div class='social-icon' style='background: #1da1f2;'><i class='fab fa-twitter'></i></div>
+                    <div class='social-icon' style='background: #0077b5;'><i class='fab fa-linkedin-in'></i></div>
                 </div>
             </div>
         </div>
