@@ -123,8 +123,8 @@ function createPDFDocument($doc, $settings) {
             .contact-item {
                 display: flex;
                 align-items: center;
-                margin-bottom: 12px;
-                font-size: 14px;
+                margin-bottom: 10px;
+                font-size: 12px;
             }
             .contact-icon {
                 width: 16px;
@@ -135,14 +135,14 @@ function createPDFDocument($doc, $settings) {
                 margin-top: auto;
             }
             .social-title {
-                font-size: 14px;
+                font-size: 12px;
                 color: #bdc3c7;
-                margin-bottom: 10px;
+                margin-bottom: 8px;
             }
             .social-handle {
-                font-size: 16px;
+                font-size: 14px;
                 font-weight: bold;
-                margin-bottom: 15px;
+                margin-bottom: 12px;
             }
             .social-icons {
                 display: flex;
@@ -152,13 +152,13 @@ function createPDFDocument($doc, $settings) {
                 margin-top: auto;
             }
             .social-icon {
-                width: 24px;
-                height: 24px;
+                width: 20px;
+                height: 20px;
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 12px;
+                font-size: 10px;
                 color: white;
             }
             .document-header {
