@@ -2139,35 +2139,63 @@
             const remainingBudget = totalAdBudget - totalSpent;
 
             const logoElement = document.getElementById('clientDetailLogo');
-            if (client.logoUrl) {
-                logoElement.src = client.logoUrl;
-                logoElement.onerror = function() {
-                    this.style.display = 'none';
-                    this.parentNode.innerHTML = '<i class="fas fa-building fa-3x text-muted"></i>';
-                };
-            } else {
-                logoElement.style.display = 'none';
-                logoElement.parentNode.innerHTML = '<i class="fas fa-building fa-3x text-muted"></i>';
+            if (logoElement) {
+                if (client.logoUrl) {
+                    logoElement.src = client.logoUrl;
+                    logoElement.onerror = function() {
+                        this.style.display = 'none';
+                        this.parentNode.innerHTML = '<i class="fas fa-building fa-3x text-muted"></i>';
+                    };
+                } else {
+                    logoElement.style.display = 'none';
+                    logoElement.parentNode.innerHTML = '<i class="fas fa-building fa-3x text-muted"></i>';
+                }
             }
-            document.getElementById('clientDetailName').textContent = client.companyName;
-            document.getElementById('clientDetailPartnerId').textContent = client.partnerId;
-            document.getElementById('clientDetailIndustry').textContent = client.industry;
-            document.getElementById('clientDetailRenewal').textContent = formatDate(client.renewalDate);
-            document.getElementById('clientDetailPlatforms').textContent = client.managingPlatforms || '-';
-            document.getElementById('clientDetailTotalAdBudget').textContent = totalAdBudget.toLocaleString(undefined, { minimumFractionDigits: 2 });
-            document.getElementById('clientDetailAdBudget').textContent = remainingBudget.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            // Safely update client detail elements
+            const nameEl = document.getElementById('clientDetailName');
+            if (nameEl) nameEl.textContent = client.companyName;
+            
+            const partnerEl = document.getElementById('clientDetailPartnerId');
+            if (partnerEl) partnerEl.textContent = client.partnerId;
+            
+            const industryEl = document.getElementById('clientDetailIndustry');
+            if (industryEl) industryEl.textContent = client.industry;
+            
+            const renewalEl = document.getElementById('clientDetailRenewal');
+            if (renewalEl) renewalEl.textContent = formatDate(client.renewalDate);
+            
+            const platformsEl = document.getElementById('clientDetailPlatforms');
+            if (platformsEl) platformsEl.textContent = client.managingPlatforms || '-';
+            
+            const totalBudgetEl = document.getElementById('clientDetailTotalAdBudget');
+            if (totalBudgetEl) totalBudgetEl.textContent = totalAdBudget.toLocaleString(undefined, { minimumFractionDigits: 2 });
+            
+            const budgetEl = document.getElementById('clientDetailAdBudget');
+            if (budgetEl) budgetEl.textContent = remainingBudget.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-            document.getElementById('clientDetailPackage').textContent = client.packageCredits;
-            document.getElementById('clientDetailExtra').textContent = client.extraCredits;
-            document.getElementById('clientDetailCarried').textContent = client.carriedForwardCredits;
-            document.getElementById('clientDetailUsed').textContent = client.usedCredits;
-            document.getElementById('clientDetailAvailable').textContent = available;
+            const packageEl = document.getElementById('clientDetailPackage');
+            if (packageEl) packageEl.textContent = client.packageCredits;
+            
+            const extraEl = document.getElementById('clientDetailExtra');
+            if (extraEl) extraEl.textContent = client.extraCredits;
+            
+            const carriedEl = document.getElementById('clientDetailCarried');
+            if (carriedEl) carriedEl.textContent = client.carriedForwardCredits;
+            
+            const usedEl = document.getElementById('clientDetailUsed');
+            if (usedEl) usedEl.textContent = client.usedCredits;
+            
+            const availableEl = document.getElementById('clientDetailAvailable');
+            if (availableEl) availableEl.textContent = available;
 
             const canManageContent = hasPermission('canManageContent');
             const canManageCampaigns = hasPermission('canManageCampaigns');
 
-            document.getElementById('btnManageContent').style.display = canManageContent ? 'block' : 'none';
-            document.getElementById('btnViewCampaigns').style.display = canManageCampaigns ? 'block' : 'none';
+            const manageContentBtn = document.getElementById('btnManageContent');
+            if (manageContentBtn) manageContentBtn.style.display = canManageContent ? 'block' : 'none';
+            
+            const viewCampaignsBtn = document.getElementById('btnViewCampaigns');
+            if (viewCampaignsBtn) viewCampaignsBtn.style.display = canManageCampaigns ? 'block' : 'none';
 
             new bootstrap.Modal(document.getElementById('clientDetailsModal')).show();
         }
