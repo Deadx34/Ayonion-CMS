@@ -3451,6 +3451,14 @@
                 </div>
             `;
             document.getElementById('documentPreview').innerHTML = readOnlyHeader + html;
+            
+            // Store document info in modal for print function
+            const modal = document.getElementById('viewDocumentModal');
+            if (modal) {
+                modal.dataset.docType = type;
+                modal.dataset.docId = id;
+            }
+            
             showDocumentModal();
         }
 
@@ -3489,6 +3497,25 @@
         // ✅ Print document function
         function printDocument(docType, docId) {
             try {
+                // If no parameters provided, try to get from current context
+                if (!docType || !docId) {
+                    // Try to get from the current document being viewed
+                    const currentDoc = getCurrentDocument();
+                    if (currentDoc) {
+                        docType = currentDoc.docType;
+                        docId = currentDoc.id;
+                    } else {
+                        showAlert('No document selected for printing.', 'warning');
+                        return;
+                    }
+                }
+                
+                // Validate parameters
+                if (!docType || !docId) {
+                    showAlert('Invalid document parameters for printing.', 'warning');
+                    return;
+                }
+                
                 // Find the document in the current data
                 const docs = appData.documents[docType + 's'] || [];
                 const doc = docs.find(d => String(d.id) === String(docId));
@@ -3510,6 +3537,25 @@
                 console.error('Print error:', error);
                 showAlert('Failed to open document for printing. Please try again.', 'warning');
             }
+        }
+        
+        // Helper function to get current document being viewed
+        function getCurrentDocument() {
+            // Try to get from modal context or global variables
+            if (typeof selectedDocument !== 'undefined' && selectedDocument) {
+                return selectedDocument;
+            }
+            
+            // Try to get from the document modal
+            const modal = document.getElementById('viewDocumentModal');
+            if (modal && modal.dataset.docType && modal.dataset.docId) {
+                return {
+                    docType: modal.dataset.docType,
+                    id: modal.dataset.docId
+                };
+            }
+            
+            return null;
         }
         
         // ✅ Generate print content for documents
