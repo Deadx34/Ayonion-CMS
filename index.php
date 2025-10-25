@@ -3392,34 +3392,36 @@
                             <div style="font-size: 14px; color: #bdc3c7; margin-bottom: 40px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
                         </div>
                         
-                        <div style="margin-bottom: 30px;">
-                            <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
-                                <span style="width: 16px; margin-right: 10px; text-align: center;">✉</span>
-                                <span>${COMPANY_INFO.email || 'info@ayonionstudios.com'}</span>
-                            </div>
-                            <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
-                                <span style="width: 16px; margin-right: 10px; text-align: center;">📞</span>
-                                <span>${COMPANY_INFO.phone || '+94 (70) 610 1035'}</span>
-                            </div>
-                            <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
-                                <span style="width: 16px; margin-right: 10px; text-align: center;">📍</span>
-                                <span>${COMPANY_INFO.address || 'No.59/1/C, Kaluwala road, Kossinna, Ganemulla. PV00231937'}</span>
-                            </div>
-                            <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
-                                <span style="width: 16px; margin-right: 10px; text-align: center;">🌐</span>
-                                <span><strong>${COMPANY_INFO.website || 'www.ayonionstudios.com'}</strong></span>
-                            </div>
-                        </div>
-                        
                         <div style="margin-top: auto;">
-                            <div style="font-size: 14px; color: #bdc3c7; margin-bottom: 10px;">Find us on social media:</div>
-                            <div style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">ayonionstudios</div>
-                            <div style="display: flex; gap: 10px;">
-                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-youtube"></i></div>
-                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #e4405f; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-instagram"></i></div>
-                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #3b5998; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-facebook-f"></i></div>
-                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #1da1f2; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-twitter"></i></div>
-                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #0077b5; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-linkedin-in"></i></div>
+                            <div style="margin-bottom: 30px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
+                                    <span style="width: 16px; margin-right: 10px; text-align: center;">✉</span>
+                                    <span>${COMPANY_INFO.email || 'info@ayonionstudios.com'}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
+                                    <span style="width: 16px; margin-right: 10px; text-align: center;">📞</span>
+                                    <span>${COMPANY_INFO.phone || '+94 (70) 610 1035'}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
+                                    <span style="width: 16px; margin-right: 10px; text-align: center;">📍</span>
+                                    <span>${COMPANY_INFO.address || 'No.59/1/C, Kaluwala road, Kossinna, Ganemulla. PV00231937'}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
+                                    <span style="width: 16px; margin-right: 10px; text-align: center;">🌐</span>
+                                    <span><strong>${COMPANY_INFO.website || 'www.ayonionstudios.com'}</strong></span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div style="font-size: 14px; color: #bdc3c7; margin-bottom: 10px;">Find us on social media:</div>
+                                <div style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">ayonionstudios</div>
+                                <div style="display: flex; gap: 10px;">
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-youtube"></i></div>
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #e4405f; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-instagram"></i></div>
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #3b5998; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-facebook-f"></i></div>
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #1da1f2; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-twitter"></i></div>
+                                    <div style="width: 24px; height: 24px; border-radius: 50%; background: #0077b5; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;"><i class="fab fa-linkedin-in"></i></div>
+                                </div>
                             </div>
                         </div>
                     </div>

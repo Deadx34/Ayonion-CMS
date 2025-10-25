@@ -148,6 +148,9 @@ function createPDFDocument($doc, $settings) {
                 display: flex;
                 gap: 10px;
             }
+            .footer-section {
+                margin-top: auto;
+            }
             .social-icon {
                 width: 24px;
                 height: 24px;
@@ -287,34 +290,36 @@ function createPDFDocument($doc, $settings) {
                 <div class='company-tagline'>{$companyTagline}</div>
             </div>
             
-            <div class='contact-section'>
-                <div class='contact-item'>
-                    <span class='contact-icon'>✉</span>
-                    <span>{$companyEmail}</span>
+            <div class='footer-section'>
+                <div class='contact-section'>
+                    <div class='contact-item'>
+                        <span class='contact-icon'>✉</span>
+                        <span>{$companyEmail}</span>
+                    </div>
+                    <div class='contact-item'>
+                        <span class='contact-icon'>📞</span>
+                        <span>{$companyPhone}</span>
+                    </div>
+                    <div class='contact-item'>
+                        <span class='contact-icon'>📍</span>
+                        <span>{$companyAddress}</span>
+                    </div>
+                    <div class='contact-item'>
+                        <span class='contact-icon'>🌐</span>
+                        <span><strong>{$companyWebsite}</strong></span>
+                    </div>
                 </div>
-                <div class='contact-item'>
-                    <span class='contact-icon'>📞</span>
-                    <span>{$companyPhone}</span>
-                </div>
-                <div class='contact-item'>
-                    <span class='contact-icon'>📍</span>
-                    <span>{$companyAddress}</span>
-                </div>
-                <div class='contact-item'>
-                    <span class='contact-icon'>🌐</span>
-                    <span><strong>{$companyWebsite}</strong></span>
-                </div>
-            </div>
-            
-            <div class='social-section'>
-                <div class='social-title'>Find us on social media:</div>
-                <div class='social-handle'>ayonionstudios</div>
-                <div class='social-icons'>
-                    <div class='social-icon' style='background: #ff0000;'><i class='fab fa-youtube'></i></div>
-                    <div class='social-icon' style='background: #e4405f;'><i class='fab fa-instagram'></i></div>
-                    <div class='social-icon' style='background: #3b5998;'><i class='fab fa-facebook-f'></i></div>
-                    <div class='social-icon' style='background: #1da1f2;'><i class='fab fa-twitter'></i></div>
-                    <div class='social-icon' style='background: #0077b5;'><i class='fab fa-linkedin-in'></i></div>
+                
+                <div class='social-section'>
+                    <div class='social-title'>Find us on social media:</div>
+                    <div class='social-handle'>ayonionstudios</div>
+                    <div class='social-icons'>
+                        <div class='social-icon' style='background: #ff0000;'><i class='fab fa-youtube'></i></div>
+                        <div class='social-icon' style='background: #e4405f;'><i class='fab fa-instagram'></i></div>
+                        <div class='social-icon' style='background: #3b5998;'><i class='fab fa-facebook-f'></i></div>
+                        <div class='social-icon' style='background: #1da1f2;'><i class='fab fa-twitter'></i></div>
+                        <div class='social-icon' style='background: #0077b5;'><i class='fab fa-linkedin-in'></i></div>
+                    </div>
                 </div>
             </div>
         </div>
