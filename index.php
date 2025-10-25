@@ -3384,63 +3384,116 @@
             const clientName = doc.clientName || doc.client_name || 'Unknown Client';
 
             const html = `
-                <div style="font-family: Arial; padding: 30px; max-width: 800px; margin: 0 auto;">
-                    <div style="border-bottom: 4px solid ${colors[type]}; padding-bottom: 20px; margin-bottom: 30px;">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div style="display: flex; align-items: center;">
-                                ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 80px; margin-right: 20px; object-fit: contain;">` : ''}
-                                <div>
-                                    <h1 style="color: ${colors[type]}; margin: 0; font-size: 2.5rem;">${COMPANY_INFO.name}</h1>
-                                    <p style="color: #666; margin: 5px 0;">${COMPANY_INFO.tagline}</p>
-                                </div>
+                <div style="display: flex; min-height: 100vh; font-family: Arial, sans-serif;">
+                    <!-- Sidebar -->
+                    <div style="width: 30%; background: #2c3e50; color: white; padding: 40px 30px; display: flex; flex-direction: column;">
+                        <div style="margin-bottom: 30px;">
+                            <div style="font-size: 28px; font-weight: bold; color: white; margin-bottom: 8px; letter-spacing: 1px;">${COMPANY_INFO.name}</div>
+                            <div style="font-size: 14px; color: #bdc3c7; margin-bottom: 40px;">${COMPANY_INFO.tagline}</div>
+                        </div>
+                        
+                        <div style="margin-bottom: 30px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
+                                <span style="width: 16px; margin-right: 10px; text-align: center;">✉</span>
+                                <span>${COMPANY_INFO.email || 'info@ayonionstudios.com'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
+                                <span style="width: 16px; margin-right: 10px; text-align: center;">📞</span>
+                                <span>${COMPANY_INFO.phone || '+94 (70) 610 1035'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
+                                <span style="width: 16px; margin-right: 10px; text-align: center;">📍</span>
+                                <span>${COMPANY_INFO.address || 'No.59/1/C, Kaluwala road, Kossinna, Ganemulla. PV00231937'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; margin-bottom: 12px; font-size: 14px;">
+                                <span style="width: 16px; margin-right: 10px; text-align: center;">🌐</span>
+                                <span><strong>${COMPANY_INFO.website || 'www.ayonionstudios.com'}</strong></span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: auto;">
+                            <div style="font-size: 14px; color: #bdc3c7; margin-bottom: 10px;">Find us on social media:</div>
+                            <div style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">ayonionstudios</div>
+                            <div style="display: flex; gap: 10px;">
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;">📺</div>
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #3b5998; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;">📘</div>
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #0077b5; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white;">💼</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div style="width: 70%; background: white; padding: 40px; display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #ecf0f1;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 14px; color: #7f8c8d; margin-bottom: 5px;">Customer</div>
+                                <div style="font-size: 18px; font-weight: bold; color: #2c3e50;">${clientName}</div>
                             </div>
                             <div style="text-align: right;">
-                                <h2 style="color: ${colors[type]}; margin: 0;">${titles[type]}</h2>
-                                <p style="margin: 5px 0; font-weight: bold;">#${docNum[type]}${String(doc.id).slice(-6)}</p>
+                                <div style="font-size: 36px; font-weight: bold; color: #2c3e50; margin-bottom: 20px;">${titles[type]}</div>
+                                <div style="font-size: 14px; color: #7f8c8d;">
+                                    <div style="margin-bottom: 5px;">Date: ${formatDate(doc.date)}</div>
+                                    <div style="margin-bottom: 5px;">Quote #: ${docNum[type]}${String(doc.id).slice(-6)}</div>
+                                    <div style="margin-bottom: 5px;">Valid Until: ${formatDate(new Date(new Date(doc.date).getTime() + 14 * 24 * 60 * 60 * 1000))}</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div style="margin: 30px 0;">
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                            <h3 style="color: ${colors[type]}; margin-top: 0;">Bill To:</h3>
-                            <p style="font-size: 18px; font-weight: bold; margin: 5px 0;">${clientName}</p>
-                            <p style="margin: 5px 0;">Partner ID: ${doc.clientPartnerId}</p>
-                            <p style="margin: 5px 0;">${COMPANY_INFO.address}</p>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; margin: 20px 0;">
-                            <div>
-                                <p style="margin: 5px 0;"><strong>Date:</strong> ${formatDate(doc.date)}</p>
-                                <p style="margin: 5px 0;"><strong>Item:</strong> ${doc.itemType || doc.item_type || 'General'}</p>
+                        
+                        <table style="width: 100%; border-collapse: collapse; margin: 30px 0; font-size: 14px;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #ecf0f1;">
+                                    <th style="padding: 15px 10px; text-align: left; font-weight: bold; color: #2c3e50;">Description</th>
+                                    <th style="padding: 15px 10px; text-align: right; font-weight: bold; color: #2c3e50;">Unit Price</th>
+                                    <th style="padding: 15px 10px; text-align: center; font-weight: bold; color: #2c3e50;">Quantity</th>
+                                    <th style="padding: 15px 10px; text-align: right; font-weight: bold; color: #2c3e50;">Amount (Rs.)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #ecf0f1;">
+                                    <td style="padding: 15px 10px;">${doc.description || doc.itemType || doc.item_type || 'Service'}</td>
+                                    <td style="padding: 15px 10px; text-align: right;">${unit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                    <td style="padding: 15px 10px; text-align: center;">${qty.toLocaleString()}</td>
+                                    <td style="padding: 15px 10px; text-align: right;">${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div style="margin-top: 30px; text-align: right;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ecf0f1;">
+                                <span>Subtotal:</span>
+                                <span>${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ecf0f1;">
+                                <span>Discount:</span>
+                                <span>-</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 2px solid #2c3e50; border-bottom: 2px solid #2c3e50; font-weight: bold; font-size: 18px; margin-top: 10px;">
+                                <span>Total:</span>
+                                <span>${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                             </div>
                         </div>
-                    </div>
-                    <table style="width: 100%; border-collapse: collapse; margin: 30px 0;">
-                        <thead>
-                            <tr style="background: ${colors[type]}; color: white;">
-                                <th style="padding: 15px; text-align: left;">Description</th>
-                                <th style="padding: 15px; text-align: center;">Quantity</th>
-                                <th style="padding: 15px; text-align: right;">Unit Price (Rs.)</th>
-                                <th style="padding: 15px; text-align: right;">Amount (Rs.)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 2px solid #e5e7eb;">
-                                <td style="padding: 15px;">${doc.description}</td>
-                                <td style="padding: 15px; text-align: center;">${qty.toLocaleString()}</td>
-                                <td style="padding: 15px; text-align: right;">${unit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                <td style="padding: 15px; text-align: right; font-weight: bold;">${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div style="text-align: right; padding: 20px; background: ${colors[type]}15; border-radius: 8px; margin-top: 30px;">
-                        <p style="font-size: 24px; font-weight: bold; color: ${colors[type]}; margin: 0;">
-                            Total: Rs. ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </p>
-                    </div>
-                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 14px;">
-                        <p>Thank you for your business!</p>
-                        <p style="margin: 5px 0;">Bank: ${COMPANY_INFO.bank} | A/C: ${COMPANY_INFO.account}</p>
-                        <p>A/C Name: ${COMPANY_INFO.accountName}</p>
+                        
+                        <div style="margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 16px; font-weight: bold; color: #2c3e50; margin-bottom: 15px;">Thank you</div>
+                            <div style="font-size: 14px; line-height: 1.6; color: #555;">
+                                Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.<br><br>
+                                <strong>Payment Instructions:</strong><br>
+                                • All cheques should be crossed and made payable to Ayonion Studios (pvt) Ltd.<br>
+                                • A 50% of advance payment is required. (Excluding package payments)<br>
+                                • The quotation is valid for two weeks from the day issued.<br>
+                                • This is a computer generated quotation, No signature required.<br><br>
+                                <div style="margin-top: 20px; padding: 15px; background: #e8f4f8; border-radius: 5px; border-left: 4px solid #3498db;">
+                                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 10px;">Please deposit the advance payment to the below account</div>
+                                    <div><strong>Ayonion Studios (pvt) Ltd</strong></div>
+                                    <div><strong>101001037178</strong></div>
+                                    <div><strong>NDB Bank, Kadawatha Branch</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; font-size: 14px;">
+                            Thank you and have a good day! Team Ayonion Studios.
+                        </div>
                     </div>
                 </div>
             `;
