@@ -1037,8 +1037,8 @@
                                 </div>
                             </div>
                             <div class="col-md-12 mb-3">
-                                <label class="form-label">Description</label>
-                                <input type="text" class="form-control" id="docDescription" required>
+                                <label class="form-label">Description <span class="text-muted">(Required for Other Service)</span></label>
+                                <input type="text" class="form-control" id="docDescription">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Quantity (Credits or Units)</label>
@@ -3214,6 +3214,31 @@
             itemTypeCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', updateSelectedCount);
             });
+            
+            // Function to handle description field requirement
+            function updateDescriptionRequirement() {
+                const otherServiceCheckbox = document.getElementById('itemType4');
+                const descriptionField = document.getElementById('docDescription');
+                
+                if (otherServiceCheckbox && descriptionField) {
+                    if (otherServiceCheckbox.checked) {
+                        descriptionField.setAttribute('required', 'required');
+                        descriptionField.classList.add('border-warning');
+                    } else {
+                        descriptionField.removeAttribute('required');
+                        descriptionField.classList.remove('border-warning');
+                    }
+                }
+            }
+            
+            // Add event listener for Other Service checkbox
+            const otherServiceCheckbox = document.getElementById('itemType4');
+            if (otherServiceCheckbox) {
+                otherServiceCheckbox.addEventListener('change', updateDescriptionRequirement);
+            }
+            
+            // Initial call
+            updateDescriptionRequirement();
 
             
 			documentForm.addEventListener('submit', async function(e) {
@@ -3243,6 +3268,15 @@
                 if (selectedItemTypes.length === 0) {
                     showAlert('Please select at least one item type.', 'warning');
                     return;
+                }
+                
+                // Check if description is required (when Other Service is selected)
+                if (selectedItemTypes.includes('Other Service')) {
+                    if (!description.value || description.value.trim() === '') {
+                        showAlert('Description is required when "Other Service" is selected.', 'warning');
+                        description.focus();
+                        return;
+                    }
                 }
                 
                 const formData = {

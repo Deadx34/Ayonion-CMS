@@ -102,6 +102,11 @@ try {
         throw new Exception("Item details are required.", 400);
     }
     
+    // Check if description is required (when Other Service is selected)
+    if (in_array('Other Service', $itemTypes) && (empty($description) || trim($description) === '')) {
+        throw new Exception("Description is required when 'Other Service' is selected.", 400);
+    }
+    
     // Calculate total from all item details
     $total = 0;
     foreach ($itemDetails as $item) {
