@@ -1129,18 +1129,20 @@
                                         checkbox.addEventListener('change', updateItemAmounts);
                                     });
                                     
-                                    // Function to handle description field requirement
+                                    // Function to handle description field visibility
                                     function updateDescriptionRequirement() {
                                         const otherServiceCheckbox = document.getElementById('itemType4');
+                                        const descriptionFieldContainer = document.getElementById('descriptionField');
                                         const descriptionField = document.getElementById('docDescription');
                                         
-                                        if (otherServiceCheckbox && descriptionField) {
+                                        if (otherServiceCheckbox && descriptionFieldContainer && descriptionField) {
                                             if (otherServiceCheckbox.checked) {
+                                                descriptionFieldContainer.style.display = 'block';
                                                 descriptionField.setAttribute('required', 'required');
-                                                descriptionField.classList.add('border-warning');
                                             } else {
+                                                descriptionFieldContainer.style.display = 'none';
                                                 descriptionField.removeAttribute('required');
-                                                descriptionField.classList.remove('border-warning');
+                                                descriptionField.value = ''; // Clear the field when hidden
                                             }
                                         }
                                     }
@@ -1157,7 +1159,7 @@
                                 });
                                 </script>
                             </div>
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-12 mb-3" id="descriptionField" style="display: none;">
                                 <label class="form-label">Description <span class="text-muted">(Required for Other Service)</span></label>
                                 <input type="text" class="form-control" id="docDescription">
                             </div>
