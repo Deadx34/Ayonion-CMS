@@ -112,6 +112,8 @@ function createPDFDocument($doc, $settings) {
                 font-size: 14px;
                 color: #bdc3c7;
                 margin-bottom: 40px;
+                text-align: center;
+                white-space: nowrap;
             }
             .contact-section {
                 margin-bottom: 30px;
@@ -279,8 +281,7 @@ function createPDFDocument($doc, $settings) {
     <body>
         <div class='sidebar'>
             <div class='company-logo'>
-                " . ($companyLogo ? "<img src='{$companyLogo}' alt='Logo' style='height: 60px; margin-bottom: 15px; object-fit: contain;'>" : "") . "
-                <div class='company-name'>{$companyName}</div>
+                " . ($companyLogo ? "<img src='{$companyLogo}' alt='Logo' style='height: 60px; margin-bottom: 10px; object-fit: contain;'>" : "") . "
                 <div class='company-tagline'>{$companyTagline}</div>
             </div>
             
