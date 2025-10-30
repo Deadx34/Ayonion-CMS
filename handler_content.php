@@ -55,6 +55,91 @@ try {
 
         echo json_encode(["success" => true, "message" => "Content credit added and client credits updated."]);
     }
+    // --- EDIT CONTENT CREDIT (POST) ---
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "Content id is required."]);
+            exit;
+        }
+
+        // Get the original record to calculate credit difference
+        $selSql = "SELECT client_id, credits FROM content_credits WHERE id = $id LIMIT 1";
+        $res = $conn->query($selSql);
+        if (!$res || $res->num_rows === 0) {
+            http_response_code(404);
+            echo json_encode(["success" => false, "message" => "Content record not found."]);
+            exit;
+        }
+        $original = $res->fetch_assoc();
+        $originalClientId = (int)$original['client_id'];
+        $originalCredits = (int)$original['credits'];
+
+        // Get new values
+        $clientId = (int)($input['clientId'] ?? $originalClientId);
+        $credits = (int)($input['credits'] ?? 0);
+        $contentType = $conn->real_escape_string($input['contentType'] ?? '');
+        $startDate = $conn->real_escape_string($input['startDate'] ?? '');
+
+        if ($credits <= 0 || $contentType === '' || $startDate === '') {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "credits, contentType, startDate are required."]);
+            exit;
+        }
+
+        $creative = $conn->real_escape_string($input['creative'] ?? $contentType);
+        $status = $conn->real_escape_string($input['status'] ?? 'In Progress');
+        $publishedDate = $conn->real_escape_string($input['publishedDate'] ?? '');
+        $contentUrl = $conn->real_escape_string($input['contentUrl'] ?? '');
+        $imageUrl = $conn->real_escape_string($input['imageUrl'] ?? '');
+
+        // Check if new columns exist
+        $checkColumns = "SHOW COLUMNS FROM content_credits LIKE 'content_url'";
+        $columnCheck = $conn->query($checkColumns);
+        
+        if ($columnCheck && $columnCheck->num_rows > 0) {
+            // Update with all columns
+            $updateSql = "UPDATE content_credits SET 
+                client_id = $clientId,
+                credit_type = '$creative',
+                credits = $credits,
+                date = '$startDate',
+                status = '$status',
+                published_date = " . ($publishedDate ? "'$publishedDate'" : "NULL") . ",
+                content_url = " . ($contentUrl ? "'$contentUrl'" : "NULL") . ",
+                image_url = " . ($imageUrl ? "'$imageUrl'" : "NULL") . "
+                WHERE id = $id";
+        } else {
+            // Update basic columns only
+            $updateSql = "UPDATE content_credits SET 
+                client_id = $clientId,
+                credit_type = '$creative',
+                credits = $credits,
+                date = '$startDate'
+                WHERE id = $id";
+        }
+
+        if (!$conn->query($updateSql)) {
+            http_response_code(500);
+            echo json_encode(["success" => false, "message" => "Failed to update content credit: " . $conn->error]);
+            exit;
+        }
+
+        // Update client's used_credits - remove old credits and add new credits
+        $creditDifference = $credits - $originalCredits;
+        
+        if ($creditDifference != 0) {
+            $updateClientSql = "UPDATE clients SET used_credits = GREATEST(COALESCE(used_credits,0) + $creditDifference, 0) WHERE id = $clientId";
+            if (!$conn->query($updateClientSql)) {
+                http_response_code(500);
+                echo json_encode(["success" => false, "message" => "Failed to update client's used credits: " . $conn->error]);
+                exit;
+            }
+        }
+
+        echo json_encode(["success" => true, "message" => "Content credit updated successfully."]);
+    }
     // --- DELETE CONTENT CREDIT (GET) ---
     else if ($action === 'delete') {
         $id = (int)($_GET['id'] ?? 0);

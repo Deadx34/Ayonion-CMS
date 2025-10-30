@@ -2340,6 +2340,7 @@
                     </td>
                     <td>
                         <button class="btn btn-sm btn-info me-1" onclick="viewContent(${c.id})" title="View Details"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-sm btn-warning me-1" onclick="editContent(${c.id})" title="Edit"><i class="fas fa-pen"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="deleteContent(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
@@ -2358,24 +2359,80 @@
             document.getElementById('addContentForm').reset();
             clearContentImagePreview();
             
+            // Set modal to "Add" mode
+            document.getElementById('addContentModal').querySelector('.modal-title').textContent = 'Add Content Credit';
+            document.getElementById('addContentForm').dataset.mode = 'add';
+            document.getElementById('addContentForm').dataset.editId = '';
+            
             new bootstrap.Modal(document.getElementById('addContentModal')).show();
         }
 
-        // FIX: Add Content using PHP handler
+        // ✅ NEW: Edit content function
+        function editContent(id) {
+            if (!hasPermission('canManageContent')) {
+                showAlert('Access Denied. Marketer/Admin role required.', 'warning');
+                return;
+            }
+            
+            const content = appData.contentCredits.find(c => c.id === id);
+            if (!content) {
+                showAlert('Content not found.', 'danger');
+                return;
+            }
+
+            // Populate form with existing data
+            document.getElementById('creativeName').value = content.creative;
+            document.getElementById('contentType').value = content.contentType;
+            document.getElementById('creditsAllocated').value = content.credits;
+            document.getElementById('publishedDate').value = content.publishedDate || '';
+            document.getElementById('contentUrl').value = content.contentUrl || '';
+            
+            // Handle image preview if image exists
+            if (content.imageUrl) {
+                const preview = document.getElementById('contentImagePreview');
+                const previewImg = document.getElementById('contentImagePreviewImg');
+                previewImg.src = content.imageUrl;
+                preview.style.display = 'block';
+                document.getElementById('contentImageUpload').dataset.imageUrl = content.imageUrl;
+            } else {
+                clearContentImagePreview();
+            }
+            
+            // Set modal to "Edit" mode
+            document.getElementById('addContentModal').querySelector('.modal-title').textContent = 'Edit Content Credit';
+            document.getElementById('addContentForm').dataset.mode = 'edit';
+            document.getElementById('addContentForm').dataset.editId = id;
+            
+            new bootstrap.Modal(document.getElementById('addContentModal')).show();
+        }
+
+        // FIX: Add/Edit Content using PHP handler
         document.getElementById('addContentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            const mode = this.dataset.mode || 'add';
+            const editId = this.dataset.editId || null;
             const clientId = parseInt(document.getElementById('contentClientSelect').value);
             const credits = parseInt(document.getElementById('creditsAllocated').value);
             const client = appData.clients.find(c => c.id === clientId);
             const totalCredits = client.packageCredits + client.extraCredits + client.carriedForwardCredits;
             const available = totalCredits - client.usedCredits;
 
-            if (credits > available) {
-                showAlert(`Insufficient credits! Only ${available} credits available`, 'danger');
+            // For edit mode, add back the original credits before checking
+            let availableForEdit = available;
+            if (mode === 'edit' && editId) {
+                const originalContent = appData.contentCredits.find(c => c.id === parseInt(editId));
+                if (originalContent) {
+                    availableForEdit = available + originalContent.credits;
+                }
+            }
+
+            if (credits > availableForEdit) {
+                showAlert(`Insufficient credits! Only ${availableForEdit} credits available`, 'danger');
                 return;
             }
 
-            const newContentData = {
+            const contentData = {
                 clientId: clientId,
                 credits: credits,
                 creative: document.getElementById('creativeName').value,
@@ -2388,11 +2445,19 @@
             };
 
             try {
-                const response = await fetch('handler_content.php?action=add', {
+                let url = 'handler_content.php?action=add';
+                let successMessage = 'Content credit added successfully! 📸';
+                
+                if (mode === 'edit' && editId) {
+                    url = `handler_content.php?action=edit&id=${editId}`;
+                    successMessage = 'Content credit updated successfully! ✏️';
+                }
+                
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
-                    body: JSON.stringify(newContentData)
+                    body: JSON.stringify(contentData)
                 });
 
                 if (!response.ok) {
@@ -2413,7 +2478,7 @@
                     // ✅ NEW: Clear image preview and reset image upload
                     clearContentImagePreview();
                     
-                    showAlert('Content credit added successfully! 📸', 'success');
+                    showAlert(successMessage, 'success');
                     loadDashboard();
                 } else {
                     showAlert('Failed to save content: ' + result.message, 'danger');
