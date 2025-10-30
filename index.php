@@ -2758,14 +2758,13 @@
                     <td style="padding: 10px;">${c.creative}</td>
                     <td style="padding: 10px;">${c.contentType}</td>
                     <td style="padding: 10px; text-align: center;">${c.credits}</td>
-                    <td style="padding: 10px;">${formatDate(c.startDate)}</td>
                     <td style="padding: 10px;">${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
                     <td style="padding: 10px;"><span style="color: ${getStatusColor(c.status) === 'success' ? '#10b981' : '#f59e0b'};">${c.status}</span></td>
                 </tr>
             `).join('');
 
             if (contents.length === 0) {
-                tableRows = '<tr><td colspan="6" style="padding: 20px; text-align: center;">No content records found.</td></tr>';
+                tableRows = '<tr><td colspan="5" style="padding: 20px; text-align: center;">No content records found.</td></tr>';
             }
 
             // Generate PDF using server-side generation
@@ -2840,7 +2839,6 @@
                                 <th style="padding: 10px; text-align: left;">Creative</th>
                                 <th style="padding: 10px;">Type</th>
                                 <th style="padding: 10px;">Credits</th>
-                                <th style="padding: 10px;">Start Date</th>
                                 <th style="padding: 10px;">Published Date</th>
                                 <th style="padding: 10px;">Status</th>
                             </tr>

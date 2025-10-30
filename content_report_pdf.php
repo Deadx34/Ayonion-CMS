@@ -13,13 +13,12 @@ function generateContentReportPDF($client, $contents, $companyInfo) {
                     <td style='padding: 10px; font-size: 12px;'>{$c['creative']}</td>
                     <td style='padding: 10px; font-size: 12px;'>{$c['contentType']}</td>
                     <td style='padding: 10px; text-align: center; font-size: 12px;'>{$c['credits']}</td>
-                    <td style='padding: 10px; font-size: 12px;'>" . date('M j, Y', strtotime($c['startDate'])) . "</td>
                     <td style='padding: 10px; font-size: 12px;'>" . ($c['publishedDate'] ? date('M j, Y', strtotime($c['publishedDate'])) : '-') . "</td>
                     <td style='padding: 10px; font-size: 12px; color: #10b981;'>{$c['status']}</td>
                 </tr>";
         }
     } else {
-        $tableRows = '<tr><td colspan="6" style="padding: 20px; text-align: center; font-size: 12px;">No content records found.</td></tr>';
+        $tableRows = '<tr><td colspan="5" style="padding: 20px; text-align: center; font-size: 12px;">No content records found.</td></tr>';
     }
     
     $html = "
@@ -158,11 +157,10 @@ function generateContentReportPDF($client, $contents, $companyInfo) {
         <table class='content-table'>
             <thead>
                 <tr>
-                    <th style='width: 20%;'>Creative</th>
-                    <th style='width: 20%;'>Content Type</th>
+                    <th style='width: 25%;'>Creative</th>
+                    <th style='width: 25%;'>Content Type</th>
                     <th style='width: 15%; text-align: center;'>Credits</th>
-                    <th style='width: 15%;'>Start Date</th>
-                    <th style='width: 15%;'>Published Date</th>
+                    <th style='width: 20%;'>Published Date</th>
                     <th style='width: 15%;'>Status</th>
                 </tr>
             </thead>
