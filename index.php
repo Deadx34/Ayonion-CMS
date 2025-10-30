@@ -615,22 +615,78 @@
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-4">
-                            <button class="btn btn-primary w-100" id="btnManageContent" onclick="manageClientContent()">
-                                <i class="fas fa-file-alt me-2"></i>Manage Content Credits
+                        <div class="col-md-3">
+                            <button class="btn btn-warning w-100 mb-2" onclick="showEditCreditsModal()">
+                                <i class="fas fa-edit me-2"></i>Edit Monthly Credits
                             </button>
                         </div>
-                        <div class="col-md-4">
-                            <button class="btn btn-success w-100" id="btnViewCampaigns" onclick="viewClientCampaigns()">
-                                <i class="fas fa-bullhorn me-2"></i>View Ad Campaigns
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100 mb-2" id="btnManageContent" onclick="manageClientContent()">
+                                <i class="fas fa-file-alt me-2"></i>Manage Content
                             </button>
                         </div>
-                        <div class="col-md-4">
-                            <button class="btn btn-info w-100" onclick="generateClientReport()">
-                                <i class="fas fa-chart-bar me-2"></i>Generate Content Report
+                        <div class="col-md-3">
+                            <button class="btn btn-success w-100 mb-2" id="btnViewCampaigns" onclick="viewClientCampaigns()">
+                                <i class="fas fa-bullhorn me-2"></i>View Campaigns
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-info w-100 mb-2" onclick="generateClientReport()">
+                                <i class="fas fa-chart-bar me-2"></i>Generate Report
                             </button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Credits Modal -->
+    <div class="modal fade" id="editCreditsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Monthly Credits</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCreditsForm">
+                        <div class="mb-3">
+                            <label class="form-label">Package Credits (Monthly Base)</label>
+                            <input type="number" class="form-control" id="editPackageCredits" min="0" value="40" required>
+                            <small class="form-text text-muted">Base monthly allocation (default: 40 credits)</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Extra Credits (One-time)</label>
+                            <input type="number" class="form-control" id="editExtraCredits" min="0" value="0" required>
+                            <small class="form-text text-muted">Additional credits for this month only</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="resetUsedCredits">
+                                <label class="form-check-label" for="resetUsedCredits">
+                                    Reset Used Credits to 0
+                                </label>
+                                <small class="form-text text-muted d-block">Check this to start a fresh cycle</small>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info" id="currentCreditsStatus">
+                            <strong>Current Status:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Carried Forward: <span id="statusCarried">0</span></li>
+                                <li>Used: <span id="statusUsed">0</span></li>
+                                <li>Total: <span id="statusTotal">0</span></li>
+                                <li>Available: <span id="statusAvailable">0</span></li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="editCreditsForm" class="btn btn-primary">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -2374,6 +2430,74 @@
 
             new bootstrap.Modal(document.getElementById('clientDetailsModal')).show();
         }
+
+        function showEditCreditsModal() {
+            if (!selectedClientId) {
+                showAlert('No client selected.', 'danger');
+                return;
+            }
+
+            const client = appData.clients.find(c => c.id === selectedClientId);
+            if (!client) {
+                showAlert('Client not found.', 'danger');
+                return;
+            }
+
+            // Populate form with current values
+            document.getElementById('editPackageCredits').value = client.packageCredits;
+            document.getElementById('editExtraCredits').value = client.extraCredits;
+            document.getElementById('resetUsedCredits').checked = false;
+
+            // Show current status
+            const totalCredits = client.packageCredits + client.extraCredits + client.carriedForwardCredits;
+            const available = totalCredits - client.usedCredits;
+            
+            document.getElementById('statusCarried').textContent = client.carriedForwardCredits;
+            document.getElementById('statusUsed').textContent = client.usedCredits;
+            document.getElementById('statusTotal').textContent = totalCredits;
+            document.getElementById('statusAvailable').textContent = available;
+
+            // Close client details modal and open edit modal
+            bootstrap.Modal.getInstance(document.getElementById('clientDetailsModal')).hide();
+            new bootstrap.Modal(document.getElementById('editCreditsModal')).show();
+        }
+
+        // Edit Credits Form Submission
+        document.getElementById('editCreditsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const packageCredits = parseInt(document.getElementById('editPackageCredits').value);
+            const extraCredits = parseInt(document.getElementById('editExtraCredits').value);
+            const resetUsedCredits = document.getElementById('resetUsedCredits').checked;
+
+            try {
+                const response = await fetch('handler_clients.php?action=update_credits', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        clientId: selectedClientId,
+                        packageCredits: packageCredits,
+                        extraCredits: extraCredits,
+                        resetUsedCredits: resetUsedCredits
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert(result.message, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('editCreditsModal')).hide();
+                    
+                    // Reload clients data and reopen client details
+                    await loadClients();
+                    showClientDetails(selectedClientId);
+                } else {
+                    showAlert(result.message, 'danger');
+                }
+            } catch (error) {
+                showAlert('Error updating credits: ' + error.message, 'danger');
+            }
+        });
 
         function manageClientContent() {
             if (!hasPermission('canManageContent')) { showAlert('Access Denied. Marketer/Admin role required.', 'danger'); return; }

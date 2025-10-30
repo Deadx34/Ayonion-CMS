@@ -57,7 +57,39 @@ else if ($action === 'delete') {
         echo json_encode(["success" => false, "message" => "Failed to delete client: " . $conn->error]);
     }
 }
-// --- 3. ERROR HANDLING ---
+// --- 3. HANDLE UPDATE CREDITS (POST) ---
+else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_credits') {
+    $clientId = (int)($input['clientId'] ?? 0);
+    $packageCredits = (int)($input['packageCredits'] ?? 0);
+    $extraCredits = (int)($input['extraCredits'] ?? 0);
+    $resetUsedCredits = (bool)($input['resetUsedCredits'] ?? false);
+    
+    if ($clientId <= 0) {
+        http_response_code(400);
+        echo json_encode(["success" => false, "message" => "Invalid client ID."]);
+        exit;
+    }
+    
+    // Build update query
+    $usedCreditsUpdate = $resetUsedCredits ? ", used_credits = 0" : "";
+    
+    $sql = "UPDATE clients SET 
+        package_credits = $packageCredits,
+        extra_credits = $extraCredits
+        $usedCreditsUpdate
+        WHERE id = $clientId";
+    
+    if (query_db($conn, $sql)) {
+        echo json_encode([
+            "success" => true, 
+            "message" => "Credits updated successfully." . ($resetUsedCredits ? " Used credits reset to 0." : "")
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => "Failed to update credits: " . $conn->error]);
+    }
+}
+// --- 4. ERROR HANDLING ---
 else {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "Invalid API endpoint request."]);
