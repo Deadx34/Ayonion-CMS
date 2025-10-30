@@ -723,10 +723,6 @@
                                 <div class="card-body">
                                     <h6 class="card-title text-primary"><i class="fas fa-calendar me-2"></i>Timeline</h6>
                                     <div class="mb-2">
-                                        <strong>Start Date:</strong><br>
-                                        <span id="viewStartDate" class="text-dark"></span>
-                                    </div>
-                                    <div class="mb-2">
                                         <strong>Status:</strong><br>
                                         <span id="viewStatus" class="badge"></span>
                                     </div>
