@@ -2914,7 +2914,8 @@
             const totalSpent = parseFloat(client.totalSpent) || 0.00;
             const remaining = totalAdBudget - totalSpent;
 
-            const campaigns = appData.campaigns.filter(c => c.clientId === clientId);
+            const campaigns = appData.campaigns.filter(c => c.clientId === clientId)
+                .sort((a, b) => b.id - a.id); // Sort by ID descending (newest first)
 
             budgetInfo.style.display = 'block';
             document.getElementById('totalAdBudget').textContent = totalAdBudget.toLocaleString(undefined, { minimumFractionDigits: 2 });
