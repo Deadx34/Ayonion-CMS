@@ -277,6 +277,61 @@
                         </form>
                     </div>
                 </div>
+                
+                <!-- Auto Carry Forward System Card -->
+                <div class="card mt-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-sync-alt me-2"></i>Auto Carry Forward System</span>
+                        <span class="badge bg-success">Active</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>How it works:</h6>
+                            <ul class="mb-0">
+                                <li>Each month starts with <strong>40 credits</strong> as package credits</li>
+                                <li>Any unused credits automatically carry forward to the next month</li>
+                                <li>Example: Used 30 credits → 10 carry forward → Next month starts with 50 total credits (40 + 10)</li>
+                                <li>System runs automatically when client's renewal date is reached</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-primary">40</h5>
+                                        <p class="mb-0">Default Monthly Credits</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-success">Auto</h5>
+                                        <p class="mb-0">Unused Credits Carry Forward</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button class="btn btn-primary" onclick="runAutoCarryForward()">
+                                <i class="fas fa-play-circle me-2"></i>Run Auto Carry Forward Now
+                            </button>
+                            <button class="btn btn-outline-secondary ms-2" onclick="viewCarryForwardLog()">
+                                <i class="fas fa-history me-2"></i>View Process Log
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                <strong>Note:</strong> For production, set up a cron job to run this automatically:
+                                <code class="ms-2">0 0 1 * * php handler_auto_carry_forward.php</code>
+                            </small>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="clients" class="section">
@@ -1775,6 +1830,130 @@
             document.getElementById('logoPreview').style.display = 'none';
         }
 
+        // ============================================
+        // AUTO CARRY FORWARD SYSTEM
+        // ============================================
+        
+        async function runAutoCarryForward() {
+            const confirmed = await showConfirm(
+                'This will process all clients whose renewal dates have passed and automatically carry forward their unused credits. Continue?',
+                'Run Auto Carry Forward',
+                'warning'
+            );
+            
+            if (!confirmed) return;
+            
+            try {
+                showAlert('Processing auto carry forward... Please wait.', 'info', 3000);
+                
+                const response = await fetch('handler_auto_carry_forward.php?manual=true', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showAlert(`✅ ${result.message}`, 'success', 5000);
+                    
+                    // Show detailed results in a modal
+                    if (result.results && result.results.length > 0) {
+                        showCarryForwardResults(result.results, result.processed_count, result.error_count);
+                    }
+                    
+                    // Reload data to reflect changes
+                    await loadAllDataFromPHP();
+                    
+                    // Reload current view if on clients or content page
+                    if (document.getElementById('clients').classList.contains('active')) {
+                        loadClients();
+                    } else if (document.getElementById('content').classList.contains('active')) {
+                        loadContentCredits();
+                    }
+                } else {
+                    showAlert('Auto carry forward failed: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                console.error('Auto carry forward error:', error);
+                showAlert('Failed to run auto carry forward: ' + error.message, 'danger');
+            }
+        }
+        
+        function showCarryForwardResults(results, successCount, errorCount) {
+            let html = `
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <div class="alert alert-${errorCount > 0 ? 'warning' : 'success'}">
+                        <strong>Summary:</strong> ${successCount} client(s) processed successfully${errorCount > 0 ? `, ${errorCount} error(s)` : ''}.
+                    </div>
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Carried Forward</th>
+                                <th>New Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            results.forEach(r => {
+                if (r.status === 'success') {
+                    html += `
+                        <tr>
+                            <td>${r.client_name}</td>
+                            <td><span class="badge bg-info">${r.carried_forward} credits</span></td>
+                            <td><span class="badge bg-success">${r.new_total} total</span></td>
+                            <td><i class="fas fa-check-circle text-success"></i> Success</td>
+                        </tr>
+                    `;
+                } else {
+                    html += `
+                        <tr>
+                            <td>${r.client_name}</td>
+                            <td colspan="2"><small class="text-danger">${r.error}</small></td>
+                            <td><i class="fas fa-exclamation-circle text-danger"></i> Error</td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            document.getElementById('documentPreview').innerHTML = html;
+            showDocumentModal();
+        }
+        
+        async function viewCarryForwardLog() {
+            try {
+                const response = await fetch('logs/auto_carry_forward.log');
+                if (response.ok) {
+                    const logContent = await response.text();
+                    
+                    let html = `
+                        <div style="background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; max-height: 600px; overflow-y: auto;">
+                            <h5 style="color: #4ec9b0; margin-bottom: 15px;">
+                                <i class="fas fa-file-alt"></i> Auto Carry Forward Process Log
+                            </h5>
+                            <pre style="color: #d4d4d4; margin: 0; white-space: pre-wrap;">${logContent || 'No log entries found.'}</pre>
+                        </div>
+                    `;
+                    
+                    document.getElementById('documentPreview').innerHTML = html;
+                    showDocumentModal();
+                } else {
+                    showAlert('Log file not found. No carry forward process has been run yet.', 'info');
+                }
+            } catch (error) {
+                showAlert('Unable to load log file: ' + error.message, 'warning');
+            }
+        }
+
         // ✅ NEW: Content image upload handler
         async function handleContentImageUpload(input) {
             const file = input.files[0];
@@ -2442,39 +2621,109 @@
                 return;
             }
 
-            tbody.innerHTML = contents.map(c => {
-                // Debug logging
-                console.log('Content item:', c);
-                console.log('Image URL:', c.imageUrl);
-                console.log('Content URL:', c.contentUrl);
+            // Group contents by month/year
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            
+            const groupedContents = {};
+            contents.forEach(c => {
+                const contentDate = new Date(c.startDate);
+                const monthKey = `${contentDate.getFullYear()}-${String(contentDate.getMonth()).padStart(2, '0')}`;
+                const monthLabel = contentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
                 
-                return `
-                <tr onmouseover="this.style.cursor='default'">
-                    <td>${c.creative}</td>
-                    <td>${c.contentType}</td>
-                    <td><span class="badge bg-warning">${c.credits}</span></td>
-                    <td>${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
-                    <td>
-                        ${c.imageUrl ? 
-                            `<img src="${c.imageUrl}" alt="Content Preview" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" onclick="viewContentImage('${c.imageUrl}')" title="Click to view full image">` : 
-                            '<span class="text-muted">-</span>'
-                        }
-                    </td>
-                    <td>
-                        ${c.contentUrl ? 
-                            `<a href="${c.contentUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="View Content">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>` : 
-                            '<span class="text-muted">-</span>'
-                        }
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-info me-1" onclick="viewContent(${c.id})" title="View Details"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-sm btn-warning me-1" onclick="editContent(${c.id})" title="Edit"><i class="fas fa-pen"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteContent(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>`;
-            }).join('');
+                if (!groupedContents[monthKey]) {
+                    groupedContents[monthKey] = {
+                        label: monthLabel,
+                        date: contentDate,
+                        items: []
+                    };
+                }
+                groupedContents[monthKey].items.push(c);
+            });
+
+            // Sort groups by date (newest first)
+            const sortedGroups = Object.entries(groupedContents).sort((a, b) => b[1].date - a[1].date);
+            
+            // Generate HTML with grouped sections
+            let html = '';
+            sortedGroups.forEach(([monthKey, group], index) => {
+                const isCurrentMonth = group.date.getMonth() === currentMonth && group.date.getFullYear() === currentYear;
+                const collapseId = `month-${monthKey}`;
+                const itemCount = group.items.length;
+                const totalCreditsInMonth = group.items.reduce((sum, item) => sum + item.credits, 0);
+                
+                // Month header row
+                html += `
+                    <tr class="table-secondary" style="cursor: pointer; background: ${isCurrentMonth ? '#e7f3ff' : '#f8f9fa'};" 
+                        data-bs-toggle="collapse" data-bs-target="#${collapseId}">
+                        <td colspan="7">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong style="font-size: 1.1em; color: ${isCurrentMonth ? '#0d6efd' : '#6c757d'};">
+                                    <i class="fas fa-calendar-alt me-2"></i>${group.label}
+                                    ${isCurrentMonth ? '<span class="badge bg-primary ms-2">Current Month</span>' : ''}
+                                </strong>
+                                <span class="text-muted">
+                                    <i class="fas fa-list me-1"></i>${itemCount} item${itemCount !== 1 ? 's' : ''} 
+                                    <span class="mx-2">|</span>
+                                    <i class="fas fa-coins me-1"></i>${totalCreditsInMonth} credit${totalCreditsInMonth !== 1 ? 's' : ''}
+                                    <i class="fas fa-chevron-down ms-2" id="icon-${collapseId}"></i>
+                                </span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                
+                // Month content rows (collapsible)
+                const collapseClass = isCurrentMonth ? 'collapse show' : 'collapse';
+                html += group.items.map(c => `
+                    <tr class="${collapseClass}" id="${collapseId}" onmouseover="this.style.cursor='default'">
+                        <td>${c.creative}</td>
+                        <td>${c.contentType}</td>
+                        <td><span class="badge bg-warning">${c.credits}</span></td>
+                        <td>${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
+                        <td>
+                            ${c.imageUrl ? 
+                                `<img src="${c.imageUrl}" alt="Content Preview" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;" onclick="viewContentImage('${c.imageUrl}')" title="Click to view full image">` : 
+                                '<span class="text-muted">-</span>'
+                            }
+                        </td>
+                        <td>
+                            ${c.contentUrl ? 
+                                `<a href="${c.contentUrl}" target="_blank" class="btn btn-sm btn-outline-primary" title="View Content">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>` : 
+                                '<span class="text-muted">-</span>'
+                            }
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info me-1" onclick="viewContent(${c.id})" title="View Details"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-sm btn-warning me-1" onclick="editContent(${c.id})" title="Edit"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteContent(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+            });
+            
+            tbody.innerHTML = html;
+            
+            // Add collapse event listeners to rotate chevron icons
+            sortedGroups.forEach(([monthKey]) => {
+                const collapseId = `month-${monthKey}`;
+                const collapseElement = document.getElementById(collapseId);
+                const icon = document.getElementById(`icon-${collapseId}`);
+                
+                if (collapseElement && icon) {
+                    collapseElement.addEventListener('show.bs.collapse', () => {
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    });
+                    collapseElement.addEventListener('hide.bs.collapse', () => {
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                    });
+                }
+            });
         }
 
         function showAddContentModal() {
@@ -2620,7 +2869,7 @@
             }
         });
 
-        // ✅ FIXED: Implemented fetch call for content deletion
+        // Implemented fetch call for content deletion
         async function deleteContent(id) {
             if (!hasPermission('canManageContent')) {
                 showAlert('Access Denied. Marketer/Admin role required.', 'warning');
@@ -2649,7 +2898,7 @@
             }
         }
 
-        // ✅ NEW: View content details function
+        // View content details function
         function viewContent(id) {
             const content = appData.contentCredits.find(c => c.id === id);
             if (!content) {
@@ -2884,7 +3133,10 @@
 
             let tableRows = contents.map(c => `
                 <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">${c.creative}</td>
+                    <td style="padding: 10px;">
+                        ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.creative}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 5px;">` : ''}
+                        <div style="font-weight: bold;">${c.creative}</div>
+                    </td>
                     <td style="padding: 10px;">${c.contentType}</td>
                     <td style="padding: 10px; text-align: center;">${c.credits}</td>
                     <td style="padding: 10px;">${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
@@ -2965,11 +3217,11 @@
                     <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
                         <thead>
                             <tr style="background: #6366f1; color: white;">
-                                <th style="padding: 10px; text-align: left;">Creative</th>
-                                <th style="padding: 10px;">Type</th>
-                                <th style="padding: 10px;">Credits</th>
-                                <th style="padding: 10px;">Published Date</th>
-                                <th style="padding: 10px;">Status</th>
+                                <th style="padding: 10px; text-align: left; width: 30%;">Creative</th>
+                                <th style="padding: 10px; width: 20%;">Type</th>
+                                <th style="padding: 10px; width: 10%;">Credits</th>
+                                <th style="padding: 10px; width: 20%;">Published Date</th>
+                                <th style="padding: 10px; width: 20%;">Status</th>
                             </tr>
                         </thead>
                         <tbody>${tableRows}</tbody>

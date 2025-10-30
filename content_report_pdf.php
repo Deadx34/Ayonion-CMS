@@ -8,9 +8,16 @@ function generateContentReportPDF($client, $contents, $companyInfo) {
     $tableRows = '';
     if (count($contents) > 0) {
         foreach ($contents as $c) {
+            $imageHtml = '';
+            if (!empty($c['imageUrl'])) {
+                $imageHtml = "<img src='{$c['imageUrl']}' alt='{$c['creative']}' style='width: 80px; height: 80px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 5px;'>";
+            }
             $tableRows .= "
                 <tr style='border-bottom: 1px solid #ddd;'>
-                    <td style='padding: 10px; font-size: 12px;'>{$c['creative']}</td>
+                    <td style='padding: 10px; font-size: 12px;'>
+                        {$imageHtml}
+                        <div style='font-weight: bold;'>{$c['creative']}</div>
+                    </td>
                     <td style='padding: 10px; font-size: 12px;'>{$c['contentType']}</td>
                     <td style='padding: 10px; text-align: center; font-size: 12px;'>{$c['credits']}</td>
                     <td style='padding: 10px; font-size: 12px;'>" . ($c['publishedDate'] ? date('M j, Y', strtotime($c['publishedDate'])) : '-') . "</td>
@@ -157,11 +164,11 @@ function generateContentReportPDF($client, $contents, $companyInfo) {
         <table class='content-table'>
             <thead>
                 <tr>
-                    <th style='width: 25%;'>Creative</th>
-                    <th style='width: 25%;'>Content Type</th>
-                    <th style='width: 15%; text-align: center;'>Credits</th>
+                    <th style='width: 30%;'>Creative</th>
+                    <th style='width: 20%;'>Content Type</th>
+                    <th style='width: 10%; text-align: center;'>Credits</th>
                     <th style='width: 20%;'>Published Date</th>
-                    <th style='width: 15%;'>Status</th>
+                    <th style='width: 20%;'>Status</th>
                 </tr>
             </thead>
             <tbody>
