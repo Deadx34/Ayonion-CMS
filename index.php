@@ -147,6 +147,18 @@
             .modal-content { height: 100%; border-radius: 0; }
         }
         .logout-btn { position: absolute; bottom: 20px; left: 20px; right: 20px; }
+        
+        /* 5-column layout for client detail buttons */
+        .col-md-2-4 {
+            flex: 0 0 auto;
+            width: 20%;
+        }
+        @media (max-width: 768px) {
+            .col-md-2-4 {
+                width: 100%;
+            }
+        }
+        
         /* Print Styles for Reports */
         @media print {
             body { background: white !important; }
@@ -625,22 +637,27 @@
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-3">
-                            <button class="btn btn-warning w-100 mb-2" onclick="showEditCreditsModal()">
-                                <i class="fas fa-edit me-2"></i>Edit Monthly Credits
+                        <div class="col-md-2-4">
+                            <button class="btn btn-secondary w-100 mb-2" onclick="showEditClientModal()">
+                                <i class="fas fa-edit me-2"></i>Edit Client Info
                             </button>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2-4">
+                            <button class="btn btn-warning w-100 mb-2" onclick="showEditCreditsModal()">
+                                <i class="fas fa-coins me-2"></i>Edit Credits
+                            </button>
+                        </div>
+                        <div class="col-md-2-4">
                             <button class="btn btn-primary w-100 mb-2" id="btnManageContent" onclick="manageClientContent()">
                                 <i class="fas fa-file-alt me-2"></i>Manage Content
                             </button>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2-4">
                             <button class="btn btn-success w-100 mb-2" id="btnViewCampaigns" onclick="viewClientCampaigns()">
                                 <i class="fas fa-bullhorn me-2"></i>View Campaigns
                             </button>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2-4">
                             <button class="btn btn-info w-100 mb-2" onclick="generateClientReport()">
                                 <i class="fas fa-chart-bar me-2"></i>Generate Report
                             </button>
@@ -702,6 +719,97 @@
         </div>
     </div>
 
+    <!-- Edit Client Info Modal -->
+    <div class="modal fade" id="editClientModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Client Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editClientForm">
+                        <input type="hidden" id="editClientId">
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Partner ID</label>
+                                <input type="text" class="form-control" id="editPartnerId" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Company/Brand Name</label>
+                                <input type="text" class="form-control" id="editCompanyName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Monthly Renewal Date</label>
+                                <input type="date" class="form-control" id="editRenewalDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Managing Platforms</label>
+                                <input type="text" class="form-control" id="editManagingPlatforms" placeholder="e.g., Facebook, Instagram, Google">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Industry Category</label>
+                                <select class="form-select" id="editIndustry" required>
+                                    <option value="">Select Industry</option>
+                                    <option value="Retail">Retail</option>
+                                    <option value="Food & Beverage">Food & Beverage</option>
+                                    <option value="Technology">Technology</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Real Estate">Real Estate</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Total Ad Budget</label>
+                                <input type="number" class="form-control" id="editTotalAdBudget" min="0" step="0.01" placeholder="0.00">
+                                <small class="text-muted">Total advertising budget for this client</small>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label"><i class="fas fa-image me-2"></i>Company/Brand Logo</label>
+                                
+                                <!-- Current Logo Display -->
+                                <div id="editCurrentLogo" class="mb-3" style="display: none;">
+                                    <div class="alert alert-light d-flex align-items-center">
+                                        <img id="editCurrentLogoImg" src="" alt="Current Logo" class="img-thumbnail me-3" style="max-width: 100px; max-height: 100px; object-fit: contain;">
+                                        <div>
+                                            <strong>Current Logo</strong><br>
+                                            <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removeEditLogo()">
+                                                <i class="fas fa-trash"></i> Remove Logo
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Upload New Logo -->
+                                <input type="file" class="form-control" id="editLogoUpload" accept="image/*" onchange="handleEditLogoUpload(this)">
+                                <small class="text-muted">Upload new logo to replace existing (Max: 2MB, Recommended: Square format)</small>
+                                
+                                <!-- New Logo Preview -->
+                                <div id="editLogoPreview" class="mt-2" style="display: none;">
+                                    <div class="alert alert-success d-flex align-items-center">
+                                        <img id="editLogoPreviewImg" src="" alt="New Logo Preview" class="img-thumbnail me-3" style="max-width: 100px; max-height: 100px; object-fit: contain;">
+                                        <div>
+                                            <strong>New Logo Preview</strong><br>
+                                            <small class="text-success">This logo will replace the current one when you save</small><br>
+                                            <button type="button" class="btn btn-sm btn-warning mt-2" onclick="cancelEditLogoUpload()">
+                                                <i class="fas fa-undo"></i> Cancel Upload
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>Update Client Information
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="addClientModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -745,8 +853,15 @@
                                 </select>
                             </div>
                             <div class="col-md-12 mb-3">
-                                <label class="form-label">Company/Brand Logo (URL)</label>
-                                <input type="url" class="form-control" id="logoUrl" placeholder="https://example.com/logo.png">
+                                <label class="form-label"><i class="fas fa-image me-2"></i>Company/Brand Logo (Optional)</label>
+                                <input type="file" class="form-control" id="clientLogoUpload" accept="image/*" onchange="handleClientLogoUpload(this)">
+                                <small class="text-muted">Upload company logo (Max: 2MB, Recommended: Square format)</small>
+                                <div id="clientLogoPreview" class="mt-2" style="display: none;">
+                                    <img id="clientLogoPreviewImg" src="" alt="Logo Preview" class="img-thumbnail" style="max-width: 150px; max-height: 150px; object-fit: contain;">
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeClientLogo()">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Save Client</button>
@@ -1965,12 +2080,96 @@
             previewImg.src = '';
         }
 
+        // Client logo upload handler for Add Client modal
+        async function handleClientLogoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showAlert('Please select a valid image file.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showAlert('Logo file is too large. Please choose an image smaller than 2MB.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            // Upload file to server
+            const formData = new FormData();
+            formData.append('logo', file);
+            
+            try {
+                const response = await fetch('upload_logo_handler_simple.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store the logo URL in the input's data attribute
+                    input.dataset.logoUrl = result.logo_url;
+                    
+                    // Show preview
+                    const preview = document.getElementById('clientLogoPreview');
+                    const previewImg = document.getElementById('clientLogoPreviewImg');
+                    previewImg.src = result.logo_url;
+                    preview.style.display = 'block';
+                    
+                    showAlert('Logo uploaded successfully!', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                    input.value = '';
+                }
+            } catch (error) {
+                showAlert('Upload error: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        function removeClientLogo() {
+            const input = document.getElementById('clientLogoUpload');
+            const preview = document.getElementById('clientLogoPreview');
+            
+            if (input) {
+                input.value = '';
+                input.dataset.logoUrl = '';
+            }
+            if (preview) preview.style.display = 'none';
+        }
+
+        function clearClientLogoPreview() {
+            const input = document.getElementById('clientLogoUpload');
+            const preview = document.getElementById('clientLogoPreview');
+            const previewImg = document.getElementById('clientLogoPreviewImg');
+            
+            if (input) {
+                input.value = '';
+                input.dataset.logoUrl = '';
+            }
+            if (previewImg) previewImg.src = '';
+            if (preview) preview.style.display = 'none';
+        }
+
         // ✅ NEW: Add modal event listener to clear image preview when modal is hidden
         document.addEventListener('DOMContentLoaded', function() {
             const addContentModal = document.getElementById('addContentModal');
             if (addContentModal) {
                 addContentModal.addEventListener('hidden.bs.modal', function() {
                     clearContentImagePreview();
+                });
+            }
+            
+            const addClientModal = document.getElementById('addClientModal');
+            if (addClientModal) {
+                addClientModal.addEventListener('hidden.bs.modal', function() {
+                    clearClientLogoPreview();
                 });
             }
         });
@@ -2276,6 +2475,7 @@
                 return;
             }
             document.getElementById('addClientForm').reset();
+            clearClientLogoPreview();
             new bootstrap.Modal(document.getElementById('addClientModal')).show();
         }
 
@@ -2285,6 +2485,10 @@
 
             const companyName = document.getElementById('companyName').value.trim();
             const packageCreditsValue = parseInt(document.getElementById('newClientPackageCredits').value) || 0;
+            
+            // Get uploaded logo URL if available
+            const logoInput = document.getElementById('clientLogoUpload');
+            const logoUrl = logoInput && logoInput.dataset.logoUrl ? logoInput.dataset.logoUrl : '';
 
             const newClientData = {
                 partnerId: document.getElementById('partnerId').value.trim(),
@@ -2293,7 +2497,7 @@
                 packageCredits: packageCreditsValue,
                 managingPlatforms: document.getElementById('managingPlatforms').value,
                 industry: document.getElementById('industry').value,
-                logoUrl: document.getElementById('logoUrl').value || '',
+                logoUrl: logoUrl
             };
             
             try {
@@ -2506,6 +2710,197 @@
                 }
             } catch (error) {
                 showAlert('Error updating credits: ' + error.message, 'danger');
+            }
+        });
+
+        // Edit Client Info Modal Functions
+        function showEditClientModal() {
+            if (!selectedClientId) {
+                showAlert('No client selected', 'warning');
+                return;
+            }
+
+            const client = appData.clients.find(c => c.id === selectedClientId);
+            if (!client) {
+                showAlert('Client not found', 'danger');
+                return;
+            }
+
+            // Populate form fields
+            document.getElementById('editClientId').value = client.id;
+            document.getElementById('editPartnerId').value = client.partnerId;
+            document.getElementById('editCompanyName').value = client.companyName;
+            document.getElementById('editRenewalDate').value = client.renewalDate;
+            document.getElementById('editManagingPlatforms').value = client.managingPlatforms || '';
+            document.getElementById('editIndustry').value = client.industry;
+            document.getElementById('editTotalAdBudget').value = client.totalAdBudget || 0;
+
+            // Handle logo display
+            const currentLogoDiv = document.getElementById('editCurrentLogo');
+            const currentLogoImg = document.getElementById('editCurrentLogoImg');
+            const editLogoUpload = document.getElementById('editLogoUpload');
+            
+            if (client.logoUrl) {
+                currentLogoImg.src = client.logoUrl;
+                currentLogoDiv.style.display = 'block';
+                editLogoUpload.dataset.currentLogoUrl = client.logoUrl;
+            } else {
+                currentLogoDiv.style.display = 'none';
+                editLogoUpload.dataset.currentLogoUrl = '';
+            }
+
+            // Reset upload fields
+            editLogoUpload.value = '';
+            editLogoUpload.dataset.newLogoUrl = '';
+            document.getElementById('editLogoPreview').style.display = 'none';
+
+            // Close client details and show edit modal
+            const clientDetailsModal = bootstrap.Modal.getInstance(document.getElementById('clientDetailsModal'));
+            if (clientDetailsModal) clientDetailsModal.hide();
+            
+            new bootstrap.Modal(document.getElementById('editClientModal')).show();
+        }
+
+        async function handleEditLogoUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showAlert('Please select a valid image file.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            // Validate file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showAlert('Logo file is too large. Please choose an image smaller than 2MB.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            // Upload file to server
+            const formData = new FormData();
+            formData.append('logo', file);
+            
+            try {
+                const response = await fetch('upload_logo_handler_simple.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store the new logo URL
+                    input.dataset.newLogoUrl = result.logo_url;
+                    
+                    // Show preview
+                    const preview = document.getElementById('editLogoPreview');
+                    const previewImg = document.getElementById('editLogoPreviewImg');
+                    previewImg.src = result.logo_url;
+                    preview.style.display = 'block';
+                    
+                    showAlert('New logo uploaded successfully! Save to apply changes.', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                    input.value = '';
+                }
+            } catch (error) {
+                showAlert('Upload error: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        function removeEditLogo() {
+            const editLogoUpload = document.getElementById('editLogoUpload');
+            const currentLogoDiv = document.getElementById('editCurrentLogo');
+            
+            // Mark for removal by setting a special flag
+            editLogoUpload.dataset.removeLogo = 'true';
+            editLogoUpload.dataset.newLogoUrl = '';
+            
+            // Hide current logo display
+            currentLogoDiv.style.display = 'none';
+            
+            showAlert('Logo will be removed when you save changes.', 'info');
+        }
+
+        function cancelEditLogoUpload() {
+            const editLogoUpload = document.getElementById('editLogoUpload');
+            const preview = document.getElementById('editLogoPreview');
+            const currentLogoDiv = document.getElementById('editCurrentLogo');
+            
+            // Clear upload
+            editLogoUpload.value = '';
+            editLogoUpload.dataset.newLogoUrl = '';
+            editLogoUpload.dataset.removeLogo = '';
+            preview.style.display = 'none';
+            
+            // Show current logo if it exists
+            if (editLogoUpload.dataset.currentLogoUrl) {
+                currentLogoDiv.style.display = 'block';
+            }
+        }
+
+        // Edit Client Form Submission
+        document.getElementById('editClientForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const clientId = parseInt(document.getElementById('editClientId').value);
+            const editLogoUpload = document.getElementById('editLogoUpload');
+            
+            // Determine logo URL to use
+            let logoUrl = editLogoUpload.dataset.currentLogoUrl || '';
+            
+            if (editLogoUpload.dataset.removeLogo === 'true') {
+                logoUrl = ''; // Remove logo
+            } else if (editLogoUpload.dataset.newLogoUrl) {
+                logoUrl = editLogoUpload.dataset.newLogoUrl; // Use new logo
+            }
+            
+            const updateData = {
+                clientId: clientId,
+                partnerId: document.getElementById('editPartnerId').value.trim(),
+                companyName: document.getElementById('editCompanyName').value.trim(),
+                renewalDate: document.getElementById('editRenewalDate').value,
+                managingPlatforms: document.getElementById('editManagingPlatforms').value.trim(),
+                industry: document.getElementById('editIndustry').value,
+                totalAdBudget: parseFloat(document.getElementById('editTotalAdBudget').value) || 0,
+                logoUrl: logoUrl
+            };
+
+            try {
+                const response = await fetch('handler_clients.php?action=update_client', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('✅ Client information updated successfully!', 'success');
+                    
+                    // Reload data
+                    await loadAllDataFromPHP();
+                    loadClientsTable();
+                    
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('editClientModal')).hide();
+                    
+                    // Reopen client details to show updated info
+                    setTimeout(() => {
+                        showClientDetails(clientId);
+                    }, 300);
+                } else {
+                    showAlert('Failed to update client: ' + result.message, 'danger');
+                }
+            } catch (error) {
+                console.error('Update client error:', error);
+                showAlert('Network error: ' + error.message, 'danger');
             }
         });
 

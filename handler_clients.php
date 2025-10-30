@@ -89,7 +89,45 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_credits') 
         echo json_encode(["success" => false, "message" => "Failed to update credits: " . $conn->error]);
     }
 }
-// --- 4. ERROR HANDLING ---
+// --- 4. HANDLE UPDATE CLIENT (POST) ---
+else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
+    $clientId = (int)($input['clientId'] ?? 0);
+    
+    if ($clientId <= 0) {
+        http_response_code(400);
+        echo json_encode(["success" => false, "message" => "Invalid client ID."]);
+        exit;
+    }
+    
+    $partnerId = $conn->real_escape_string($input['partnerId'] ?? '');
+    $companyName = $conn->real_escape_string($input['companyName'] ?? '');
+    $renewalDate = $conn->real_escape_string($input['renewalDate'] ?? '');
+    $managingPlatforms = $conn->real_escape_string($input['managingPlatforms'] ?? '');
+    $industry = $conn->real_escape_string($input['industry'] ?? '');
+    $totalAdBudget = (float)($input['totalAdBudget'] ?? 0);
+    $logoUrl = $conn->real_escape_string($input['logoUrl'] ?? '');
+    
+    $sql = "UPDATE clients SET 
+        partner_id = '$partnerId',
+        company_name = '$companyName',
+        renewal_date = '$renewalDate',
+        managing_platforms = '$managingPlatforms',
+        industry = '$industry',
+        total_ad_budget = $totalAdBudget,
+        logo_url = '$logoUrl'
+        WHERE id = $clientId";
+    
+    if (query_db($conn, $sql)) {
+        echo json_encode([
+            "success" => true, 
+            "message" => "Client information updated successfully."
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => "Failed to update client: " . $conn->error]);
+    }
+}
+// --- 5. ERROR HANDLING ---
 else {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "Invalid API endpoint request."]);
