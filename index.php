@@ -654,9 +654,10 @@
                                 <option value="">Select Type</option>
                                 <option value="Social Media Post">Social Media Post</option>
                                 <option value="Video">Video</option>
+                                <option value="Reel">Reel</option>
                                 <option value="Graphic Design">Graphic Design</option>
                                 <option value="Story">Story</option>
-                                <option value="Reel">Reel</option>
+                                <option value="Blog Post">Blog Post</option>
                             </select>
                         </div>
                         <div class="mb-3">
