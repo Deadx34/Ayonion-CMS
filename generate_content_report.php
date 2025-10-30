@@ -16,9 +16,12 @@ try {
     $client = $input['client'];
     $contents = $input['contents'];
     $companyInfo = $input['companyInfo'];
+    $isSelectedReport = isset($input['isSelectedReport']) ? $input['isSelectedReport'] : false;
+    $selectedCount = isset($input['selectedCount']) ? $input['selectedCount'] : 0;
+    $totalSelectedCredits = isset($input['totalSelectedCredits']) ? $input['totalSelectedCredits'] : 0;
     
     // Generate PDF content
-    $htmlContent = generateContentReportPDF($client, $contents, $companyInfo);
+    $htmlContent = generateContentReportPDF($client, $contents, $companyInfo, $isSelectedReport, $selectedCount, $totalSelectedCredits);
     
     // Use browser's PDF generation with proper headers
     header('Content-Type: text/html; charset=UTF-8');

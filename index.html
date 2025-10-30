@@ -401,6 +401,9 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
+                                        <th style="width: 40px;">
+                                            <input type="checkbox" class="form-check-input" id="selectAllContents" onchange="toggleSelectAllContents()" title="Select All">
+                                        </th>
                                         <th>Creative</th><th>Content Type</th><th>Credits</th>
                                         <th>Published Date</th><th>Preview</th><th>Link</th><th>Actions</th>
                                     </tr>
@@ -408,7 +411,14 @@
                                 <tbody id="contentTableBody"></tbody>
                             </table>
                         </div>
-                        <button class="btn btn-success mt-3" onclick="generateContentReport()"><i class="fas fa-file-pdf me-2"></i>Generate Report</button>
+                        <div class="mt-3">
+                            <button class="btn btn-success me-2" onclick="generateContentReport()">
+                                <i class="fas fa-file-pdf me-2"></i>Generate Report (All)
+                            </button>
+                            <button class="btn btn-primary" id="generateSelectedReportBtn" onclick="generateSelectedContentReport()" style="display: none;">
+                                <i class="fas fa-file-pdf me-2"></i>Generate Report (<span id="selectedCount">0</span> Selected)
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2814,7 +2824,7 @@
                 html += `
                     <tr class="table-secondary" style="cursor: pointer; background: ${isCurrentMonth ? '#e7f3ff' : '#f8f9fa'};" 
                         data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="d-flex justify-content-between align-items-center">
                                 <strong style="font-size: 1.1em; color: ${isCurrentMonth ? '#0d6efd' : '#6c757d'};">
                                     <i class="fas fa-calendar-alt me-2"></i>${group.label}
@@ -2835,6 +2845,9 @@
                 const collapseClass = isCurrentMonth ? 'collapse show' : 'collapse';
                 html += group.items.map(c => `
                     <tr class="${collapseClass}" id="${collapseId}" onmouseover="this.style.cursor='default'">
+                        <td onclick="event.stopPropagation();">
+                            <input type="checkbox" class="form-check-input content-checkbox" data-content-id="${c.id}" onchange="updateSelectedCount()">
+                        </td>
                         <td>${c.creative}</td>
                         <td>${c.contentType}</td>
                         <td><span class="badge bg-warning">${c.credits}</span></td>
@@ -2881,6 +2894,201 @@
                     });
                 }
             });
+        }
+
+        // Multi-select functions for content report
+        function toggleSelectAllContents() {
+            const selectAll = document.getElementById('selectAllContents');
+            const checkboxes = document.querySelectorAll('.content-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.content-checkbox:checked');
+            const count = checkboxes.length;
+            const selectedCountSpan = document.getElementById('selectedCount');
+            const generateSelectedBtn = document.getElementById('generateSelectedReportBtn');
+            const selectAllCheckbox = document.getElementById('selectAllContents');
+            
+            if (selectedCountSpan) {
+                selectedCountSpan.textContent = count;
+            }
+            
+            if (generateSelectedBtn) {
+                generateSelectedBtn.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+            
+            // Update "Select All" checkbox state
+            const allCheckboxes = document.querySelectorAll('.content-checkbox');
+            if (selectAllCheckbox && allCheckboxes.length > 0) {
+                selectAllCheckbox.checked = count === allCheckboxes.length;
+                selectAllCheckbox.indeterminate = count > 0 && count < allCheckboxes.length;
+            }
+        }
+
+        async function generateSelectedContentReport() {
+            const checkboxes = document.querySelectorAll('.content-checkbox:checked');
+            
+            if (checkboxes.length === 0) {
+                showAlert('Please select at least one content item.', 'warning');
+                return;
+            }
+            
+            const clientId = parseInt(document.getElementById('contentClientSelect').value);
+            if (!clientId) {
+                showAlert('Please select a client first.', 'warning');
+                return;
+            }
+            
+            const client = appData.clients.find(c => c.id === clientId);
+            if (!client) {
+                showAlert('Client not found.', 'danger');
+                return;
+            }
+            
+            // Get selected content IDs
+            const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.contentId));
+            
+            // Filter contents by selected IDs
+            const selectedContents = appData.contentCredits.filter(c => selectedIds.includes(c.id));
+            
+            if (selectedContents.length === 0) {
+                showAlert('No valid content items found.', 'danger');
+                return;
+            }
+            
+            // Calculate totals for selected items
+            const totalSelectedCredits = selectedContents.reduce((sum, c) => sum + c.credits, 0);
+            
+            // Generate report data
+            const reportData = {
+                client: client,
+                contents: selectedContents,
+                companyInfo: COMPANY_INFO,
+                isSelectedReport: true,
+                selectedCount: selectedContents.length,
+                totalSelectedCredits: totalSelectedCredits
+            };
+            
+            // Generate PDF using server-side generation
+            try {
+                const printWindow = window.open('', '_blank', 'width=800,height=600');
+                
+                const response = await fetch('generate_content_report.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reportData)
+                });
+                
+                if (response.ok) {
+                    const htmlContent = await response.text();
+                    printWindow.document.write(htmlContent);
+                    
+                    printWindow.onload = function() {
+                        setTimeout(() => {
+                            printWindow.print();
+                        }, 1000);
+                    };
+                    
+                    showAlert(`Selected content report (${selectedContents.length} items) generated successfully! 📄`, 'success');
+                    return;
+                }
+            } catch (error) {
+                console.log('Server PDF generation failed, falling back to browser print', error);
+            }
+            
+            // Fallback to browser print
+            let tableRows = selectedContents.map(c => `
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;">
+                        ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.creative}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 5px;">` : ''}
+                        <div style="font-weight: bold;">${c.creative}</div>
+                    </td>
+                    <td style="padding: 10px;">${c.contentType}</td>
+                    <td style="padding: 10px; text-align: center;">${c.credits}</td>
+                    <td style="padding: 10px;">${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
+                    <td style="padding: 10px;"><span style="color: ${getStatusColor(c.status) === 'success' ? '#10b981' : '#f59e0b'};">${c.status}</span></td>
+                </tr>
+            `).join('');
+
+            const html = `
+                <div style="font-family: Arial; padding: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
+                        ${client.logoUrl ? `<img src="${client.logoUrl}" style="width: 80px; height: 80px; margin-right: 20px; border-radius: 8px;">` : ''}
+                        <div>
+                            <h1 style="margin: 0; color: #1f2937; font-size: 28px;">${client.companyName}</h1>
+                            <p style="margin: 5px 0 0 0; color: #6b7280;">Content Credit Report - Selected Items</p>
+                            <p style="margin: 5px 0 0 0; color: #6b7280; font-size: 14px;">
+                                <strong>${selectedContents.length}</strong> items selected | 
+                                <strong>${totalSelectedCredits}</strong> total credits
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 5px;"><strong>Partner ID:</strong></td>
+                                <td style="padding: 5px;">${client.partnerId}</td>
+                                <td style="padding: 5px;"><strong>Industry:</strong></td>
+                                <td style="padding: 5px;">${client.industry}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 5px;"><strong>Report Date:</strong></td>
+                                <td style="padding: 5px;">${new Date().toLocaleDateString()}</td>
+                                <td style="padding: 5px;"><strong>Renewal Date:</strong></td>
+                                <td style="padding: 5px;">${formatDate(client.renewalDate)}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h2 style="color: #1f2937; font-size: 20px; margin-bottom: 15px;">Selected Content Details</h2>
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
+                        <thead style="background: #f3f4f6;">
+                            <tr>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Creative</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Type</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e5e7eb;">Credits</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Published Date</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e5e7eb;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 30px; padding: 15px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
+                        <p style="margin: 0; color: #92400e; font-size: 14px;">
+                            <strong>Note:</strong> This report includes only the selected content items (${selectedContents.length} of ${appData.contentCredits.filter(c => c.clientId === clientId).length} total items).
+                        </p>
+                    </div>
+                    
+                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px;">
+                        <p>${COMPANY_INFO.name} | ${COMPANY_INFO.address}</p>
+                        <p>${COMPANY_INFO.phone} | ${COMPANY_INFO.email}</p>
+                        <p style="margin-top: 10px;">Generated on ${new Date().toLocaleString()}</p>
+                    </div>
+                </div>
+            `;
+
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            };
+            
+            showAlert(`Selected content report (${selectedContents.length} items) generated successfully! 📄`, 'success');
         }
 
         function showAddContentModal() {

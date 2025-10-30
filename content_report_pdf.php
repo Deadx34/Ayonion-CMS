@@ -1,9 +1,21 @@
 <?php
 // AYONION-CMS/content_report_pdf.php - Content report PDF generation
 
-function generateContentReportPDF($client, $contents, $companyInfo) {
+function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedReport = false, $selectedCount = 0, $totalSelectedCredits = 0) {
     $totalCredits = $client['packageCredits'] + $client['extraCredits'] + $client['carriedForwardCredits'];
     $available = $totalCredits - $client['usedCredits'];
+    
+    // Add selected report info header if applicable
+    $selectedReportInfo = '';
+    if ($isSelectedReport && $selectedCount > 0) {
+        $selectedReportInfo = "
+            <div style='background: #fef3c7; padding: 12px; border-left: 4px solid #f59e0b; border-radius: 4px; margin-bottom: 20px;'>
+                <p style='margin: 0; color: #92400e; font-size: 13px;'>
+                    <strong>📋 Selected Items Report:</strong> This report includes <strong>{$selectedCount}</strong> selected content items with a total of <strong>{$totalSelectedCredits} credits</strong>.
+                </p>
+            </div>
+        ";
+    }
     
     $tableRows = '';
     if (count($contents) > 0) {
@@ -148,6 +160,8 @@ function generateContentReportPDF($client, $contents, $companyInfo) {
             <p><strong>Reporting Cycle:</strong> Ends on " . date('F j, Y', strtotime($client['renewalDate'])) . "</p>
             <p><strong>Generated:</strong> " . date('F j, Y') . "</p>
         </div>
+        
+        {$selectedReportInfo}
         
         <div class='credit-summary'>
             <h4 class='summary-title'>Credit Summary</h4>
