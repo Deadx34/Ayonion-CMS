@@ -67,6 +67,12 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 margin-right: 20px; 
                 object-fit: contain; 
             }
+            .client-logo {
+                display: block;
+                margin: 0 auto 15px;
+                max-height: 80px;
+                object-fit: contain;
+            }
             .company-name { 
                 color: #6366f1; 
                 margin: 0; 
@@ -155,6 +161,10 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             </div>
         </div>
         
+        " . (!empty($client['logoUrl']) 
+            ? "<div style='text-align:center; margin:15px 0;'><img src='" . $client['logoUrl'] . "' alt='Client Logo' class='client-logo'></div>" 
+            : "<div style='text-align:center; margin:15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;'><h2 style='color: #6366f1; margin: 0; font-size: 22px;'>{$client['companyName']}</h2></div>") . "
+
         <div class='client-info'>
             <h3 class='client-name'>{$client['companyName']} ({$client['partnerId']})</h3>
             <p><strong>Reporting Cycle:</strong> Ends on " . date('F j, Y', strtotime($client['renewalDate'])) . "</p>

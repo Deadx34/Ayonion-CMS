@@ -461,16 +461,8 @@
                         
                         <div class="row mb-3 border p-3 rounded" style="background: #f8f9fa;">
                             <h6 class="mb-3"><i class="fas fa-chart-line me-2"></i>Campaign Report Generator</h6>
-                            <div class="col-md-4">
-                                <label class="form-label small">Start Date</label>
-                                <input type="date" class="form-control" id="reportStartDate">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small">End Date</label>
-                                <input type="date" class="form-control" id="reportEndDate">
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-success w-100 mt-md-4" onclick="generateCampaignReport()"><i class="fas fa-file-pdf me-2"></i>Generate Report</button>
+                            <div class="col-md-12">
+                                <button class="btn btn-success" onclick="generateCampaignReport()"><i class="fas fa-file-pdf me-2"></i>Generate Report</button>
                             </div>
                         </div>
 
@@ -4078,26 +4070,12 @@
         function generateCampaignReport() {
             // ... (Report generation logic remains local/front-end) ...
             const clientId = parseInt(document.getElementById('campaignClientSelect').value);
-            const startDateStr = document.getElementById('reportStartDate').value;
-            const endDateStr = document.getElementById('reportEndDate').value;
 
             if(!clientId) { showAlert('Please select a client first.', 'warning'); return; }
-            if(!startDateStr || !endDateStr) { showAlert('Please select both Start and End dates for the report range.', 'warning'); return; }
-
-            const startDate = new Date(startDateStr + 'T00:00:00');
-            const endDate = new Date(endDateStr + 'T23:59:59');
-
-            if (startDate > endDate) {
-                showAlert('Start Date cannot be after End Date.', 'danger');
-                return;
-            }
 
             const client = appData.clients.find(c => c.id === clientId);
 
-            const campaigns = appData.campaigns.filter(c => {
-                const campaignDate = new Date(c.dateAdded);
-                return c.clientId === clientId && campaignDate >= startDate && campaignDate <= endDate;
-            });
+            const campaigns = appData.campaigns.filter(c => c.clientId === clientId);
 
             const totalSpend = campaigns.reduce((sum, c) => sum + c.spend, 0);
             const totalReach = campaigns.reduce((sum, c) => sum + c.reach, 0);
@@ -4110,10 +4088,10 @@
             const avgCPR = totalResults > 0 ? totalSpend / totalResults : 0;
 
             let evidenceSection = '<div style="page-break-before:always; padding-top: 30px;">';
-            evidenceSection += '<h4 style="margin-bottom: 20px; color: #6366f1;">Campaign Evidence (In Range)</h4>';
+            evidenceSection += '<h4 style="margin-bottom: 20px; color: #6366f1;">Campaign Evidence</h4>';
 
             if (campaigns.length === 0) {
-                evidenceSection += '<p class="text-muted">No campaign data found in the selected range for evidence reporting.</p>';
+                evidenceSection += '<p class="text-muted">No campaign data found for evidence reporting.</p>';
             } else {
                  campaigns.forEach(c => {
                       let mediaHtml = '';
@@ -4952,11 +4930,6 @@
         window.addEventListener('load', function() {
             loadFromLocalStorage();
             initDocumentForm(); // Initialize document form handler
-            const today = new Date();
-            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-            document.getElementById('reportStartDate').value = firstDayOfMonth.toISOString().split('T')[0];
-            document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
         });
 
         window.addEventListener('beforeunload', function() {
