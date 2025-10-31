@@ -101,6 +101,94 @@ try {
             throw new Exception("Database error: Could not delete user.");
         }
     }
+    // --- HANDLE GET PROFILE (GET) ---
+    else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'get_profile') {
+        // Any authenticated user can view their own profile
+        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+            throw new Exception("Authentication required.", 401);
+        }
+        
+        $userId = (int)($_SESSION['user_id'] ?? 0);
+        $sql = "SELECT username, role, full_name, email FROM users WHERE id = {$userId} LIMIT 1";
+        $result = $conn->query($sql);
+        
+        if ($result && $row = $result->fetch_assoc()) {
+            echo json_encode([
+                "success" => true,
+                "profile" => [
+                    'username' => $row['username'],
+                    'role' => $row['role'],
+                    'full_name' => $row['full_name'],
+                    'email' => $row['email']
+                ]
+            ]);
+        } else {
+            throw new Exception("Could not fetch profile.");
+        }
+    }
+    // --- HANDLE UPDATE PROFILE (POST) ---
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_profile') {
+        // Any authenticated user can update their own profile
+        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+            throw new Exception("Authentication required.", 401);
+        }
+        
+        $userId = (int)($_SESSION['user_id'] ?? 0);
+        $fullName = trim($input['fullName'] ?? '');
+        $email = trim($input['email'] ?? '');
+        
+        $fullName_esc = $conn->real_escape_string($fullName);
+        $email_esc = $conn->real_escape_string($email);
+        
+        $sql = "UPDATE users SET full_name = '{$fullName_esc}', email = '{$email_esc}' WHERE id = {$userId}";
+        
+        if (query_db($conn, $sql)) {
+            echo json_encode(["success" => true, "message" => "Profile updated successfully."]);
+        } else {
+            throw new Exception("Database error: Could not update profile.");
+        }
+    }
+    // --- HANDLE CHANGE PASSWORD (POST) ---
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'change_password') {
+        // Any authenticated user can change their own password
+        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+            throw new Exception("Authentication required.", 401);
+        }
+        
+        $userId = (int)($_SESSION['user_id'] ?? 0);
+        $currentPassword = (string)($input['currentPassword'] ?? '');
+        $newPassword = (string)($input['newPassword'] ?? '');
+        
+        if ($currentPassword === '' || $newPassword === '') {
+            throw new Exception("Current password and new password are required.", 400);
+        }
+        
+        if (strlen($newPassword) < 6) {
+            throw new Exception("New password must be at least 6 characters long.", 400);
+        }
+        
+        // Verify current password
+        $sql = "SELECT password FROM users WHERE id = {$userId} LIMIT 1";
+        $result = $conn->query($sql);
+        
+        if (!$result || !$row = $result->fetch_assoc()) {
+            throw new Exception("User not found.");
+        }
+        
+        if (!password_verify($currentPassword, $row['password'])) {
+            throw new Exception("Current password is incorrect.", 403);
+        }
+        
+        // Update to new password
+        $hashed_password = password_hash($newPassword, PASSWORD_DEFAULT);
+        $sql = "UPDATE users SET password = '{$hashed_password}', is_temp_password = 0 WHERE id = {$userId}";
+        
+        if (query_db($conn, $sql)) {
+            echo json_encode(["success" => true, "message" => "Password changed successfully."]);
+        } else {
+            throw new Exception("Database error: Could not change password.");
+        }
+    }
     else {
         throw new Exception("Invalid user action.", 400);
     }

@@ -531,6 +531,67 @@
                 </div>
             </div>
             
+            <div id="profile" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <span><i class="fas fa-user-circle me-2"></i>My Profile</span>
+                    </div>
+                    <div class="card-body">
+                        <form id="profileForm" class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" id="profileUsername" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Role</label>
+                                <input type="text" class="form-control" id="profileRole" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="profileFullName" placeholder="Enter your full name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="profileEmail" placeholder="Enter your email">
+                            </div>
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Save Profile
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <span><i class="fas fa-key me-2"></i>Change Password</span>
+                    </div>
+                    <div class="card-body">
+                        <form id="changePasswordForm" class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-control" id="currentPassword" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="newPassword" required minlength="6">
+                                <small class="text-muted">Minimum 6 characters</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirmPassword" required minlength="6">
+                            </div>
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-lock me-2"></i>Change Password
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
             <div id="users" class="section">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -1570,7 +1631,7 @@
         // --- RBAC DEFINITION ---
         const permissions = {
             admin: {
-                sections: ['dashboard', 'clients', 'content', 'campaigns', 'finances', 'users', 'settings'],
+                sections: ['dashboard', 'clients', 'content', 'campaigns', 'finances', 'profile', 'users', 'settings'],
                 canAddClient: true,
                 canDeleteClient: true,
                 canManageContent: true,
@@ -1579,7 +1640,7 @@
                 canManageUsers: true
             },
             marketer: {
-                sections: ['dashboard', 'clients', 'content', 'campaigns'],
+                sections: ['dashboard', 'clients', 'content', 'campaigns', 'profile'],
                 canAddClient: false,
                 canDeleteClient: false,
                 canManageContent: true,
@@ -1588,7 +1649,7 @@
                 canManageUsers: false
             },
             finance: {
-                sections: ['dashboard', 'clients', 'finances'],
+                sections: ['dashboard', 'clients', 'finances', 'profile'],
                 canAddClient: false,
                 canDeleteClient: false,
                 canManageContent: false,
@@ -1872,8 +1933,9 @@
                 { id: 'content', icon: 'file-alt', label: 'Content Credits' },
                 { id: 'campaigns', icon: 'bullhorn', label: 'Ad Campaigns' },
                 { id: 'finances', icon: 'file-invoice-dollar', label: 'Financial Management' },
+                { id: 'profile', icon: 'user-circle', label: 'My Profile' },
                 { id: 'users', icon: 'user-cog', label: 'Manage Users' },
-                { id: 'settings', icon: 'gear', label: 'Settings' }
+                { id: 'settings', icon: 'gear', label: 'Admin Settings' }
             ];
 
             const userPermissions = permissions[currentUser.role];
@@ -1895,6 +1957,91 @@
                 });
             });
         }
+
+        // ============================================
+        // PROFILE MANAGEMENT
+        // ============================================
+        async function loadProfile() {
+            try {
+                const res = await fetch('handler_users.php?action=get_profile', { credentials: 'same-origin' });
+                const data = await res.json();
+                if (data.success) {
+                    const profile = data.profile || {};
+                    document.getElementById('profileUsername').value = profile.username || '';
+                    document.getElementById('profileRole').value = (profile.role || '').charAt(0).toUpperCase() + (profile.role || '').slice(1);
+                    document.getElementById('profileFullName').value = profile.full_name || '';
+                    document.getElementById('profileEmail').value = profile.email || '';
+                } else {
+                    showAlert('Failed to load profile: ' + (data.message || ''), 'danger');
+                }
+            } catch (_) {
+                showAlert('Network error loading profile', 'danger');
+            }
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const payload = {
+                fullName: document.getElementById('profileFullName').value.trim(),
+                email: document.getElementById('profileEmail').value.trim()
+            };
+            try {
+                const res = await fetch('handler_users.php?action=update_profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('Profile updated successfully! ✅', 'success');
+                } else {
+                    showAlert('Failed to update profile: ' + (data.message || ''), 'danger');
+                }
+            } catch (_) {
+                showAlert('Network error updating profile', 'danger');
+            }
+        });
+
+        document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showAlert('New passwords do not match!', 'danger');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showAlert('Password must be at least 6 characters long!', 'danger');
+                return;
+            }
+
+            const payload = {
+                currentPassword: currentPassword,
+                newPassword: newPassword
+            };
+
+            try {
+                const res = await fetch('handler_users.php?action=change_password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAlert('Password changed successfully! 🔒', 'success');
+                    document.getElementById('changePasswordForm').reset();
+                } else {
+                    showAlert('Failed to change password: ' + (data.message || ''), 'danger');
+                }
+            } catch (_) {
+                showAlert('Network error changing password', 'danger');
+            }
+        });
 
         async function loadSettings() {
             if (currentUser.role !== 'admin') { showAlert('Access denied to Settings', 'danger'); return; }
@@ -2401,7 +2548,9 @@
                 content: 'Content Credits',
                 campaigns: 'Ad Campaigns',
                 finances: 'Financial Management',
-                users: 'User Management'
+                profile: 'My Profile',
+                users: 'User Management',
+                settings: 'Admin Settings'
             };
             document.getElementById('pageTitle').textContent = titles[sectionId];
 
@@ -2423,6 +2572,9 @@
                 if (triggerEl) {
                     new bootstrap.Tab(triggerEl).show();
                 }
+            }
+            if(sectionId === 'profile') {
+                loadProfile();
             }
             if(sectionId === 'users') {
                 loadUsersTable();
