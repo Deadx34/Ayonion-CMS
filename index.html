@@ -5467,12 +5467,19 @@
                             const price = parseFloat(unitPriceInput.value) || 0;
                             
                             if (qty > 0 && price > 0) {
-                                itemDetails.push({
+                                const itemDetail = {
                                     itemType: itemType,
                                     quantity: qty,
                                     unitPrice: price,
                                     total: qty * price
-                                });
+                                };
+                                
+                                // Add custom description for "Other Service"
+                                if (itemType === 'Other Service' && description.value) {
+                                    itemDetail.description = description.value.trim();
+                                }
+                                
+                                itemDetails.push(itemDetail);
                             }
                         }
                     });
@@ -5491,12 +5498,19 @@
                         return;
                     }
                     
-                    itemDetails.push({
+                    const itemDetail = {
                         itemType: selectedItemTypes[0],
                         quantity: qty,
                         unitPrice: price,
                         total: qty * price
-                    });
+                    };
+                    
+                    // Add custom description for "Other Service"
+                    if (selectedItemTypes[0] === 'Other Service' && description.value) {
+                        itemDetail.description = description.value.trim();
+                    }
+                    
+                    itemDetails.push(itemDetail);
                 }
                 
                 const formData = {

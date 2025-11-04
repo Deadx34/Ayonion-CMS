@@ -5040,7 +5040,7 @@
                 });
                 
                 // Check if all elements exist and at least one item type is selected
-				if (!clientSelect || !description || !quantity || !unitPrice || !date) {
+				if (!clientSelect || !description || !date) {
                     console.error('One or more form elements not found');
                     showAlert('Form error: Missing form elements', 'danger');
                     return;
@@ -5060,13 +5060,97 @@
                     }
                 }
                 
+                // Validate form based on current state
+                if (selectedItemTypes.length > 1) {
+                    // Multiple items - validate dynamic inputs
+                    const dynamicInputs = form.querySelectorAll('.item-quantity, .item-unit-price');
+                    for (let input of dynamicInputs) {
+                        if (!input.value || input.value <= 0) {
+                            showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
+                            input.focus();
+                            return;
+                        }
+                    }
+                } else {
+                    // Single item - validate regular inputs
+                    const quantity = form.querySelector('#docQuantity');
+                    const unitPrice = form.querySelector('#docUnitPrice');
+                    
+                    if (!quantity || !unitPrice || !quantity.value || !unitPrice.value || 
+                        parseInt(quantity.value) <= 0 || parseFloat(unitPrice.value) <= 0) {
+                        showAlert('Please enter valid quantity and unit price.', 'warning');
+                        if (quantity && !quantity.value) quantity.focus();
+                        else if (unitPrice && !unitPrice.value) unitPrice.focus();
+                        return;
+                    }
+                }
+                
+                // Handle different input scenarios
+                let itemDetails = [];
+                
+                if (selectedItemTypes.length > 1) {
+                    // Multiple items - get individual amounts
+                    selectedItemTypes.forEach(itemType => {
+                        const quantityInput = form.querySelector(`input[data-item-type="${itemType}"].item-quantity`);
+                        const unitPriceInput = form.querySelector(`input[data-item-type="${itemType}"].item-unit-price`);
+                        
+                        if (quantityInput && unitPriceInput) {
+                            const qty = parseInt(quantityInput.value) || 0;
+                            const price = parseFloat(unitPriceInput.value) || 0;
+                            
+                            if (qty > 0 && price > 0) {
+                                const itemDetail = {
+                                    itemType: itemType,
+                                    quantity: qty,
+                                    unitPrice: price,
+                                    total: qty * price
+                                };
+                                
+                                // Add custom description for "Other Service"
+                                if (itemType === 'Other Service' && description.value) {
+                                    itemDetail.description = description.value.trim();
+                                }
+                                
+                                itemDetails.push(itemDetail);
+                            }
+                        }
+                    });
+                    
+                    if (itemDetails.length === 0) {
+                        showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
+                        return;
+                    }
+                } else {
+                    // Single item - use regular inputs
+                    const qty = parseInt(quantity.value) || 0;
+                    const price = parseFloat(unitPrice.value) || 0;
+                    
+                    if (qty <= 0 || price <= 0) {
+                        showAlert('Please enter valid quantity and unit price.', 'warning');
+                        return;
+                    }
+                    
+                    const itemDetail = {
+                        itemType: selectedItemTypes[0],
+                        quantity: qty,
+                        unitPrice: price,
+                        total: qty * price
+                    };
+                    
+                    // Add custom description for "Other Service"
+                    if (selectedItemTypes[0] === 'Other Service' && description.value) {
+                        itemDetail.description = description.value.trim();
+                    }
+                    
+                    itemDetails.push(itemDetail);
+                }
+                
                 const formData = {
 					clientId: parseInt(clientSelect.value),
 					docType: form.dataset.docType,
 					itemTypes: selectedItemTypes,
+					itemDetails: itemDetails,
 					description: description.value,
-					quantity: parseInt(quantity.value),
-					unitPrice: parseFloat(unitPrice.value),
 					date: date.value
                 };
 
