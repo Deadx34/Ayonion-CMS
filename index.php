@@ -3181,6 +3181,11 @@
                 groupedContents[monthKey].items.push(c);
             });
 
+            // Sort items within each group by ID (newest first)
+            Object.values(groupedContents).forEach(group => {
+                group.items.sort((a, b) => b.id - a.id);
+            });
+
             // Sort groups by date (newest first)
             const sortedGroups = Object.entries(groupedContents).sort((a, b) => b[1].date - a[1].date);
             
