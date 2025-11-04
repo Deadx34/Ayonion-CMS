@@ -30,14 +30,14 @@ try {
         $qualityRanking = $conn->real_escape_string($input['qualityRanking'] ?? '');
         $conversionRanking = $conn->real_escape_string($input['conversionRanking'] ?? '');
         
-        $evidenceUrls = $conn->real_escape_string(json_encode($input['evidenceUrls'] ?? []));
-        $evidenceFiles = $conn->real_escape_string(json_encode($input['evidenceFiles'] ?? []));
+        $evidenceImageUrl = $conn->real_escape_string($input['evidenceImageUrl'] ?? '');
+        $creativeImageUrl = $conn->real_escape_string($input['creativeImageUrl'] ?? '');
 
         // 1. Add Campaign Record
         $sql_campaign = "INSERT INTO campaigns (
-            id, client_id, platform, ad_name, ad_id, result_type, results, cpr, reach, impressions, spend, quality_ranking, conversion_ranking, evidence_urls, evidence_files
+            id, client_id, platform, ad_name, ad_id, result_type, results, cpr, reach, impressions, spend, quality_ranking, conversion_ranking, evidence_image_url, creative_image_url
         ) VALUES (
-            '$id', '$clientId', '$platform', '$adName', '$adId', '$resultType', $results, $cpr, $reach, $impressions, $spend, '$qualityRanking', '$conversionRanking', '$evidenceUrls', '$evidenceFiles'
+            '$id', '$clientId', '$platform', '$adName', '$adId', '$resultType', $results, $cpr, $reach, $impressions, $spend, '$qualityRanking', '$conversionRanking', '$evidenceImageUrl', '$creativeImageUrl'
         )";
 
         // 2. Update Client's Total Spent

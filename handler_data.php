@@ -79,8 +79,8 @@ if ($campaign_result) {
             'spend' => (float)$row['spend'],
             'qualityRanking' => $row['quality_ranking'],
             'conversionRanking' => $row['conversion_ranking'],
-            'evidenceUrls' => json_decode($row['evidence_urls'] ?? '[]'),
-            'evidenceFiles' => json_decode($row['evidence_files'] ?? '[]'),
+            'evidenceImageUrl' => $row['evidence_image_url'] ?? null,
+            'creativeImageUrl' => $row['creative_image_url'] ?? null,
             'dateAdded' => date('Y-m-d H:i:s') // Add current timestamp for display
         ];
     }

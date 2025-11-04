@@ -1217,15 +1217,25 @@
                                     <option value="Below Average">Below Average</option>
                                 </select>
                             </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Evidence URLs (comma-separated)</label>
-                                <textarea class="form-control" id="evidenceUrls" rows="2" placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"></textarea>
-                                <small class="text-muted">Add multiple image URLs separated by commas</small>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Evidence Image</label>
+                                <input type="file" class="form-control" id="evidenceImageUpload" accept="image/*" onchange="handleEvidenceImageUpload(this)">
+                                <input type="hidden" id="evidenceImageUrl">
+                                <div id="evidenceImagePreview" class="mt-2" style="display: none;">
+                                    <img id="evidenceImagePreviewImg" src="" alt="Evidence Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeEvidenceImage()">Remove</button>
+                                </div>
+                                <small class="text-muted">Upload campaign performance evidence/screenshot</small>
                             </div>
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">Upload Evidence Images (Optional)</label>
-                                <input type="file" class="form-control" id="evidenceImageUpload" multiple accept="image/*">
-                                <div id="imagePreviewContainer" class="mt-2"></div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Creative Image</label>
+                                <input type="file" class="form-control" id="creativeImageUpload" accept="image/*" onchange="handleCreativeImageUpload(this)">
+                                <input type="hidden" id="creativeImageUrl">
+                                <div id="creativeImagePreview" class="mt-2" style="display: none;">
+                                    <img id="creativeImagePreviewImg" src="" alt="Creative Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeCreativeImage()">Remove</button>
+                                </div>
+                                <small class="text-muted">Upload ad creative/design used in campaign</small>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Save Campaign</button>
@@ -1267,9 +1277,17 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12">
-                            <h6>Evidence Screenshots/Links</h6>
-                            <div id="evidenceContainer" class="mb-3 d-flex flex-wrap"></div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-chart-bar me-2"></i>Evidence Image</h6>
+                            <div id="evidenceImageContainer" class="mb-3">
+                                <p class="text-muted">No evidence image uploaded</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-image me-2"></i>Creative Image</h6>
+                            <div id="creativeImageContainer" class="mb-3">
+                                <p class="text-muted">No creative image uploaded</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4257,10 +4275,93 @@
             const clientId = document.getElementById('campaignClientSelect').value;
             if(!clientId) { showAlert('Please select a client first', 'warning'); return; }
             document.getElementById('addCampaignForm').reset();
-            document.getElementById('imagePreviewContainer').innerHTML = '';
-            document.getElementById('evidenceImageUpload').value = '';
-            campaignImageFiles = [];
+            clearEvidenceImagePreview();
+            clearCreativeImagePreview();
             new bootstrap.Modal(document.getElementById('addCampaignModal')).show();
+        }
+
+        // Handle Evidence Image Upload
+        async function handleEvidenceImageUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const response = await fetch('upload_content_image.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.image_url) {
+                    document.getElementById('evidenceImageUrl').value = result.image_url;
+                    document.getElementById('evidenceImagePreviewImg').src = result.image_url;
+                    document.getElementById('evidenceImagePreview').style.display = 'block';
+                    showAlert('Evidence image uploaded successfully! ✅', 'success');
+                } else {
+                    throw new Error(result.message || 'Upload failed');
+                }
+            } catch (error) {
+                showAlert('Error uploading evidence image: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        // Handle Creative Image Upload
+        async function handleCreativeImageUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            try {
+                const response = await fetch('upload_content_image.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.image_url) {
+                    document.getElementById('creativeImageUrl').value = result.image_url;
+                    document.getElementById('creativeImagePreviewImg').src = result.image_url;
+                    document.getElementById('creativeImagePreview').style.display = 'block';
+                    showAlert('Creative image uploaded successfully! ✅', 'success');
+                } else {
+                    throw new Error(result.message || 'Upload failed');
+                }
+            } catch (error) {
+                showAlert('Error uploading creative image: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        function removeEvidenceImage() {
+            document.getElementById('evidenceImageUrl').value = '';
+            document.getElementById('evidenceImageUpload').value = '';
+            document.getElementById('evidenceImagePreview').style.display = 'none';
+        }
+
+        function removeCreativeImage() {
+            document.getElementById('creativeImageUrl').value = '';
+            document.getElementById('creativeImageUpload').value = '';
+            document.getElementById('creativeImagePreview').style.display = 'none';
+        }
+
+        function clearEvidenceImagePreview() {
+            document.getElementById('evidenceImageUrl').value = '';
+            document.getElementById('evidenceImageUpload').value = '';
+            document.getElementById('evidenceImagePreview').style.display = 'none';
+        }
+
+        function clearCreativeImagePreview() {
+            document.getElementById('creativeImageUrl').value = '';
+            document.getElementById('creativeImageUpload').value = '';
+            document.getElementById('creativeImagePreview').style.display = 'none';
         }
 
         // FIX: Add Campaign using PHP handler
@@ -4279,11 +4380,6 @@
                 return;
             }
 
-            const evidenceUrls = document.getElementById('evidenceUrls').value
-                .split(',')
-                .map(url => url.trim())
-                .filter(url => url.length > 0);
-
             const newCampaignData = {
                 clientId: clientId,
                 platform: document.getElementById('campaignPlatform').value,
@@ -4297,8 +4393,8 @@
                 spend: spend,
                 qualityRanking: document.getElementById('qualityRanking').value,
                 conversionRanking: document.getElementById('conversionRanking').value,
-                evidenceUrls: evidenceUrls,
-                evidenceFiles: [...campaignImageFiles]
+                evidenceImageUrl: document.getElementById('evidenceImageUrl').value || null,
+                creativeImageUrl: document.getElementById('creativeImageUrl').value || null
             };
 
             try {
@@ -4342,22 +4438,31 @@
             document.getElementById('detailQuality').textContent = campaign.qualityRanking;
             document.getElementById('detailConversion').textContent = campaign.conversionRanking;
 
-            const evidenceContainer = document.getElementById('evidenceContainer');
-            let evidenceHTML = '';
+            // Display Evidence Image
+            const evidenceImageContainer = document.getElementById('evidenceImageContainer');
+            if (campaign.evidenceImageUrl) {
+                evidenceImageContainer.innerHTML = `
+                    <img src="${campaign.evidenceImageUrl}" alt="Evidence" 
+                         style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" 
+                         onclick="window.open('${campaign.evidenceImageUrl}', '_blank')" 
+                         title="Click to view full size">
+                `;
+            } else {
+                evidenceImageContainer.innerHTML = '<p class="text-muted">No evidence image uploaded</p>';
+            }
 
-            evidenceHTML += (campaign.evidenceUrls || []).map(url => `
-                <a href="${url}" target="_blank" class="evidence-preview" style="text-decoration: none; display: flex; align-items: center; justify-content: center; background: #e0e7ff;" title="View Link">
-                    <i class="fas fa-link fa-2x text-primary"></i>
-                </a>
-            `).join('');
-
-            evidenceHTML += (campaign.evidenceFiles || []).map(dataUrl => `
-                <div onclick="window.open('${dataUrl}', '_blank')" class="evidence-preview" style="cursor: pointer;" title="Click to enlarge">
-                    <img src="${dataUrl}" alt="Evidence">
-                </div>
-            `).join('');
-
-            evidenceContainer.innerHTML = evidenceHTML || '<p class="text-muted w-100">No evidence provided</p>';
+            // Display Creative Image
+            const creativeImageContainer = document.getElementById('creativeImageContainer');
+            if (campaign.creativeImageUrl) {
+                creativeImageContainer.innerHTML = `
+                    <img src="${campaign.creativeImageUrl}" alt="Creative" 
+                         style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" 
+                         onclick="window.open('${campaign.creativeImageUrl}', '_blank')" 
+                         title="Click to view full size">
+                `;
+            } else {
+                creativeImageContainer.innerHTML = '<p class="text-muted">No creative image uploaded</p>';
+            }
 
             new bootstrap.Modal(document.getElementById('campaignDetailsModal')).show();
         }
