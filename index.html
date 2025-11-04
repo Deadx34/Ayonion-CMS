@@ -1511,10 +1511,23 @@
                                             selectedItems.forEach((checkbox, index) => {
                                                 const itemDiv = document.createElement('div');
                                                 itemDiv.className = 'row mb-3 p-3 border rounded';
+                                                
+                                                // Check if this is "Other Service" to add description field
+                                                const isOtherService = checkbox.value === 'Other Service';
+                                                
                                                 itemDiv.innerHTML = `
                                                     <div class="col-12">
                                                         <h6 class="mb-2 text-primary">${checkbox.value}</h6>
                                                     </div>
+                                                    ${isOtherService ? `
+                                                    <div class="col-12 mb-3">
+                                                        <label class="form-label">Description <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control item-description" 
+                                                               data-item-type="${checkbox.value}"
+                                                               placeholder="Enter service description" 
+                                                               required>
+                                                    </div>
+                                                    ` : ''}
                                                     <div class="col-md-6">
                                                         <label class="form-label">Quantity</label>
                                                         <input type="number" class="form-control item-quantity" 
@@ -1548,12 +1561,24 @@
                                             itemAmountsContainer.innerHTML = '';
                                             const checkbox = selectedItems[0];
                                             
+                                            // Check if this is "Other Service" to add description field
+                                            const isOtherService = checkbox.value === 'Other Service';
+                                            
                                             const itemDiv = document.createElement('div');
                                             itemDiv.className = 'row mb-3 p-3 border rounded';
                                             itemDiv.innerHTML = `
                                                 <div class="col-12">
                                                     <h6 class="mb-2 text-primary">${checkbox.value}</h6>
                                                 </div>
+                                                ${isOtherService ? `
+                                                <div class="col-12 mb-3">
+                                                    <label class="form-label">Description <span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control item-description" 
+                                                           data-item-type="${checkbox.value}"
+                                                           placeholder="Enter service description" 
+                                                           required>
+                                                </div>
+                                                ` : ''}
                                                 <div class="col-md-6">
                                                     <label class="form-label">Quantity</label>
                                                     <input type="number" class="form-control item-quantity" 
@@ -1589,39 +1614,10 @@
                                         checkbox.addEventListener('change', updateItemAmounts);
                                     });
                                     
-                                    // Function to handle description field visibility
-                                    function updateDescriptionRequirement() {
-                                        const otherServiceCheckbox = document.getElementById('itemType4');
-                                        const descriptionFieldContainer = document.getElementById('descriptionField');
-                                        const descriptionField = document.getElementById('docDescription');
-                                        
-                                        if (otherServiceCheckbox && descriptionFieldContainer && descriptionField) {
-                                            if (otherServiceCheckbox.checked) {
-                                                descriptionFieldContainer.style.display = 'block';
-                                                descriptionField.setAttribute('required', 'required');
-                                            } else {
-                                                descriptionFieldContainer.style.display = 'none';
-                                                descriptionField.removeAttribute('required');
-                                                descriptionField.value = ''; // Clear the field when hidden
-                                            }
-                                        }
-                                    }
-                                    
-                                    // Add event listener for Other Service checkbox
-                                    const otherServiceCheckbox = document.getElementById('itemType4');
-                                    if (otherServiceCheckbox) {
-                                        otherServiceCheckbox.addEventListener('change', updateDescriptionRequirement);
-                                    }
-                                    
                                     // Initial call
                                     updateItemAmounts();
-                                    updateDescriptionRequirement();
                                 });
                                 </script>
-                            </div>
-                            <div class="col-md-12 mb-3" id="descriptionField" style="display: none;">
-                                <label class="form-label">Description <span class="text-muted">(Required for Other Service)</span></label>
-                                <input type="text" class="form-control" id="docDescription">
                             </div>
                             
                             <!-- Dynamic Item Amounts Section -->
@@ -5446,20 +5442,18 @@
                     return;
                 }
                 
-                // Check if description is required (when Other Service is selected)
-                if (selectedItemTypes.includes('Other Service')) {
-                    if (!description.value || description.value.trim() === '') {
-                        showAlert('Description is required when "Other Service" is selected.', 'warning');
-                        description.focus();
-                        return;
-                    }
-                }
-                
                 // Validate form based on current state
                 // Always validate dynamic inputs now (used for both single and multiple items)
-                const dynamicInputs = form.querySelectorAll('.item-quantity, .item-unit-price');
+                const dynamicInputs = form.querySelectorAll('.item-quantity, .item-unit-price, .item-description');
                 for (let input of dynamicInputs) {
-                    if (!input.value || input.value <= 0) {
+                    if (input.classList.contains('item-description')) {
+                        // Validate description for Other Service
+                        if (!input.value || input.value.trim() === '') {
+                            showAlert('Description is required for "Other Service".', 'warning');
+                            input.focus();
+                            return;
+                        }
+                    } else if (!input.value || input.value <= 0) {
                         showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
                         input.focus();
                         return;
@@ -5473,6 +5467,7 @@
                 selectedItemTypes.forEach(itemType => {
                     const quantityInput = form.querySelector(`input[data-item-type="${itemType}"].item-quantity`);
                     const unitPriceInput = form.querySelector(`input[data-item-type="${itemType}"].item-unit-price`);
+                    const descriptionInput = form.querySelector(`input[data-item-type="${itemType}"].item-description`);
                     
                     if (quantityInput && unitPriceInput) {
                         const qty = parseInt(quantityInput.value) || 0;
@@ -5486,9 +5481,9 @@
                                 total: qty * price
                             };
                             
-                            // Add custom description for "Other Service"
-                            if (itemType === 'Other Service' && description.value) {
-                                itemDetail.description = description.value.trim();
+                            // Add custom description for "Other Service" from the dynamic input
+                            if (itemType === 'Other Service' && descriptionInput && descriptionInput.value) {
+                                itemDetail.description = descriptionInput.value.trim();
                             }
                             
                             itemDetails.push(itemDetail);
