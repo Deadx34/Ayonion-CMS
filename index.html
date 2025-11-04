@@ -6,6 +6,7 @@
     <title>Ayonion Studios - Management System (Final)</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
@@ -17,7 +18,7 @@
             --light: #f8fafc;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light); }
+        body { font-family: 'Lato', 'Segoe UI', sans-serif; background: var(--light); }
         .sidebar { background: var(--dark); min-height: 100vh; position: fixed; left: 0; top: 0; width: 260px; z-index: 1000; overflow-y: auto; transition: transform 0.3s ease; }
         .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
         .sidebar-header h3 { font-size: 1.4rem; font-weight: 700; margin: 0; }
@@ -48,6 +49,11 @@
         .table-hover > tbody > tr:hover { --bs-table-hover-bg: #f0f1ff; cursor: pointer; transform: scale(1.01); }
         .table th { border: none; padding: 15px; font-weight: 600; color: var(--dark); }
         .table td { padding: 15px; vertical-align: middle; }
+        .sortable { cursor: pointer; user-select: none; position: relative; padding-right: 25px !important; }
+        .sortable:hover { background: #e7e9fd; }
+        .sortable::after { content: '⇅'; position: absolute; right: 8px; opacity: 0.3; font-size: 12px; }
+        .sortable.asc::after { content: '↑'; opacity: 1; color: var(--primary); }
+        .sortable.desc::after { content: '↓'; opacity: 1; color: var(--primary); }
         .badge { padding: 6px 12px; border-radius: 6px; font-weight: 500; }
         .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.3s; cursor: pointer; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3); }
@@ -219,7 +225,6 @@
                 </button>
             </div>
         </nav>
-
         <main class="content-area">
             <div class="top-bar">
                 <div class="d-flex align-items-center gap-2 flex-grow-1">
@@ -356,17 +361,17 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover" id="clientsTable">
                                 <thead>
                                     <tr>
                                         <th>Logo</th>
-                                        <th>Partner ID</th>
-                                        <th>Company Name</th>
-                                        <th>Renewal Date</th>
-                                        <th>Available Credits</th>
-                                        <th>Ad Budget</th>
-                                        <th>Platforms</th>
-                                        <th>Industry</th>
+                                        <th class="sortable" data-sort="partnerId" data-type="string">Partner ID</th>
+                                        <th class="sortable" data-sort="companyName" data-type="string">Company Name</th>
+                                        <th class="sortable" data-sort="renewalDate" data-type="date">Renewal Date</th>
+                                        <th class="sortable" data-sort="availableCredits" data-type="number">Available Credits</th>
+                                        <th class="sortable" data-sort="adBudget" data-type="number">Ad Budget</th>
+                                        <th class="sortable" data-sort="platforms" data-type="string">Platforms</th>
+                                        <th class="sortable" data-sort="industry" data-type="string">Industry</th>
                                         <th id="clientActionsHeader" style="display: none;">Actions</th>
                                     </tr>
                                 </thead>
@@ -467,14 +472,20 @@
                         </div>
 
                         <div class="table-responsive mt-3">
-                            <table class="table table-hover">
+                            <table class="table table-hover" id="campaignsTable">
                                 <thead>
                                     <tr>
                                         <th width="50">
                                             <input type="checkbox" id="selectAllCampaigns" onchange="toggleAllCampaigns()">
                                         </th>
-                                        <th>Platform</th><th>Ad Name</th><th>Results</th>
-                                        <th>CPR</th><th>Reach</th><th>Spend</th><th>Date</th><th>Actions</th>
+                                        <th class="sortable" data-sort="platform" data-type="string">Platform</th>
+                                        <th class="sortable" data-sort="adName" data-type="string">Ad Name</th>
+                                        <th class="sortable" data-sort="results" data-type="number">Results</th>
+                                        <th class="sortable" data-sort="cpr" data-type="number">CPR</th>
+                                        <th class="sortable" data-sort="reach" data-type="number">Reach</th>
+                                        <th class="sortable" data-sort="spend" data-type="number">Spend</th>
+                                        <th class="sortable" data-sort="date" data-type="date">Date</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="campaignsTableBody"></tbody>
@@ -518,13 +529,13 @@
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="quotationsTab" role="tabpanel">
-                                <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Quote #</th><th>Client</th><th>Type</th><th>Date</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="quotationsTableBody"></tbody></table></div>
+                                <div class="table-responsive"><table class="table table-hover" id="quotationsTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Quote #</th><th class="sortable" data-sort="client" data-type="string">Client</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="quotationsTableBody"></tbody></table></div>
                             </div>
                             <div class="tab-pane fade" id="invoicesTab" role="tabpanel">
-                                <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Invoice #</th><th>Client</th><th>Type</th><th>Date</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="invoicesTableBody"></tbody></table></div>
+                                <div class="table-responsive"><table class="table table-hover" id="invoicesTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Invoice #</th><th class="sortable" data-sort="client" data-type="string">Client</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="invoicesTableBody"></tbody></table></div>
                             </div>
                             <div class="tab-pane fade" id="receiptsTab" role="tabpanel">
-                                <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Receipt #</th><th>Client</th><th>Type</th><th>Date</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="receiptsTableBody"></tbody></table></div>
+                                <div class="table-responsive"><table class="table table-hover" id="receiptsTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Receipt #</th><th class="sortable" data-sort="client" data-type="string">Client</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="receiptsTableBody"></tbody></table></div>
                             </div>
                         </div>
                     </div>
@@ -602,12 +613,12 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover" id="usersTable">
                                 <thead>
                                     <tr>
-                                        <th>Username</th>
-                                        <th>Role</th>
-                                        <th>Password Status</th>
+                                        <th class="sortable" data-sort="username" data-type="string">Username</th>
+                                        <th class="sortable" data-sort="role" data-type="string">Role</th>
+                                        <th class="sortable" data-sort="passwordStatus" data-type="string">Password Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -1740,6 +1751,71 @@
             selectedClientCampaignId = parseInt(localStorage.getItem('selectedClientCampaignId')) || (appData.clients.length > 0 ? appData.clients[0].id : null);
         }
 
+        // ============================================
+        // TABLE SORTING FUNCTIONS
+        // ============================================
+        let sortStates = {}; // Store sort state for each table
+
+        function initializeTableSorting() {
+            // Add click handlers to all sortable headers
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', function() {
+                    const table = this.closest('table');
+                    const tableId = table.id;
+                    const sortField = this.dataset.sort;
+                    const sortType = this.dataset.type;
+                    
+                    // Toggle sort direction
+                    if (!sortStates[tableId]) sortStates[tableId] = {};
+                    const currentSort = sortStates[tableId][sortField] || 'none';
+                    const newSort = currentSort === 'asc' ? 'desc' : 'asc';
+                    
+                    // Clear all sort indicators for this table
+                    table.querySelectorAll('.sortable').forEach(h => {
+                        h.classList.remove('asc', 'desc');
+                    });
+                    
+                    // Set new sort state
+                    sortStates[tableId] = { [sortField]: newSort };
+                    this.classList.add(newSort);
+                    
+                    // Sort the table
+                    sortTable(table, sortField, sortType, newSort);
+                });
+            });
+        }
+
+        function sortTable(table, field, type, direction) {
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                let aVal = a.dataset[field] || '';
+                let bVal = b.dataset[field] || '';
+                
+                // Handle different data types
+                if (type === 'number') {
+                    aVal = parseFloat(aVal.replace(/[^0-9.-]/g, '')) || 0;
+                    bVal = parseFloat(bVal.replace(/[^0-9.-]/g, '')) || 0;
+                } else if (type === 'date') {
+                    aVal = new Date(aVal).getTime() || 0;
+                    bVal = new Date(bVal).getTime() || 0;
+                } else {
+                    aVal = aVal.toLowerCase();
+                    bVal = bVal.toLowerCase();
+                }
+                
+                if (direction === 'asc') {
+                    return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                } else {
+                    return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+                }
+            });
+            
+            // Re-append sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
         async function loadAllDataFromPHP() {
             try {
                 showAlert('Loading latest data from server...', 'info', 2000);
@@ -2667,7 +2743,9 @@
                     : `<button class="btn btn-sm btn-secondary" disabled>Current User</button>`;
                 
                 return `
-                <tr>
+                <tr data-username="${u.username.toLowerCase()}"
+                    data-role="${u.role.toLowerCase()}"
+                    data-passwordstatus="${isTemp.toLowerCase()}">
                     <td>${u.username}</td>
                     <td>${u.role.charAt(0).toUpperCase() + u.role.slice(1)}</td>
                     <td><span class="badge bg-${statusColor}">${isTemp}</span></td>
@@ -2865,7 +2943,14 @@
                     : '';
 
                 return `
-                <tr onclick="showClientDetails(${c.id})">
+                <tr onclick="showClientDetails(${c.id})" 
+                    data-partnerid="${c.partnerId.toLowerCase()}"
+                    data-companyname="${c.companyName.toLowerCase()}"
+                    data-renewaldate="${c.renewalDate}"
+                    data-availablecredits="${available}"
+                    data-adbudget="${remainingBudget}"
+                    data-platforms="${(c.managingPlatforms || '-').toLowerCase()}"
+                    data-industry="${c.industry.toLowerCase()}">
                     <td style="cursor: pointer;">
                         ${c.logoUrl ? `<img src="${c.logoUrl}" class="logo-preview" alt="Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\\'fas fa-building fa-2x text-muted\\'></i>'">` : '<i class="fas fa-building fa-2x text-muted"></i>'}
                     </td>
@@ -4249,7 +4334,14 @@
             }
 
             tbody.innerHTML = campaigns.map(c => `
-                <tr onclick="viewCampaignDetails(${c.id})">
+                <tr onclick="viewCampaignDetails(${c.id})"
+                    data-platform="${c.platform.toLowerCase()}"
+                    data-adname="${c.adName.toLowerCase()}"
+                    data-results="${c.results}"
+                    data-cpr="${c.cpr}"
+                    data-reach="${c.reach}"
+                    data-spend="${c.spend}"
+                    data-date="${c.dateAdded}">
                     <td onclick="event.stopPropagation();">
                         <input type="checkbox" class="campaign-checkbox" value="${c.id}" onchange="updateSelectedCampaigns()">
                     </td>
@@ -5525,6 +5617,13 @@
             printWindow.document.close();
             showAlert('Invoice opening for printing! 🖨️', 'info');
         }
+
+        // ============================================
+        // INITIALIZE APP ON LOAD
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTableSorting();
+        });
 
     </script>
 </body>
