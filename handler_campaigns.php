@@ -77,7 +77,82 @@ try {
         } else {
             throw new Exception("Failed to delete campaign and revert budget.");
         }
-    } else {
+    }
+    // --- 3. HANDLE EDIT CAMPAIGN (POST) ---
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit') {
+        $campaignId = $conn->real_escape_string($input['id'] ?? '');
+        $clientId = (int)($input['clientId'] ?? 0);
+        $newSpend = (float)($input['spend'] ?? 0.00);
+
+        // Get old spend amount before update
+        $fetch_sql = "SELECT spend, client_id FROM campaigns WHERE id = '$campaignId'";
+        $result = $conn->query($fetch_sql);
+        if (!$result || $result->num_rows !== 1) {
+            throw new Exception("Campaign not found.");
+        }
+        $oldCampaign = $result->fetch_assoc();
+        $oldSpend = (float)$oldCampaign['spend'];
+        $oldClientId = (int)$oldCampaign['client_id'];
+
+        // Sanitize and escape all fields
+        $platform = $conn->real_escape_string($input['platform'] ?? '');
+        $adName = $conn->real_escape_string($input['adName'] ?? '');
+        $adId = $conn->real_escape_string($input['adId'] ?? '');
+        $resultType = $conn->real_escape_string($input['resultType'] ?? '');
+        $results = (int)($input['results'] ?? 0);
+        $cpr = (float)($input['cpr'] ?? 0.00);
+        $reach = (int)($input['reach'] ?? 0);
+        $impressions = (int)($input['impressions'] ?? 0);
+        $qualityRanking = $conn->real_escape_string($input['qualityRanking'] ?? '');
+        $conversionRanking = $conn->real_escape_string($input['conversionRanking'] ?? '');
+        
+        $evidenceImageUrl = $conn->real_escape_string($input['evidenceImageUrl'] ?? '');
+        $creativeImageUrl = $conn->real_escape_string($input['creativeImageUrl'] ?? '');
+
+        // 1. Update Campaign Record
+        $sql_campaign = "UPDATE campaigns SET 
+            platform = '$platform',
+            ad_name = '$adName',
+            ad_id = '$adId',
+            result_type = '$resultType',
+            results = $results,
+            cpr = $cpr,
+            reach = $reach,
+            impressions = $impressions,
+            spend = $newSpend,
+            quality_ranking = '$qualityRanking',
+            conversion_ranking = '$conversionRanking',
+            evidence_image_url = '$evidenceImageUrl',
+            creative_image_url = '$creativeImageUrl'
+            WHERE id = '$campaignId'";
+
+        // 2. Adjust client's total_spent (remove old spend, add new spend)
+        $spendDifference = $newSpend - $oldSpend;
+        
+        // If client changed, revert spend from old client and add to new client
+        if ($oldClientId !== $clientId) {
+            $sql_old_client = "UPDATE clients SET total_spent = total_spent - $oldSpend WHERE id = $oldClientId";
+            $sql_new_client = "UPDATE clients SET total_spent = total_spent + $newSpend WHERE id = $clientId";
+            
+            if (query_db($conn, $sql_campaign) && query_db($conn, $sql_old_client) && query_db($conn, $sql_new_client)) {
+                $conn->commit();
+                echo json_encode(["success" => true, "message" => "Campaign updated and budget adjusted."]);
+            } else {
+                throw new Exception("Failed to update campaign.");
+            }
+        } else {
+            // Same client, just adjust the difference
+            $sql_client = "UPDATE clients SET total_spent = total_spent + $spendDifference WHERE id = $clientId";
+            
+            if (query_db($conn, $sql_campaign) && query_db($conn, $sql_client)) {
+                $conn->commit();
+                echo json_encode(["success" => true, "message" => "Campaign updated and budget adjusted."]);
+            } else {
+                throw new Exception("Failed to update campaign.");
+            }
+        }
+    }
+    else {
         throw new Exception("Invalid API endpoint request.", 400);
     }
 } catch (Exception $e) {

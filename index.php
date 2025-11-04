@@ -1286,6 +1286,119 @@
         </div>
     </div>
 
+    <!-- Edit Campaign Modal -->
+    <div class="modal fade" id="editCampaignModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Campaign</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCampaignForm">
+                        <input type="hidden" id="editCampaignId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Platform</label>
+                                <select class="form-select" id="editCampaignPlatform" required>
+                                    <option value="">Select Platform</option>
+                                    <option value="Meta Ads">Meta Ads (Facebook & Instagram)</option>
+                                    <option value="Google Ads">Google Ads</option>
+                                    <option value="LinkedIn Ads">LinkedIn Ads</option>
+                                    <option value="TikTok Ads">TikTok Ads</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ad ID</label>
+                                <input type="text" class="form-control" id="editAdId" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ad Name</label>
+                                <input type="text" class="form-control" id="editAdName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Result Type</label>
+                                <select class="form-select" id="editResultType" required>
+                                    <option value="Clicks">Clicks</option>
+                                    <option value="Impressions">Impressions</option>
+                                    <option value="Conversions">Conversions</option>
+                                    <option value="Leads">Leads</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Results</label>
+                                <input type="number" class="form-control" id="editResults" required min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cost Per Result (CPR)</label>
+                                <input type="number" step="0.01" class="form-control" id="editCpr" required min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Reach</label>
+                                <input type="number" class="form-control" id="editReach" required min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Impressions</label>
+                                <input type="number" class="form-control" id="editImpressions" required min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Spend (Rs.)</label>
+                                <input type="number" step="0.01" class="form-control" id="editSpend" required min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Quality Ranking</label>
+                                <select class="form-select" id="editQualityRanking">
+                                    <option value="Above Average">Above Average</option>
+                                    <option value="Average">Average</option>
+                                    <option value="Below Average">Below Average</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Conversion Rate Ranking</label>
+                                <select class="form-select" id="editConversionRanking">
+                                    <option value="Above Average">Above Average</option>
+                                    <option value="Average">Average</option>
+                                    <option value="Below Average">Below Average</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Evidence Image</label>
+                                <!-- Current Evidence Image -->
+                                <div id="editCurrentEvidenceImage" style="display: none;" class="mb-2">
+                                    <img id="editCurrentEvidenceImageImg" src="" alt="Current Evidence" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
+                                    <p class="text-muted small mb-0">Current evidence image</p>
+                                </div>
+                                <input type="file" class="form-control" id="editEvidenceImageUpload" accept="image/*" onchange="handleEditEvidenceImageUpload(this)">
+                                <input type="hidden" id="editEvidenceImageUrl">
+                                <div id="editEvidenceImagePreview" class="mt-2" style="display: none;">
+                                    <img id="editEvidenceImagePreviewImg" src="" alt="Evidence Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeEditEvidenceImage()">Remove</button>
+                                </div>
+                                <small class="text-muted">Upload new evidence image (optional - leave empty to keep current)</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Creative Image</label>
+                                <!-- Current Creative Image -->
+                                <div id="editCurrentCreativeImage" style="display: none;" class="mb-2">
+                                    <img id="editCurrentCreativeImageImg" src="" alt="Current Creative" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
+                                    <p class="text-muted small mb-0">Current creative image</p>
+                                </div>
+                                <input type="file" class="form-control" id="editCreativeImageUpload" accept="image/*" onchange="handleEditCreativeImageUpload(this)">
+                                <input type="hidden" id="editCreativeImageUrl">
+                                <div id="editCreativeImagePreview" class="mt-2" style="display: none;">
+                                    <img id="editCreativeImagePreviewImg" src="" alt="Creative Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeEditCreativeImage()">Remove</button>
+                                </div>
+                                <small class="text-muted">Upload new creative image (optional - leave empty to keep current)</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Campaign</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="documentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -4158,8 +4271,9 @@
                     <td>Rs. ${c.spend.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td>${formatDateTime(c.dateAdded)}</td>
                     <td onclick="event.stopPropagation();">
-                        <button class="btn btn-sm btn-info" onclick="viewCampaignDetails(${c.id})"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCampaign(${c.id})"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-sm btn-info" onclick="viewCampaignDetails(${c.id})" title="View"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-sm btn-warning" onclick="showEditCampaignModal(${c.id})" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteCampaign(${c.id})" title="Delete"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`).join('');
         }
@@ -4394,6 +4508,200 @@
                 }
             }
         }
+
+        // Show Edit Campaign Modal
+        function showEditCampaignModal(campaignId) {
+            if (!hasPermission('canManageCampaigns')) {
+                showAlert('Access Denied. Marketer/Admin role required.', 'warning');
+                return;
+            }
+
+            const campaign = appData.campaigns.find(c => c.id === campaignId);
+            if (!campaign) {
+                showAlert('Campaign not found', 'danger');
+                return;
+            }
+
+            // Populate form fields
+            document.getElementById('editCampaignId').value = campaign.id;
+            document.getElementById('editCampaignPlatform').value = campaign.platform;
+            document.getElementById('editAdId').value = campaign.adId;
+            document.getElementById('editAdName').value = campaign.adName;
+            document.getElementById('editResultType').value = campaign.resultType;
+            document.getElementById('editResults').value = campaign.results;
+            document.getElementById('editCpr').value = campaign.cpr;
+            document.getElementById('editReach').value = campaign.reach;
+            document.getElementById('editImpressions').value = campaign.impressions;
+            document.getElementById('editSpend').value = campaign.spend;
+            document.getElementById('editQualityRanking').value = campaign.qualityRanking;
+            document.getElementById('editConversionRanking').value = campaign.conversionRanking;
+
+            // Set hidden field values for existing images
+            document.getElementById('editEvidenceImageUrl').value = campaign.evidenceImageUrl || '';
+            document.getElementById('editCreativeImageUrl').value = campaign.creativeImageUrl || '';
+
+            // Show current evidence image if exists
+            if (campaign.evidenceImageUrl) {
+                document.getElementById('editCurrentEvidenceImage').style.display = 'block';
+                document.getElementById('editCurrentEvidenceImageImg').src = campaign.evidenceImageUrl;
+            } else {
+                document.getElementById('editCurrentEvidenceImage').style.display = 'none';
+            }
+
+            // Show current creative image if exists
+            if (campaign.creativeImageUrl) {
+                document.getElementById('editCurrentCreativeImage').style.display = 'block';
+                document.getElementById('editCurrentCreativeImageImg').src = campaign.creativeImageUrl;
+            } else {
+                document.getElementById('editCurrentCreativeImage').style.display = 'none';
+            }
+
+            // Clear new upload previews
+            document.getElementById('editEvidenceImagePreview').style.display = 'none';
+            document.getElementById('editCreativeImagePreview').style.display = 'none';
+            document.getElementById('editEvidenceImageUpload').value = '';
+            document.getElementById('editCreativeImageUpload').value = '';
+
+            new bootstrap.Modal(document.getElementById('editCampaignModal')).show();
+        }
+
+        // Handle Edit Evidence Image Upload
+        async function handleEditEvidenceImageUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('Evidence image must be less than 5MB', 'danger');
+                input.value = '';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('contentImage', file);
+
+            try {
+                const response = await fetch('upload_content_image.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('editEvidenceImageUrl').value = result.imageUrl;
+                    document.getElementById('editEvidenceImagePreviewImg').src = result.imageUrl;
+                    document.getElementById('editEvidenceImagePreview').style.display = 'block';
+                    showAlert('Evidence image uploaded successfully! ✅', 'success');
+                } else {
+                    throw new Error(result.message || 'Upload failed');
+                }
+            } catch (error) {
+                showAlert('Error uploading evidence image: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        // Handle Edit Creative Image Upload
+        async function handleEditCreativeImageUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('Creative image must be less than 5MB', 'danger');
+                input.value = '';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('contentImage', file);
+
+            try {
+                const response = await fetch('upload_content_image.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('editCreativeImageUrl').value = result.imageUrl;
+                    document.getElementById('editCreativeImagePreviewImg').src = result.imageUrl;
+                    document.getElementById('editCreativeImagePreview').style.display = 'block';
+                    showAlert('Creative image uploaded successfully! ✅', 'success');
+                } else {
+                    throw new Error(result.message || 'Upload failed');
+                }
+            } catch (error) {
+                showAlert('Error uploading creative image: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        // Remove edit evidence image
+        function removeEditEvidenceImage() {
+            document.getElementById('editEvidenceImageUpload').value = '';
+            document.getElementById('editEvidenceImageUrl').value = document.getElementById('editEvidenceImageUrl').dataset.original || '';
+            document.getElementById('editEvidenceImagePreview').style.display = 'none';
+        }
+
+        // Remove edit creative image
+        function removeEditCreativeImage() {
+            document.getElementById('editCreativeImageUpload').value = '';
+            document.getElementById('editCreativeImageUrl').value = document.getElementById('editCreativeImageUrl').dataset.original || '';
+            document.getElementById('editCreativeImagePreview').style.display = 'none';
+        }
+
+        // Handle Edit Campaign Form Submit
+        document.getElementById('editCampaignForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!hasPermission('canManageCampaigns')) {
+                showAlert('Access Denied. Marketer/Admin role required.', 'warning');
+                return;
+            }
+
+            const campaignId = document.getElementById('editCampaignId').value;
+            const clientId = parseInt(document.getElementById('campaignClientSelect').value);
+
+            const spend = parseFloat(document.getElementById('editSpend').value);
+
+            const updatedCampaignData = {
+                id: campaignId,
+                clientId: clientId,
+                platform: document.getElementById('editCampaignPlatform').value,
+                adId: document.getElementById('editAdId').value,
+                adName: document.getElementById('editAdName').value,
+                resultType: document.getElementById('editResultType').value,
+                results: parseInt(document.getElementById('editResults').value),
+                cpr: parseFloat(document.getElementById('editCpr').value),
+                reach: parseInt(document.getElementById('editReach').value),
+                impressions: parseInt(document.getElementById('editImpressions').value),
+                spend: spend,
+                qualityRanking: document.getElementById('editQualityRanking').value,
+                conversionRanking: document.getElementById('editConversionRanking').value,
+                evidenceImageUrl: document.getElementById('editEvidenceImageUrl').value || null,
+                creativeImageUrl: document.getElementById('editCreativeImageUrl').value || null
+            };
+
+            try {
+                const response = await fetch('handler_campaigns.php?action=edit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedCampaignData)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    await loadAllDataFromPHP();
+                    loadCampaigns();
+                    loadDashboard();
+                    bootstrap.Modal.getInstance(document.getElementById('editCampaignModal')).hide();
+                    showAlert('Campaign updated successfully! 🎉', 'success');
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                showAlert('Error updating campaign: ' + error.message, 'danger');
+            }
+        });
 
         function generateCampaignReport() {
             // ... (Report generation logic remains local/front-end) ...
