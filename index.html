@@ -1533,16 +1533,43 @@
                                                 itemAmountsContainer.appendChild(itemDiv);
                                             });
                                         } else if (count === 1) {
-                                            // Single item selected - show regular inputs
-                                            itemAmountsSection.style.display = 'none';
-                                            singleQuantityField.style.display = 'block';
-                                            singleUnitPriceField.style.display = 'block';
+                                            // Single item selected - show dynamic input with item name
+                                            itemAmountsSection.style.display = 'block';
+                                            singleQuantityField.style.display = 'none';
+                                            singleUnitPriceField.style.display = 'none';
                                             
-                                            // Add required attributes back to single fields
+                                            // Remove required attributes from single fields
                                             const singleQuantity = document.getElementById('docQuantity');
                                             const singleUnitPrice = document.getElementById('docUnitPrice');
-                                            if (singleQuantity) singleQuantity.setAttribute('required', 'required');
-                                            if (singleUnitPrice) singleUnitPrice.setAttribute('required', 'required');
+                                            if (singleQuantity) singleQuantity.removeAttribute('required');
+                                            if (singleUnitPrice) singleUnitPrice.removeAttribute('required');
+                                            
+                                            // Clear and show single item with its name
+                                            itemAmountsContainer.innerHTML = '';
+                                            const checkbox = selectedItems[0];
+                                            
+                                            const itemDiv = document.createElement('div');
+                                            itemDiv.className = 'row mb-3 p-3 border rounded';
+                                            itemDiv.innerHTML = `
+                                                <div class="col-12">
+                                                    <h6 class="mb-2 text-primary">${checkbox.value}</h6>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Quantity</label>
+                                                    <input type="number" class="form-control item-quantity" 
+                                                           data-item-type="${checkbox.value}" 
+                                                           value="1" required min="0" 
+                                                           placeholder="Enter quantity">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Unit Price (Rs.)</label>
+                                                    <input type="number" step="0.01" class="form-control item-unit-price" 
+                                                           data-item-type="${checkbox.value}" 
+                                                           required min="0" 
+                                                           placeholder="Enter unit price">
+                                                </div>
+                                            `;
+                                            itemAmountsContainer.appendChild(itemDiv);
                                         } else {
                                             // No items selected
                                             itemAmountsSection.style.display = 'none';
@@ -5429,26 +5456,12 @@
                 }
                 
                 // Validate form based on current state
-                if (selectedItemTypes.length > 1) {
-                    // Multiple items - validate dynamic inputs
-                    const dynamicInputs = form.querySelectorAll('.item-quantity, .item-unit-price');
-                    for (let input of dynamicInputs) {
-                        if (!input.value || input.value <= 0) {
-                            showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
-                            input.focus();
-                            return;
-                        }
-                    }
-                } else {
-                    // Single item - validate regular inputs
-                    const quantity = form.querySelector('#docQuantity');
-                    const unitPrice = form.querySelector('#docUnitPrice');
-                    
-                    if (!quantity || !unitPrice || !quantity.value || !unitPrice.value || 
-                        parseInt(quantity.value) <= 0 || parseFloat(unitPrice.value) <= 0) {
-                        showAlert('Please enter valid quantity and unit price.', 'warning');
-                        if (quantity && !quantity.value) quantity.focus();
-                        else if (unitPrice && !unitPrice.value) unitPrice.focus();
+                // Always validate dynamic inputs now (used for both single and multiple items)
+                const dynamicInputs = form.querySelectorAll('.item-quantity, .item-unit-price');
+                for (let input of dynamicInputs) {
+                    if (!input.value || input.value <= 0) {
+                        showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
+                        input.focus();
                         return;
                     }
                 }
@@ -5456,61 +5469,36 @@
                 // Handle different input scenarios
                 let itemDetails = [];
                 
-                if (selectedItemTypes.length > 1) {
-                    // Multiple items - get individual amounts
-                    selectedItemTypes.forEach(itemType => {
-                        const quantityInput = form.querySelector(`input[data-item-type="${itemType}"].item-quantity`);
-                        const unitPriceInput = form.querySelector(`input[data-item-type="${itemType}"].item-unit-price`);
+                // Get individual amounts from dynamic inputs (works for both single and multiple)
+                selectedItemTypes.forEach(itemType => {
+                    const quantityInput = form.querySelector(`input[data-item-type="${itemType}"].item-quantity`);
+                    const unitPriceInput = form.querySelector(`input[data-item-type="${itemType}"].item-unit-price`);
+                    
+                    if (quantityInput && unitPriceInput) {
+                        const qty = parseInt(quantityInput.value) || 0;
+                        const price = parseFloat(unitPriceInput.value) || 0;
                         
-                        if (quantityInput && unitPriceInput) {
-                            const qty = parseInt(quantityInput.value) || 0;
-                            const price = parseFloat(unitPriceInput.value) || 0;
+                        if (qty > 0 && price > 0) {
+                            const itemDetail = {
+                                itemType: itemType,
+                                quantity: qty,
+                                unitPrice: price,
+                                total: qty * price
+                            };
                             
-                            if (qty > 0 && price > 0) {
-                                const itemDetail = {
-                                    itemType: itemType,
-                                    quantity: qty,
-                                    unitPrice: price,
-                                    total: qty * price
-                                };
-                                
-                                // Add custom description for "Other Service"
-                                if (itemType === 'Other Service' && description.value) {
-                                    itemDetail.description = description.value.trim();
-                                }
-                                
-                                itemDetails.push(itemDetail);
+                            // Add custom description for "Other Service"
+                            if (itemType === 'Other Service' && description.value) {
+                                itemDetail.description = description.value.trim();
                             }
+                            
+                            itemDetails.push(itemDetail);
                         }
-                    });
-                    
-                    if (itemDetails.length === 0) {
-                        showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
-                        return;
                     }
-                } else {
-                    // Single item - use regular inputs
-                    const qty = parseInt(quantity.value) || 0;
-                    const price = parseFloat(unitPrice.value) || 0;
-                    
-                    if (qty <= 0 || price <= 0) {
-                        showAlert('Please enter valid quantity and unit price.', 'warning');
-                        return;
-                    }
-                    
-                    const itemDetail = {
-                        itemType: selectedItemTypes[0],
-                        quantity: qty,
-                        unitPrice: price,
-                        total: qty * price
-                    };
-                    
-                    // Add custom description for "Other Service"
-                    if (selectedItemTypes[0] === 'Other Service' && description.value) {
-                        itemDetail.description = description.value.trim();
-                    }
-                    
-                    itemDetails.push(itemDetail);
+                });
+                
+                if (itemDetails.length === 0) {
+                    showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
+                    return;
                 }
                 
                 const formData = {
