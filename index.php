@@ -4212,7 +4212,7 @@
             
             const file = input.files[0];
             const formData = new FormData();
-            formData.append('image', file);
+            formData.append('contentImage', file);
             
             try {
                 const response = await fetch('upload_content_image.php', {
@@ -4242,7 +4242,7 @@
             
             const file = input.files[0];
             const formData = new FormData();
-            formData.append('image', file);
+            formData.append('contentImage', file);
             
             try {
                 const response = await fetch('upload_content_image.php', {
