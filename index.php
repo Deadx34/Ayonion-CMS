@@ -4704,7 +4704,7 @@
         });
 
         function generateCampaignReport() {
-            // ... (Report generation logic remains local/front-end) ...
+            // Campaign Report Generation - Beautiful modern design
             const clientId = parseInt(document.getElementById('campaignClientSelect').value);
             const startDateStr = document.getElementById('reportStartDate').value;
             const endDateStr = document.getElementById('reportEndDate').value;
@@ -4728,6 +4728,36 @@
             });
 
             const totalSpend = campaigns.reduce((sum, c) => sum + c.spend, 0);
+            const totalReach = campaigns.reduce((sum, c) => sum + c.reach, 0);
+            const totalResults = campaigns.reduce((sum, c) => sum + c.results, 0);
+
+            const totalAdBudget = parseFloat(client.totalAdBudget) || 0.00;
+            const totalSpent = parseFloat(client.totalSpent) || 0.00;
+            const remainingBudget = totalAdBudget - totalSpent;
+
+            const avgCPR = totalResults > 0 ? totalSpend / totalResults : 0;
+            
+            // Get unique platforms
+            const platforms = [...new Set(campaigns.map(c => c.platform))].join(', ') || 'N/A';
+            
+            // Calculate metrics by result type
+            const clicksTotal = campaigns.filter(c => c.resultType === 'Clicks').reduce((sum, c) => sum + c.results, 0);
+            const leadsTotal = campaigns.filter(c => c.resultType === 'Leads').reduce((sum, c) => sum + c.results, 0);
+            
+            // Format date range for display
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const reportMonth = monthNames[startDate.getMonth()] + ' ' + startDate.getFullYear();
+            const today = new Date();
+            const todayFormatted = monthNames[today.getMonth()] + ' ' + today.getDate() + ', ' + today.getFullYear();
+            
+            // Platform badge color mapper
+            const getPlatformBadge = (platform) => {
+                const platformLower = platform.toLowerCase();
+                if (platformLower.includes('meta')) return `<span class="platform-badge platform-meta">${platform}</span>`;
+                if (platformLower.includes('facebook')) return `<span class="platform-badge platform-facebook">${platform}</span>`;
+                if (platformLower.includes('instagram')) return `<span class="platform-badge platform-instagram">${platform}</span>`;
+                return `<span class="platform-badge platform-meta">${platform}</span>`;
+            };
             const totalReach = campaigns.reduce((sum, c) => sum + c.reach, 0);
             const totalResults = campaigns.reduce((sum, c) => sum + c.results, 0);
 
@@ -4767,45 +4797,114 @@
             evidenceSection += '</div>';
 
             const html = `
-                <div style="font-family: Arial; padding: 20px;">
-                    <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
-                        ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 60px; margin-right: 20px; object-fit: contain;">` : ''}
-                        <div>
-                            <h1 style="color: #6366f1; margin: 0; font-size: 2rem;">${COMPANY_INFO.name}</h1>
-                            <p style="color: #666; margin: 5px 0;">Ad Campaign Performance Report</p>
-                        </div>
-                    </div>
-                    <h4 style="margin-top: 30px; margin-bottom: 15px;">Campaign Details (In Range)</h4>
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
-                        <thead>
-                            <tr style="background: #6366f1; color: white;">
-                                <th style="padding: 10px; text-align: left;">Platform</th>
-                                <th style="padding: 10px;">Ad Name</th>
-                                <th style="padding: 10px;">Results</th>
-                                <th style="padding: 10px;">Spend</th>
-                                <th style="padding: 10px;">Reach</th>
-                                <th style="padding: 10px;">Quality</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${campaigns.map(c => `
-                                <tr style="border-bottom: 1px solid #ddd;">
-                                    <td style="padding: 10px;">${c.platform}</td>
-                                    <td style="padding: 10px;">${c.adName}</td>
-                                    <td style="padding: 10px;">${c.results.toLocaleString()} ${c.resultType}</td>
-                                    <td style="padding: 10px;">Rs. ${c.spend.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                    <td style="padding: 10px;">${c.reach.toLocaleString()}</td>
-                                    <td style="padding: 10px;">${c.qualityRanking}</td>
-                                </tr>
-                            `).join('') || '<tr><td colspan="7" style="padding: 20px; text-align: center;">No campaigns found in this date range.</td></tr>'}
-                        </tbody>
-                    </table>
-                    ${evidenceSection}
-                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 14px;">
-                        <p>${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}</p>
-                        <p style="margin: 5px 0;">Generated on ${formatDate(new Date())}</p>
-                    </div>
-                </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Campaign Performance Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding: 20px; }
+        .report-container { max-width: 1200px; margin: 0 auto; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 32px; margin-bottom: 10px; }
+        .header p { font-size: 16px; opacity: 0.9; }
+        .client-info { background: #f8f9fa; padding: 30px 40px; border-left: 4px solid #667eea; }
+        .client-info h2 { color: #333; margin-bottom: 15px; font-size: 20px; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .info-item { display: flex; align-items: center; }
+        .info-label { font-weight: 600; color: #666; min-width: 140px; }
+        .info-value { color: #333; font-weight: 500; }
+        .budget-summary { padding: 40px; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+        .budget-summary h2 { color: #333; margin-bottom: 25px; font-size: 24px; text-align: center; }
+        .budget-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .budget-card { background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .budget-card h3 { color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .budget-card .amount { font-size: 28px; font-weight: bold; color: #333; }
+        .budget-card.total .amount { color: #667eea; }
+        .budget-card.spent .amount { color: #f39c12; }
+        .budget-card.remaining .amount { color: #27ae60; }
+        .campaigns-section { padding: 40px; }
+        .campaigns-section h2 { color: #333; margin-bottom: 25px; font-size: 24px; }
+        .campaign-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .campaign-table thead { background: #667eea; color: white; }
+        .campaign-table th { padding: 15px 10px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .campaign-table td { padding: 15px 10px; border-bottom: 1px solid #e0e0e0; font-size: 14px; }
+        .campaign-table tbody tr:hover { background: #f8f9fa; }
+        .platform-badge { display: inline-block; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; color: white; }
+        .platform-meta { background: #1877f2; }
+        .platform-facebook { background: #4267B2; }
+        .platform-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .metrics-summary { background: #f8f9fa; padding: 40px; border-top: 3px solid #667eea; }
+        .metrics-summary h2 { color: #333; margin-bottom: 25px; font-size: 24px; text-align: center; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .metric-box { background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #667eea; }
+        .metric-box h3 { color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .metric-box .value { font-size: 24px; font-weight: bold; color: #333; }
+        .footer { background: #333; color: white; padding: 30px 40px; text-align: center; }
+        .footer p { font-size: 14px; opacity: 0.8; }
+        @media print { body { padding: 0; } .report-container { box-shadow: none; } }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="header">
+            <h1>Campaign Performance Report</h1>
+            <p>Generated on ${todayFormatted}</p>
+        </div>
+        <div class="client-info">
+            <h2>Client Information</h2>
+            <div class="info-grid">
+                <div class="info-item"><span class="info-label">Client Name:</span><span class="info-value">${client.name}</span></div>
+                <div class="info-item"><span class="info-label">Report Period:</span><span class="info-value">${reportMonth}</span></div>
+                <div class="info-item"><span class="info-label">Total Campaigns:</span><span class="info-value">${campaigns.length}</span></div>
+                <div class="info-item"><span class="info-label">Active Platforms:</span><span class="info-value">${platforms}</span></div>
+            </div>
+        </div>
+        <div class="budget-summary">
+            <h2>Budget Overview</h2>
+            <div class="budget-cards">
+                <div class="budget-card total"><h3>Total Budget</h3><div class="amount">Rs. ${totalAdBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div></div>
+                <div class="budget-card spent"><h3>Amount Spent</h3><div class="amount">Rs. ${totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div></div>
+                <div class="budget-card remaining"><h3>Remaining</h3><div class="amount">Rs. ${remainingBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div></div>
+            </div>
+        </div>
+        <div class="campaigns-section">
+            <h2>Campaign Performance Details</h2>
+            <table class="campaign-table">
+                <thead>
+                    <tr><th>Platform</th><th>Campaign Name</th><th>Results</th><th>CPR</th><th>Reach</th><th>Spend</th></tr>
+                </thead>
+                <tbody>
+                    ${campaigns.length > 0 ? campaigns.map(c => `
+                    <tr>
+                        <td>${getPlatformBadge(c.platform)}</td>
+                        <td>${c.adName}</td>
+                        <td>${c.results.toLocaleString()} ${c.resultType}</td>
+                        <td>Rs. ${c.cpr.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                        <td>${c.reach.toLocaleString()}</td>
+                        <td>Rs. ${c.spend.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    </tr>
+                    `).join('') : '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #999;">No campaigns found in this date range.</td></tr>'}
+                </tbody>
+            </table>
+        </div>
+        <div class="metrics-summary">
+            <h2>Key Metrics Summary</h2>
+            <div class="metrics-grid">
+                <div class="metric-box"><h3>Total Clicks</h3><div class="value">${clicksTotal.toLocaleString()}</div></div>
+                <div class="metric-box"><h3>Total Leads</h3><div class="value">${leadsTotal.toLocaleString()}</div></div>
+                <div class="metric-box"><h3>Total Reach</h3><div class="value">${totalReach.toLocaleString()}</div></div>
+                <div class="metric-box"><h3>Avg CPR</h3><div class="value">Rs. ${avgCPR.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div></div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>${COMPANY_INFO.name} - Management System | Generated by ${COMPANY_INFO.tagline || 'Ayonion Studios'}</p>
+            <p style="margin-top: 10px; font-size: 12px;">This report is confidential and intended for the client only.</p>
+        </div>
+    </div>
+</body>
+</html>
             `;
 
             // Add read-only header to document
