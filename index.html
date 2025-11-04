@@ -4261,28 +4261,6 @@
         // CAMPAIGN MANAGEMENT (PHP Handlers)
         // ============================================
 
-        document.getElementById('evidenceImageUpload').addEventListener('change', function(e) {
-            const previewContainer = document.getElementById('imagePreviewContainer');
-            previewContainer.innerHTML = '';
-            campaignImageFiles = [];
-
-            const files = Array.from(e.target.files);
-
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const dataUrl = event.target.result;
-                    campaignImageFiles.push(dataUrl);
-
-                    const div = document.createElement('div');
-                    div.className = 'evidence-preview';
-                    div.innerHTML = `<img src="${dataUrl}" alt="Evidence">`;
-                    previewContainer.appendChild(div);
-                }
-                reader.readAsDataURL(file);
-            });
-        });
-
         function loadCampaigns() {
             const clientId = parseInt(document.getElementById('campaignClientSelect').value);
             const tbody = document.getElementById('campaignsTableBody');
@@ -5419,11 +5397,17 @@
         window.addEventListener('load', function() {
             loadFromLocalStorage();
             initDocumentForm(); // Initialize document form handler
-            const today = new Date();
-            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-            document.getElementById('reportStartDate').value = firstDayOfMonth.toISOString().split('T')[0];
-            document.getElementById('reportEndDate').value = today.toISOString().split('T')[0];
+            
+            // Set default date range for reports (if elements exist)
+            const reportStartDate = document.getElementById('reportStartDate');
+            const reportEndDate = document.getElementById('reportEndDate');
+            
+            if (reportStartDate && reportEndDate) {
+                const today = new Date();
+                const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                reportStartDate.value = firstDayOfMonth.toISOString().split('T')[0];
+                reportEndDate.value = today.toISOString().split('T')[0];
+            }
         });
 
         window.addEventListener('beforeunload', function() {
