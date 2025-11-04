@@ -109,18 +109,32 @@ try {
         }
         
         $userId = (int)($_SESSION['user_id'] ?? 0);
-        $sql = "SELECT username, role, full_name, email FROM users WHERE id = {$userId} LIMIT 1";
+        
+        // Try to get profile with new columns, fallback to basic if columns don't exist
+        $sql = "SELECT username, role FROM users WHERE id = {$userId} LIMIT 1";
         $result = $conn->query($sql);
         
         if ($result && $row = $result->fetch_assoc()) {
+            $profile = [
+                'username' => $row['username'],
+                'role' => $row['role'],
+                'full_name' => null,
+                'email' => null
+            ];
+            
+            // Check if full_name and email columns exist by trying to select them
+            $checkSql = "SELECT full_name, email FROM users WHERE id = {$userId} LIMIT 1";
+            $checkResult = $conn->query($checkSql);
+            
+            if ($checkResult && $checkRow = $checkResult->fetch_assoc()) {
+                $profile['full_name'] = $checkRow['full_name'];
+                $profile['email'] = $checkRow['email'];
+            }
+            // If query fails (columns don't exist), we keep the null values
+            
             echo json_encode([
                 "success" => true,
-                "profile" => [
-                    'username' => $row['username'],
-                    'role' => $row['role'],
-                    'full_name' => $row['full_name'],
-                    'email' => $row['email']
-                ]
+                "profile" => $profile
             ]);
         } else {
             throw new Exception("Could not fetch profile.");
@@ -140,12 +154,22 @@ try {
         $fullName_esc = $conn->real_escape_string($fullName);
         $email_esc = $conn->real_escape_string($email);
         
-        $sql = "UPDATE users SET full_name = '{$fullName_esc}', email = '{$email_esc}' WHERE id = {$userId}";
+        // Check if columns exist before updating
+        $checkSql = "SELECT full_name, email FROM users WHERE id = {$userId} LIMIT 1";
+        $checkResult = $conn->query($checkSql);
         
-        if (query_db($conn, $sql)) {
-            echo json_encode(["success" => true, "message" => "Profile updated successfully."]);
+        if ($checkResult) {
+            // Columns exist, update them
+            $sql = "UPDATE users SET full_name = '{$fullName_esc}', email = '{$email_esc}' WHERE id = {$userId}";
+            
+            if (query_db($conn, $sql)) {
+                echo json_encode(["success" => true, "message" => "Profile updated successfully."]);
+            } else {
+                throw new Exception("Database error: Could not update profile.");
+            }
         } else {
-            throw new Exception("Database error: Could not update profile.");
+            // Columns don't exist yet - migration needed
+            throw new Exception("Profile columns not available. Please run the user profile migration first.", 503);
         }
     }
     // --- HANDLE CHANGE PASSWORD (POST) ---
