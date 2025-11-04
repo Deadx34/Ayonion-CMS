@@ -5128,11 +5128,41 @@
             const titles = { quotation: 'QUOTATION', invoice: 'INVOICE', receipt: 'RECEIPT' };
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
 
-            // ... (HTML generation remains local) ...
-            const qty = parseFloat(doc.quantity || 0);
-            const unit = parseFloat(doc.unitPrice || doc.unit_price || 0);
-            const total = parseFloat(doc.total || 0);
+            // Handle multiple line items or single item
             const clientName = doc.clientName || doc.client_name || 'Unknown Client';
+            const total = parseFloat(doc.total || 0);
+            
+            // Check if we have detailed item information (new format)
+            let lineItems = [];
+            if (doc.itemDetails && Array.isArray(doc.itemDetails)) {
+                // New format with detailed item information
+                lineItems = doc.itemDetails.map(item => ({
+                    description: item.description || item.itemType || 'Service',
+                    quantity: parseFloat(item.quantity || 0),
+                    unitPrice: parseFloat(item.unitPrice || 0),
+                    total: parseFloat(item.total || 0)
+                }));
+            } else {
+                // Old format with single item
+                const qty = parseFloat(doc.quantity || 0);
+                const unit = parseFloat(doc.unitPrice || doc.unit_price || 0);
+                lineItems = [{
+                    description: doc.description || 'Service',
+                    quantity: qty,
+                    unitPrice: unit,
+                    total: total
+                }];
+            }
+
+            // Generate table rows for all line items
+            const tableRows = lineItems.map(item => `
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 15px;">${item.description}</td>
+                    <td style="padding: 15px; text-align: center;">${item.quantity.toLocaleString()}</td>
+                    <td style="padding: 15px; text-align: right;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 15px; text-align: right; font-weight: bold;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `).join('');
 
             const html = `
                 <div style="display: flex; min-height: 100vh; font-family: Arial, sans-serif;">
@@ -5204,12 +5234,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr style="border-bottom: 1px solid #ecf0f1;">
-                                    <td style="padding: 15px 10px;">${doc.description || doc.itemType || doc.item_type || 'Service'}</td>
-                                    <td style="padding: 15px 10px; text-align: right;">${unit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                    <td style="padding: 15px 10px; text-align: center;">${qty.toLocaleString()}</td>
-                                    <td style="padding: 15px 10px; text-align: right;">${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                </tr>
+                                ${tableRows}
                             </tbody>
                         </table>
                         

@@ -5575,7 +5575,7 @@
             if (doc.itemDetails && Array.isArray(doc.itemDetails)) {
                 // New format with detailed item information
                 lineItems = doc.itemDetails.map(item => ({
-                    description: `${item.itemType} - ${doc.description}`,
+                    description: item.description || item.itemType || 'Service',
                     quantity: parseFloat(item.quantity || 0),
                     unitPrice: parseFloat(item.unitPrice || 0),
                     total: parseFloat(item.total || 0)
