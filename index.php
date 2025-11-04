@@ -1143,12 +1143,11 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Platform</label>
                                 <select class="form-select" id="campaignPlatform" required>
-                                    <option value="">Select</option>
-                                    <option value="Facebook">Facebook</option>
-                                    <option value="Instagram">Instagram</option>
+                                    <option value="">Select Platform</option>
+                                    <option value="Meta Ads">Meta Ads (Facebook & Instagram)</option>
                                     <option value="Google Ads">Google Ads</option>
-                                    <option value="LinkedIn">LinkedIn</option>
-                                    <option value="TikTok">TikTok</option>
+                                    <option value="LinkedIn Ads">LinkedIn Ads</option>
+                                    <option value="TikTok Ads">TikTok Ads</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
