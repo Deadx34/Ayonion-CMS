@@ -3271,6 +3271,9 @@
                     });
                 }
             });
+            
+            // Initialize selected count after loading content
+            updateSelectedCount();
         }
 
         // Multi-select functions for content report
