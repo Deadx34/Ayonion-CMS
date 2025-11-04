@@ -122,15 +122,21 @@ try {
                 'email' => null
             ];
             
-            // Check if full_name and email columns exist by trying to select them
-            $checkSql = "SELECT full_name, email FROM users WHERE id = {$userId} LIMIT 1";
-            $checkResult = $conn->query($checkSql);
+            // Check if full_name and email columns exist before querying
+            $columnCheckSql = "SHOW COLUMNS FROM users LIKE 'full_name'";
+            $columnCheckResult = $conn->query($columnCheckSql);
             
-            if ($checkResult && $checkRow = $checkResult->fetch_assoc()) {
-                $profile['full_name'] = $checkRow['full_name'];
-                $profile['email'] = $checkRow['email'];
+            if ($columnCheckResult && $columnCheckResult->num_rows > 0) {
+                // Columns exist, safe to query them
+                $checkSql = "SELECT full_name, email FROM users WHERE id = {$userId} LIMIT 1";
+                $checkResult = $conn->query($checkSql);
+                
+                if ($checkResult && $checkRow = $checkResult->fetch_assoc()) {
+                    $profile['full_name'] = $checkRow['full_name'];
+                    $profile['email'] = $checkRow['email'];
+                }
             }
-            // If query fails (columns don't exist), we keep the null values
+            // If columns don't exist, we keep the null values
             
             echo json_encode([
                 "success" => true,
