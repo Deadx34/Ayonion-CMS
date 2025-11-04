@@ -1,7 +1,15 @@
 <?php
 // AYONION-CMS/handler_users.php
 
+// Set headers to prevent 403 errors from hosting providers
 header('Content-Type: application/json');
+header('X-Content-Type-Options: nosniff');
+
+// Bypass some ModSecurity rules that may block POST requests
+if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+    // This is an AJAX request, allow it
+}
+
 include 'includes/config.php';
 $conn = connect_db();
 

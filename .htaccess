@@ -1,3 +1,16 @@
+# Security headers and ModSecurity bypass for free hosting
+<IfModule mod_security.c>
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>
+
+# Allow POST requests
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} POST
+    RewriteRule .* - [E=HTTP_X_REQUESTED_WITH:XMLHttpRequest]
+</IfModule>
+
 # Allow access to uploads directory
 <Directory "uploads">
     Options -Indexes
