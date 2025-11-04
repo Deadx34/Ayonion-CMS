@@ -5905,62 +5905,235 @@
                 totalAmount: totalAmount
             };
 
-            // Generate invoice preview HTML
+            // Generate invoice preview HTML with modern design
+            const invoiceNumber = `INV-${Date.now().toString().slice(-12)}`;
+            const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // Get platform badges with appropriate styling
+            const getPlatformBadge = (platform) => {
+                const badges = {
+                    'Meta Ads': '<span class="badge" style="background: linear-gradient(135deg, #0062E6 0%, #19AFFF 100%); color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">Meta Ads</span>',
+                    'Facebook': '<span class="badge" style="background: #4267B2; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">Facebook</span>',
+                    'Instagram': '<span class="badge" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">Instagram</span>'
+                };
+                return badges[platform] || `<span class="badge bg-primary" style="padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">${platform}</span>`;
+            };
+            
             const invoiceHTML = `
-                <div class="invoice-preview">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h4>Invoice Preview</h4>
-                            <p class="text-muted">Invoice #INV-${Date.now()}</p>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <h5>${client.company_name || client.partner_id}</h5>
-                            <p class="text-muted">${client.partner_id}</p>
+                <style>
+                    .invoice-container {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        background: white;
+                        max-width: 1200px;
+                        margin: 0 auto;
+                    }
+                    .invoice-header {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        padding: 40px;
+                        text-align: center;
+                        border-radius: 8px 8px 0 0;
+                    }
+                    .invoice-header h1 {
+                        font-size: 32px;
+                        margin-bottom: 10px;
+                        font-weight: 600;
+                    }
+                    .invoice-header p {
+                        font-size: 16px;
+                        opacity: 0.95;
+                        margin: 5px 0;
+                    }
+                    .client-info {
+                        background: #f8f9fa;
+                        padding: 30px 40px;
+                        border-left: 4px solid #667eea;
+                    }
+                    .client-info h2 {
+                        color: #333;
+                        margin-bottom: 20px;
+                        font-size: 20px;
+                        font-weight: 600;
+                    }
+                    .info-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 15px;
+                    }
+                    .info-item {
+                        display: flex;
+                        align-items: flex-start;
+                    }
+                    .info-label {
+                        font-weight: 600;
+                        color: #666;
+                        min-width: 120px;
+                    }
+                    .info-value {
+                        color: #333;
+                        font-weight: 500;
+                    }
+                    .amount-summary {
+                        padding: 40px;
+                        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+                    }
+                    .amount-summary h2 {
+                        color: #333;
+                        margin-bottom: 25px;
+                        font-size: 24px;
+                        text-align: center;
+                        font-weight: 600;
+                    }
+                    .amount-card {
+                        background: white;
+                        padding: 30px;
+                        border-radius: 10px;
+                        text-align: center;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        max-width: 400px;
+                        margin: 0 auto;
+                    }
+                    .amount-card h3 {
+                        color: #666;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        margin-bottom: 15px;
+                        font-weight: 600;
+                    }
+                    .amount-card .amount {
+                        font-size: 42px;
+                        font-weight: bold;
+                        color: #667eea;
+                        margin: 10px 0;
+                    }
+                    .campaigns-section {
+                        padding: 40px;
+                    }
+                    .campaigns-section h2 {
+                        color: #333;
+                        margin-bottom: 25px;
+                        font-size: 24px;
+                        font-weight: 600;
+                    }
+                    .campaign-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 30px;
+                    }
+                    .campaign-table thead {
+                        background: #667eea;
+                        color: white;
+                    }
+                    .campaign-table th {
+                        padding: 15px 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        font-size: 13px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+                    .campaign-table td {
+                        padding: 15px 12px;
+                        border-bottom: 1px solid #e0e0e0;
+                        font-size: 14px;
+                    }
+                    .campaign-table tbody tr:hover {
+                        background: #f8f9fa;
+                    }
+                    .footer-section {
+                        background: #333;
+                        color: white;
+                        padding: 30px 40px;
+                        text-align: center;
+                        border-radius: 0 0 8px 8px;
+                    }
+                    .footer-section p {
+                        font-size: 14px;
+                        opacity: 0.8;
+                        margin: 5px 0;
+                    }
+                </style>
+                
+                <div class="invoice-container">
+                    <!-- Header -->
+                    <div class="invoice-header">
+                        <h1>Invoice Preview</h1>
+                        <p>Invoice #${invoiceNumber}</p>
+                        <p>Generated on ${currentDate}</p>
+                    </div>
+                    
+                    <!-- Client Information -->
+                    <div class="client-info">
+                        <h2>Bill To</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Client Name:</span>
+                                <span class="info-value">${client.company_name || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Partner ID:</span>
+                                <span class="info-value">${client.partner_id || 'undefined'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Industry:</span>
+                                <span class="info-value">${client.industry || 'Technology'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Invoice Date:</span>
+                                <span class="info-value">${currentDate}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Due Date:</span>
+                                <span class="info-value">${dueDate}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status:</span>
+                                <span class="info-value"><span class="badge bg-warning text-dark">Draft</span></span>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h6>Bill To:</h6>
-                            <p><strong>${client.company_name || 'N/A'}</strong><br>
-                            Partner ID: ${client.partner_id}<br>
-                            Industry: ${client.industry || 'N/A'}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Invoice Details:</h6>
-                            <p>Date: ${new Date().toLocaleDateString()}<br>
-                            Due Date: ${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}<br>
-                            Status: Draft</p>
+                    <!-- Amount Summary -->
+                    <div class="amount-summary">
+                        <h2>Total Amount Due</h2>
+                        <div class="amount-card">
+                            <h3>Invoice Total</h3>
+                            <div class="amount">Rs. ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                            <p style="color: #666; margin-top: 10px; font-size: 14px;">${campaigns.length} Campaign${campaigns.length !== 1 ? 's' : ''} Included</p>
                         </div>
                     </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead class="table-light">
+                    
+                    <!-- Campaign Details -->
+                    <div class="campaigns-section">
+                        <h2>Campaign Details</h2>
+                        <table class="campaign-table">
+                            <thead>
                                 <tr>
                                     <th>Campaign</th>
                                     <th>Platform</th>
                                     <th>Date</th>
-                                    <th class="text-end">Amount</th>
+                                    <th style="text-align: right;">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${campaigns.map(c => `
                                     <tr>
                                         <td>${c.adName}</td>
-                                        <td><span class="badge bg-primary">${c.platform}</span></td>
+                                        <td>${getPlatformBadge(c.platform)}</td>
                                         <td>${formatDateTime(c.dateAdded)}</td>
-                                        <td class="text-end">Rs. ${parseFloat(c.spend).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                        <td style="text-align: right; font-weight: 600;">Rs. ${parseFloat(c.spend).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
-                            <tfoot class="table-light">
-                                <tr>
-                                    <th colspan="3" class="text-end">Total Amount:</th>
-                                    <th class="text-end">Rs. ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</th>
-                                </tr>
-                            </tfoot>
                         </table>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="footer-section">
+                        <p><strong>Pvt Ltd - Management System</strong> | Generated by Ayonion Studios</p>
+                        <p style="margin-top: 10px; font-size: 12px;">This invoice is confidential and intended for the client only.</p>
                     </div>
                 </div>
             `;
