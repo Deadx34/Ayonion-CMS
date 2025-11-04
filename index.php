@@ -6059,7 +6059,7 @@
                 <div class="invoice-container">
                     <!-- Header -->
                     <div class="invoice-header">
-                        <h1>Invoice Preview</h1>
+                        <h1>Invoice</h1>
                         <p>Invoice #${invoiceNumber}</p>
                         <p>Generated on ${currentDate}</p>
                     </div>
