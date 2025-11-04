@@ -452,7 +452,7 @@
                             </div>
                             <div class="col-md-8 text-end">
                                 <button class="btn btn-success me-2 mt-2" id="generateInvoiceBtn" onclick="showInvoiceModal()" style="display:none;">
-                                    <i class="fas fa-file-invoice me-2"></i>Generate Invoice
+                                    <i class="fas fa-file-invoice me-2"></i>Generate Report
                                 </button>
                                 <button class="btn btn-primary mt-2" onclick="showAddCampaignModal()">
                                     <i class="fas fa-plus me-2"></i>Add Campaign
