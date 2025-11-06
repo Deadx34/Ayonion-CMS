@@ -545,16 +545,31 @@
                         <form id="changePasswordForm" class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label">Current Password</label>
-                                <input type="password" class="form-control" id="currentPassword" required>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="currentPassword" required>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('currentPassword')">
+                                        <i class="fas fa-eye" id="currentPassword-icon"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="newPassword" required minlength="6">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="newPassword" required minlength="6">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('newPassword')">
+                                        <i class="fas fa-eye" id="newPassword-icon"></i>
+                                    </button>
+                                </div>
                                 <small class="text-muted">Minimum 6 characters</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" required minlength="6">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="confirmPassword" required minlength="6">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('confirmPassword')">
+                                        <i class="fas fa-eye" id="confirmPassword-icon"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="col-12 mt-3">
                                 <button type="submit" class="btn btn-warning">
@@ -2103,6 +2118,21 @@
                 }
             } catch (_) {
                 showAlert('Network error loading profile', 'danger');
+            }
+        }
+
+        function togglePasswordVisibility(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + '-icon');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
 
