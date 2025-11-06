@@ -1350,7 +1350,8 @@
                                 <!-- Current Evidence Image -->
                                 <div id="editCurrentEvidenceImage" style="display: none;" class="mb-2">
                                     <img id="editCurrentEvidenceImageImg" src="" alt="Current Evidence" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-                                    <p class="text-muted small mb-0">Current evidence image</p>
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeCurrentEvidenceImage()">Remove</button>
+                                    <p class="text-muted small mb-0 mt-1">Current evidence image</p>
                                 </div>
                                 <input type="file" class="form-control" id="editEvidenceImageUpload" accept="image/*" onchange="handleEditEvidenceImageUpload(this)">
                                 <input type="hidden" id="editEvidenceImageUrl">
@@ -1365,7 +1366,8 @@
                                 <!-- Current Creative Image -->
                                 <div id="editCurrentCreativeImage" style="display: none;" class="mb-2">
                                     <img id="editCurrentCreativeImageImg" src="" alt="Current Creative" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-                                    <p class="text-muted small mb-0">Current creative image</p>
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeCurrentCreativeImage()">Remove</button>
+                                    <p class="text-muted small mb-0 mt-1">Current creative image</p>
                                 </div>
                                 <input type="file" class="form-control" id="editCreativeImageUpload" accept="image/*" onchange="handleEditCreativeImageUpload(this)">
                                 <input type="hidden" id="editCreativeImageUrl">
@@ -4696,18 +4698,34 @@
             }
         }
 
-        // Remove edit evidence image
+        // Remove edit evidence image (new upload preview)
         function removeEditEvidenceImage() {
             document.getElementById('editEvidenceImageUpload').value = '';
             document.getElementById('editEvidenceImageUrl').value = document.getElementById('editEvidenceImageUrl').dataset.original || '';
             document.getElementById('editEvidenceImagePreview').style.display = 'none';
         }
 
-        // Remove edit creative image
+        // Remove edit creative image (new upload preview)
         function removeEditCreativeImage() {
             document.getElementById('editCreativeImageUpload').value = '';
             document.getElementById('editCreativeImageUrl').value = document.getElementById('editCreativeImageUrl').dataset.original || '';
             document.getElementById('editCreativeImagePreview').style.display = 'none';
+        }
+
+        // Remove current evidence image (existing image)
+        function removeCurrentEvidenceImage() {
+            document.getElementById('editCurrentEvidenceImage').style.display = 'none';
+            document.getElementById('editEvidenceImageUrl').value = '';
+            document.getElementById('editEvidenceImageUrl').dataset.original = '';
+            showAlert('Evidence image will be removed when you update the campaign.', 'info');
+        }
+
+        // Remove current creative image (existing image)
+        function removeCurrentCreativeImage() {
+            document.getElementById('editCurrentCreativeImage').style.display = 'none';
+            document.getElementById('editCreativeImageUrl').value = '';
+            document.getElementById('editCreativeImageUrl').dataset.original = '';
+            showAlert('Creative image will be removed when you update the campaign.', 'info');
         }
 
         // Handle Edit Campaign Form Submit
