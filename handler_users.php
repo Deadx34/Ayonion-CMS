@@ -213,11 +213,25 @@ try {
             throw new Exception("User not found.");
         }
         
-        if (!password_verify($currentPassword, $row['password'])) {
+        $storedPassword = $row['password'];
+        
+        // Check if password matches - try both hashed and plain text for backwards compatibility
+        $passwordMatches = false;
+        
+        // First try password_verify for hashed passwords
+        if (password_verify($currentPassword, $storedPassword)) {
+            $passwordMatches = true;
+        }
+        // Fallback: Check if it's plain text match (for legacy passwords)
+        else if ($currentPassword === $storedPassword) {
+            $passwordMatches = true;
+        }
+        
+        if (!$passwordMatches) {
             throw new Exception("Current password is incorrect.", 403);
         }
         
-        // Update to new password
+        // Update to new password (always hash it)
         $hashed_password = password_hash($newPassword, PASSWORD_DEFAULT);
         $sql = "UPDATE users SET password = '{$hashed_password}', is_temp_password = 0 WHERE id = {$userId}";
         
