@@ -539,37 +539,6 @@
             <div id="profile" class="section">
                 <div class="card">
                     <div class="card-header">
-                        <span><i class="fas fa-user-circle me-2"></i>My Profile</span>
-                    </div>
-                    <div class="card-body">
-                        <form id="profileForm" class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Username</label>
-                                <input type="text" class="form-control" id="profileUsername" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Role</label>
-                                <input type="text" class="form-control" id="profileRole" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="profileFullName" placeholder="Enter your full name">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="profileEmail" placeholder="Enter your email">
-                            </div>
-                            <div class="col-12 mt-3">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>Save Profile
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <div class="card mt-4">
-                    <div class="card-header">
                         <span><i class="fas fa-key me-2"></i>Change Password</span>
                     </div>
                     <div class="card-body">
