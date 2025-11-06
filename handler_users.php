@@ -35,9 +35,18 @@ try {
         @ini_set('session.use_strict_mode', '1');
         session_start();
     }
-    // Enforce admin session
-    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || ($_SESSION['role'] ?? '') !== 'admin') {
-        throw new Exception("Authentication required.", 401);
+    
+    // Change password and get_profile actions can be used by any authenticated user
+    if ($action === 'change_password' || $action === 'get_profile' || $action === 'update_profile') {
+        // Only check if logged in, not admin role
+        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+            throw new Exception("Authentication required.", 401);
+        }
+    } else {
+        // All other actions require admin role
+        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || ($_SESSION['role'] ?? '') !== 'admin') {
+            throw new Exception("Authentication required.", 401);
+        }
     }
 
     // --- HANDLE LIST USERS (GET) ---
