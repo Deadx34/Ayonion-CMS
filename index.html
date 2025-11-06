@@ -5394,9 +5394,6 @@
                 e.preventDefault();
 				const form = this;
 				const clientSelect = form.querySelector('#docClientSelect');
-				const description = form.querySelector('#docDescription');
-				const quantity = form.querySelector('#docQuantity');
-				const unitPrice = form.querySelector('#docUnitPrice');
 				const date = form.querySelector('#docDate');
                 
                 // Get selected item types
@@ -5407,10 +5404,10 @@
                     selectedItemTypes.push(checkbox.value);
                 });
                 
-                // Check if all elements exist and at least one item type is selected
-				if (!clientSelect || !description || !date) {
-                    console.error('One or more form elements not found');
-                    showAlert('Form error: Missing form elements', 'danger');
+                // Check if all required elements exist and at least one item type is selected
+				if (!clientSelect || !date) {
+                    console.error('One or more required form elements not found');
+                    showAlert('Form error: Missing required form elements', 'danger');
                     return;
                 }
                 
