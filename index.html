@@ -2167,23 +2167,6 @@
         // ============================================
         // PROFILE MANAGEMENT
         // ============================================
-        async function loadProfile() {
-            try {
-                const res = await fetch('handler_users.php?action=get_profile', { credentials: 'same-origin' });
-                const data = await res.json();
-                if (data.success) {
-                    const profile = data.profile || {};
-                    document.getElementById('profileUsername').value = profile.username || '';
-                    document.getElementById('profileRole').value = (profile.role || '').charAt(0).toUpperCase() + (profile.role || '').slice(1);
-                    document.getElementById('profileFullName').value = profile.full_name || '';
-                    document.getElementById('profileEmail').value = profile.email || '';
-                } else {
-                    showAlert('Failed to load profile: ' + (data.message || ''), 'danger');
-                }
-            } catch (_) {
-                showAlert('Network error loading profile', 'danger');
-            }
-        }
 
         function togglePasswordVisibility(fieldId) {
             const passwordField = document.getElementById(fieldId);
@@ -2769,9 +2752,6 @@
                 if (triggerEl) {
                     new bootstrap.Tab(triggerEl).show();
                 }
-            }
-            if(sectionId === 'profile') {
-                loadProfile();
             }
             if(sectionId === 'users') {
                 loadUsersTable();
