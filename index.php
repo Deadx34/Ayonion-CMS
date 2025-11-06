@@ -3483,7 +3483,7 @@
                                     <i class="fas fa-list me-1"></i>${itemCount} item${itemCount !== 1 ? 's' : ''} 
                                     <span class="mx-2">|</span>
                                     <i class="fas fa-coins me-1"></i>${totalCreditsInMonth} credit${totalCreditsInMonth !== 1 ? 's' : ''}
-                                    <i class="fas fa-chevron-down ms-2" id="icon-${collapseId}"></i>
+                                    <i class="fas ${isCurrentMonth ? 'fa-chevron-up' : 'fa-chevron-down'} ms-2" id="icon-${collapseId}"></i>
                                 </span>
                             </div>
                         </td>
