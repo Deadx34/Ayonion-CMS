@@ -5221,6 +5221,10 @@
 						bootstrap.Modal.getInstance(document.getElementById('documentModal')).hide();
                         this.reset();
                         
+                        // Reset item type checkboxes and clear dynamic items
+                        document.querySelectorAll('#documentForm input[type="checkbox"]').forEach(cb => cb.checked = false);
+                        updateItemAmounts();
+                        
                         // ✅ NEW: Trigger automatic print after successful creation
                         const docId = result.documentId || result.id;
                         if (docId) {
