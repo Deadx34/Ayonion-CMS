@@ -5190,7 +5190,6 @@
 					docType: form.dataset.docType,
 					itemTypes: selectedItemTypes,
 					itemDetails: itemDetails,
-					description: description.value,
 					date: date.value
                 };
 
