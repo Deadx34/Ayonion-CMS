@@ -2170,30 +2170,6 @@
             }
         }
 
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const payload = {
-                fullName: document.getElementById('profileFullName').value.trim(),
-                email: document.getElementById('profileEmail').value.trim()
-            };
-            try {
-                const res = await fetch('handler_users.php?action=update_profile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    credentials: 'same-origin'
-                });
-                const data = await res.json();
-                if (data.success) {
-                    showAlert('Profile updated successfully! ✅', 'success');
-                } else {
-                    showAlert('Failed to update profile: ' + (data.message || ''), 'danger');
-                }
-            } catch (_) {
-                showAlert('Network error updating profile', 'danger');
-            }
-        });
-
         document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const currentPassword = document.getElementById('currentPassword').value;
