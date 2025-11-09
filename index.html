@@ -1628,6 +1628,9 @@
                                         }
                                     }
                                     
+                                    // Expose updateItemAmounts globally for use when opening modal
+                                    window.updateItemAmounts = updateItemAmounts;
+                                    
                                     // Add event listeners to all checkboxes
                                     itemTypeCheckboxes.forEach(checkbox => {
                                         checkbox.addEventListener('change', updateItemAmounts);
@@ -5347,6 +5350,15 @@
 			document.getElementById('documentForm').dataset.docType = type;
 			populateClientSelect('docClientSelect');
 			document.getElementById('docDate').valueAsDate = new Date();
+            
+            // Uncheck all item type checkboxes and clear dynamic fields
+            document.querySelectorAll('#documentForm input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            // Manually trigger updateItemAmounts to ensure fields are properly hidden
+            if (typeof window.updateItemAmounts === 'function') {
+                window.updateItemAmounts();
+            }
+            
             new bootstrap.Modal(document.getElementById('documentModal')).show();
         }
 
