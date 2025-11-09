@@ -1647,7 +1647,7 @@
                     <div class="me-auto">
                         <small class="text-muted"><i class="fas fa-eye me-1"></i>Read-only document view</small>
                     </div>
-                    <button class="btn btn-primary" onclick="printDocument()"><i class="fas fa-print me-2"></i>Print</button>
+                    <button class="btn btn-primary" onclick="printCurrentDocument()"><i class="fas fa-print me-2"></i>Print</button>
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -5738,6 +5738,78 @@
                     showAlert('Error deleting document: ' + error.message, 'danger');
                 }
             }
+        }
+
+        // ✅ Print current document preview (for content reports)
+        function printCurrentDocument() {
+            const documentPreview = document.getElementById('documentPreview');
+            if (!documentPreview || !documentPreview.innerHTML.trim()) {
+                showAlert('No document to print.', 'warning');
+                return;
+            }
+
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            
+            // Get the document content
+            const content = documentPreview.innerHTML;
+            
+            // Write the content with print styles
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Print Document</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            padding: 20px;
+                            margin: 0;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        th, td {
+                            padding: 8px;
+                            text-align: left;
+                            border: 1px solid #ddd;
+                        }
+                        th {
+                            background-color: #6366f1 !important;
+                            color: white !important;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+                        img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                            }
+                            .no-print {
+                                display: none !important;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${content}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            
+            // Wait for content to load, then trigger print
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.focus();
+                    printWindow.print();
+                }, 500);
+            };
         }
 
         // ✅ Print document function
