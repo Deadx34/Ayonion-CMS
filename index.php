@@ -3770,7 +3770,7 @@
                 </tr>
             `).join('');
 
-            const html = `
+            const reportHtml = `
                 <div style="font-family: Arial; padding: 20px;">
                     <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
                         ${client.logoUrl ? `<img src="${client.logoUrl}" style="width: 80px; height: 80px; margin-right: 20px; border-radius: 8px;">` : ''}
@@ -3831,8 +3831,62 @@
                 </div>
             `;
 
+            // Show report in modal with print/download buttons
+            const html = `
+                <div class="mb-3 d-print-none" style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn btn-primary" onclick="printSelectedContentReport()">
+                        <i class="fas fa-print me-2"></i>Print Report
+                    </button>
+                    <button class="btn btn-success" onclick="downloadSelectedContentReportPDF()">
+                        <i class="fas fa-download me-2"></i>Download PDF
+                    </button>
+                </div>
+                <div id="selectedContentReportContent">${reportHtml}</div>
+            `;
+            
+            document.getElementById('documentPreview').innerHTML = html;
+            
+            // Store report HTML for print/download functions
+            window.currentSelectedReportHTML = reportHtml;
+            window.currentSelectedReportFilename = `${client.companyName.replace(/[^a-z0-9]/gi, '_')}_Selected_Content_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            
+            showDocumentModal();
+            
+            showAlert(`Selected content report (${selectedContents.length} items) generated successfully! 📄`, 'success');
+        }
+        
+        // Function to print selected content report
+        function printSelectedContentReport() {
+            const reportContent = window.currentSelectedReportHTML;
+            if (!reportContent) {
+                showAlert('No report content available to print.', 'warning');
+                return;
+            }
+            
             const printWindow = window.open('', '_blank', 'width=800,height=600');
-            printWindow.document.write(html);
+            printWindow.document.write(reportContent);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            };
+        }
+        
+        // Function to download selected content report as PDF
+        function downloadSelectedContentReportPDF() {
+            const reportContent = window.currentSelectedReportHTML;
+            const filename = window.currentSelectedReportFilename || 'selected_content_report.pdf';
+            
+            if (!reportContent) {
+                showAlert('No report content available to download.', 'warning');
+                return;
+            }
+            
+            // Open in new window for PDF save
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(reportContent);
+            printWindow.document.title = filename.replace('.pdf', '');
             printWindow.document.close();
             printWindow.onload = function() {
                 setTimeout(() => {
@@ -3840,7 +3894,7 @@
                 }, 500);
             };
             
-            showAlert(`Selected content report (${selectedContents.length} items) generated successfully! 📄`, 'success');
+            showAlert('Opening print dialog. Choose "Save as PDF" as the destination.', 'info');
         }
 
         function showAddContentModal() {
@@ -4305,7 +4359,7 @@
             }
             
             // Fallback to browser print
-            const html = `
+            const reportHtml = `
                 <div style="font-family: Arial; padding: 20px;">
                     <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
                         ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 60px; margin-right: 20px; object-fit: contain;">` : ''}
@@ -4350,9 +4404,68 @@
                 </div>
             `;
 
-            // Removed read-only header for cleaner print output
+            // Show report in modal with print/download buttons
+            const html = `
+                <div class="mb-3 d-print-none" style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn btn-primary" onclick="printContentReport()">
+                        <i class="fas fa-print me-2"></i>Print Report
+                    </button>
+                    <button class="btn btn-success" onclick="downloadContentReportPDF()">
+                        <i class="fas fa-download me-2"></i>Download PDF
+                    </button>
+                </div>
+                <div id="contentReportContent">${reportHtml}</div>
+            `;
+            
             document.getElementById('documentPreview').innerHTML = html;
+            
+            // Store report HTML for print/download functions
+            window.currentContentReportHTML = reportHtml;
+            window.currentContentReportFilename = `${client.companyName.replace(/[^a-z0-9]/gi, '_')}_Content_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            
             showDocumentModal();
+        }
+        
+        // Function to print content report
+        function printContentReport() {
+            const reportContent = window.currentContentReportHTML;
+            if (!reportContent) {
+                showAlert('No report content available to print.', 'warning');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(reportContent);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            };
+        }
+        
+        // Function to download content report as PDF
+        function downloadContentReportPDF() {
+            const reportContent = window.currentContentReportHTML;
+            const filename = window.currentContentReportFilename || 'content_report.pdf';
+            
+            if (!reportContent) {
+                showAlert('No report content available to download.', 'warning');
+                return;
+            }
+            
+            // Open in new window for PDF save
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(reportContent);
+            printWindow.document.title = filename.replace('.pdf', '');
+            printWindow.document.close();
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.print();
+                }, 500);
+            };
+            
+            showAlert('Opening print dialog. Choose "Save as PDF" as the destination.', 'info');
         }
 
         // ============================================
