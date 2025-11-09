@@ -5489,8 +5489,15 @@
                             };
                             
                             // Add custom description for "Other Service" from the dynamic input
-                            if (itemType === 'Other Service' && descriptionInput && descriptionInput.value) {
-                                itemDetail.description = descriptionInput.value.trim();
+                            if (itemType === 'Other Service') {
+                                if (descriptionInput && descriptionInput.value && descriptionInput.value.trim() !== '') {
+                                    itemDetail.description = descriptionInput.value.trim();
+                                } else {
+                                    // Description is required for Other Service
+                                    showAlert('Description is required for "Other Service".', 'warning');
+                                    if (descriptionInput) descriptionInput.focus();
+                                    return;
+                                }
                             }
                             
                             itemDetails.push(itemDetail);
