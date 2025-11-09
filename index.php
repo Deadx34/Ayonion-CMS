@@ -5176,9 +5176,10 @@
                 
                 // Handle different input scenarios
                 let itemDetails = [];
+                let validationError = null;
                 
                 // Get individual amounts from dynamic inputs (works for both single and multiple)
-                selectedItemTypes.forEach(itemType => {
+                for (const itemType of selectedItemTypes) {
                     const quantityInput = form.querySelector(`input[data-item-type="${itemType}"].item-quantity`);
                     const unitPriceInput = form.querySelector(`input[data-item-type="${itemType}"].item-unit-price`);
                     const descriptionInput = form.querySelector(`input[data-item-type="${itemType}"].item-description`);
@@ -5201,20 +5202,36 @@
                                     itemDetail.description = descriptionInput.value.trim();
                                 } else {
                                     // Description is required for Other Service
-                                    showAlert('Description is required for "Other Service".', 'warning');
-                                    if (descriptionInput) descriptionInput.focus();
-                                    return;
+                                    validationError = {
+                                        message: 'Description is required for "Other Service".',
+                                        element: descriptionInput
+                                    };
+                                    break;
                                 }
                             }
                             
                             itemDetails.push(itemDetail);
                         }
                     }
-                });
+                }
+                
+                // Check if validation failed
+                if (validationError) {
+                    showAlert(validationError.message, 'warning');
+                    if (validationError.element) validationError.element.focus();
+                    return;
+                }
                 
                 if (itemDetails.length === 0) {
                     showAlert('Please enter valid quantities and prices for all selected item types.', 'warning');
                     return;
+                }
+                
+                // Extract description from "Other Service" item if present
+                let documentDescription = '';
+                const otherServiceItem = itemDetails.find(item => item.itemType === 'Other Service');
+                if (otherServiceItem && otherServiceItem.description) {
+                    documentDescription = otherServiceItem.description;
                 }
                 
                 const formData = {
@@ -5222,6 +5239,7 @@
 					docType: form.dataset.docType,
 					itemTypes: selectedItemTypes,
 					itemDetails: itemDetails,
+					description: documentDescription,
 					date: date.value
                 };
 
