@@ -1543,16 +1543,16 @@
                                                 itemAmountsContainer.appendChild(itemDiv);
                                             });
                                         } else {
-                                            // No items selected
+                                            // No items selected - hide everything
                                             itemAmountsSection.style.display = 'none';
-                                            singleQuantityField.style.display = 'block';
-                                            singleUnitPriceField.style.display = 'block';
+                                            singleQuantityField.style.display = 'none';
+                                            singleUnitPriceField.style.display = 'none';
                                             
-                                            // Add required attributes back to single fields
+                                            // Remove required attributes from single fields
                                             const singleQuantity = document.getElementById('docQuantity');
                                             const singleUnitPrice = document.getElementById('docUnitPrice');
-                                            if (singleQuantity) singleQuantity.setAttribute('required', 'required');
-                                            if (singleUnitPrice) singleUnitPrice.setAttribute('required', 'required');
+                                            if (singleQuantity) singleQuantity.removeAttribute('required');
+                                            if (singleUnitPrice) singleUnitPrice.removeAttribute('required');
                                         }
                                     }
                                     
