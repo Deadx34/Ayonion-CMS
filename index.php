@@ -106,18 +106,11 @@
         .document-preview {
             position: relative;
         }
+        /* Removed pseudo-element for cleaner print output */
         .document-preview::before {
-            content: "📄 Document View - Read Only";
-            position: absolute;
-            top: -10px;
-            right: 10px;
-            background: #e3f2fd;
-            color: #1976d2;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-            z-index: 10;
+            content: "";
+            display: none;
+        }
         }
         .logo-preview { width: 60px; height: 60px; object-fit: contain; border: 2px solid #e2e8f0; border-radius: 8px; padding: 5px; cursor: pointer; transition: all 0.3s; }
         .logo-preview:hover { transform: scale(1.1); border-color: var(--primary); }
@@ -4282,13 +4275,8 @@
                 </div>
             `;
 
-            // Add read-only header to document
-            const readOnlyHeader = `
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 8px 12px; margin-bottom: 20px; font-size: 14px; color: #6c757d;">
-                    <i class="fas fa-lock me-2"></i>Document View - Read Only
-                </div>
-            `;
-            document.getElementById('documentPreview').innerHTML = readOnlyHeader + html;
+            // Removed read-only header for cleaner print output
+            document.getElementById('documentPreview').innerHTML = html;
             showDocumentModal();
         }
 
@@ -5441,13 +5429,8 @@
                     </div>
                 </div>
             `;
-            // Add read-only header to document
-            const readOnlyHeader = `
-                <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 8px 12px; margin-bottom: 20px; font-size: 14px; color: #6c757d;">
-                    <i class="fas fa-lock me-2"></i>Document View - Read Only
-                </div>
-            `;
-            document.getElementById('documentPreview').innerHTML = readOnlyHeader + html;
+            // Removed read-only header for cleaner print output
+            document.getElementById('documentPreview').innerHTML = html;
             
             // Store document info in modal for print function
             const modal = document.getElementById('viewDocumentModal');
@@ -5539,10 +5522,20 @@
                         @media print {
                             body {
                                 padding: 0;
+                                margin: 0;
                             }
                             .no-print {
                                 display: none !important;
                             }
+                            /* Hide URL and "about:blank" at bottom */
+                            @page {
+                                margin: 0.5cm;
+                            }
+                        }
+                        /* Hide browser URL in print */
+                        @page {
+                            margin-top: 0;
+                            margin-bottom: 0;
                         }
                     </style>
                 </head>
