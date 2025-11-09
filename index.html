@@ -19,7 +19,8 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Lato', 'Segoe UI', sans-serif; background: var(--light); }
-        .sidebar { background: var(--dark); min-height: 100vh; position: fixed; left: 0; top: 0; width: 260px; z-index: 1000; overflow-y: auto; transition: transform 0.3s ease; }
+        .sidebar { background: var(--dark); min-height: 100vh; position: fixed; left: 0; top: 0; width: 260px; z-index: 1000; overflow-y: auto; transition: transform 0.3s ease; scrollbar-width: none; -ms-overflow-style: none; }
+        .sidebar::-webkit-scrollbar { display: none; }
         .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
         .sidebar-header h3 { font-size: 1.4rem; font-weight: 700; margin: 0; }
         .sidebar-header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.85rem; }
