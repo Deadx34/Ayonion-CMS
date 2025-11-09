@@ -5097,6 +5097,15 @@
             // Uncheck all item type checkboxes and clear dynamic fields
             document.querySelectorAll('#documentForm input[type="checkbox"]').forEach(cb => cb.checked = false);
             
+            // Clear all Other Services
+            const otherServicesContainer = document.getElementById('otherServicesContainer');
+            if (otherServicesContainer) {
+                otherServicesContainer.innerHTML = '<small class="text-muted">Click "Add Other Service" to add custom service items</small>';
+            }
+            if (typeof window.otherServiceCounter !== 'undefined') {
+                window.otherServiceCounter = 0;
+            }
+            
             // Manually trigger updateItemAmounts to ensure fields are properly hidden
             if (typeof window.updateItemAmounts === 'function') {
                 window.updateItemAmounts();
