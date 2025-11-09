@@ -1465,6 +1465,22 @@
                                             selectedCount.style.display = 'none';
                                         }
                                         
+                                        // Save existing values before rebuilding
+                                        const existingValues = {};
+                                        itemAmountsContainer.querySelectorAll('.item-quantity, .item-unit-price, .item-description').forEach(input => {
+                                            const itemType = input.dataset.itemType;
+                                            if (!existingValues[itemType]) {
+                                                existingValues[itemType] = {};
+                                            }
+                                            if (input.classList.contains('item-quantity')) {
+                                                existingValues[itemType].quantity = input.value;
+                                            } else if (input.classList.contains('item-unit-price')) {
+                                                existingValues[itemType].unitPrice = input.value;
+                                            } else if (input.classList.contains('item-description')) {
+                                                existingValues[itemType].description = input.value;
+                                            }
+                                        });
+                                        
                                         // Show/hide appropriate input sections
                                         if (count >= 1) {
                                             // One or more items selected - show dynamic inputs with item names
@@ -1488,6 +1504,12 @@
                                                 // Check if this is "Other Service" to add description field
                                                 const isOtherService = checkbox.value === 'Other Service';
                                                 
+                                                // Get saved values if they exist
+                                                const savedValues = existingValues[checkbox.value] || {};
+                                                const savedQuantity = savedValues.quantity || '1';
+                                                const savedUnitPrice = savedValues.unitPrice || '';
+                                                const savedDescription = savedValues.description || '';
+                                                
                                                 itemDiv.innerHTML = `
                                                     <div class="col-12">
                                                         <h6 class="mb-2 text-primary">${checkbox.value}</h6>
@@ -1497,6 +1519,7 @@
                                                         <label class="form-label">Description <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control item-description" 
                                                                data-item-type="${checkbox.value}"
+                                                               value="${savedDescription}"
                                                                placeholder="Enter service description" 
                                                                required>
                                                     </div>
@@ -1505,13 +1528,14 @@
                                                         <label class="form-label">Quantity</label>
                                                         <input type="number" class="form-control item-quantity" 
                                                                data-item-type="${checkbox.value}" 
-                                                               value="1" required min="0" 
+                                                               value="${savedQuantity}" required min="0" 
                                                                placeholder="Enter quantity">
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">Unit Price (Rs.)</label>
                                                         <input type="number" step="0.01" class="form-control item-unit-price" 
                                                                data-item-type="${checkbox.value}" 
+                                                               value="${savedUnitPrice}"
                                                                required min="0" 
                                                                placeholder="Enter unit price">
                                                     </div>
@@ -1553,13 +1577,13 @@
                             </div>
                             
                             <!-- Fallback for single item type (hidden by default now) -->
-                            <div class="col-md-6 mb-3" id="singleQuantityField">
+                            <div class="col-md-6 mb-3" id="singleQuantityField" style="display: none;">
                                 <label class="form-label">Quantity (Credits or Units)</label>
-                                <input type="number" class="form-control" id="docQuantity" value="1" required min="0">
+                                <input type="number" class="form-control" id="docQuantity" value="1" min="0">
                             </div>
-                            <div class="col-md-6 mb-3" id="singleUnitPriceField">
+                            <div class="col-md-6 mb-3" id="singleUnitPriceField" style="display: none;">
                                 <label class="form-label">Unit Price (Rs.)</label>
-                                <input type="number" step="0.01" class="form-control" id="docUnitPrice" required min="0">
+                                <input type="number" step="0.01" class="form-control" id="docUnitPrice" min="0">
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Generate Document</button>
