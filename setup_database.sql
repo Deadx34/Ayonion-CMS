@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS documents (
     client_id BIGINT,
     client_name VARCHAR(255),
     doc_type VARCHAR(50),
-    item_type VARCHAR(255),
+    item_type TEXT,
     description TEXT,
     quantity INT DEFAULT 0,
     unit_price DECIMAL(12,2) DEFAULT 0.00,
