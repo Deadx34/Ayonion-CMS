@@ -5057,8 +5057,11 @@
                 return;
             }
 
+            // Sort documents by ID in descending order (newest first)
+            const sortedDocs = [...docs].sort((a, b) => b.id - a.id);
+
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
-            tbody.innerHTML = docs.map(doc => `
+            tbody.innerHTML = sortedDocs.map(doc => `
                 <tr onclick="viewDocument('${type}', ${doc.id})" style="cursor: pointer;">
                     <td>${docNum[type]}${String(doc.id).slice(-6)}</td>
                     <td>${doc.clientName || doc.client_name || 'Unknown Client'}</td>
