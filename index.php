@@ -407,7 +407,7 @@
                                 <div class="col-md-6">
                                     <strong>Package Credits:</strong> <span id="packageCredits">0</span><br>
                                     <strong>Extra Credits:</strong> <span id="extraCredits">0</span><br>
-                                    <strong>Carried Forward:</strong> <span id="carriedCredits">0</span>
+                                    <strong>Brought Forward:</strong> <span id="carriedCredits">0</span>
                                 </div>
                                 <div class="col-md-6">
                                     <strong>Total Credits:</strong> <span id="totalCredits">0</span><br>
@@ -659,7 +659,7 @@
                                     <div class="col-md-2 text-center">
                                         <div style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
                                             <h4 class="text-warning mb-0" id="clientDetailCarried">0</h4>
-                                            <small>Carried Forward</small>
+                                            <small>Brought Forward</small>
                                         </div>
                                     </div>
                                     <div class="col-md-2 text-center">
@@ -746,7 +746,7 @@
                         <div class="alert alert-info" id="currentCreditsStatus">
                             <strong>Current Status:</strong>
                             <ul class="mb-0 mt-2">
-                                <li>Carried Forward: <span id="statusCarried">0</span></li>
+                                <li>Brought Forward: <span id="statusCarried">0</span></li>
                                 <li>Used: <span id="statusUsed">0</span></li>
                                 <li>Total: <span id="statusTotal">0</span></li>
                                 <li>Available: <span id="statusAvailable">0</span></li>
@@ -1085,7 +1085,7 @@
                                 <p class="mb-1"><strong>Extra Credits:</strong> <span id="manageExtraCredits">0</span></p>
                             </div>
                             <div class="col-md-6">
-                                <p class="mb-1"><strong>Carried Forward:</strong> <span id="manageCarriedCredits">0</span></p>
+                                <p class="mb-1"><strong>Brought Forward:</strong> <span id="manageCarriedCredits">0</span></p>
                                 <p class="mb-1"><strong>Used Credits:</strong> <span id="manageUsedCredits">0</span></p>
                             </div>
                         </div>
@@ -2347,7 +2347,7 @@
                         <thead>
                             <tr>
                                 <th>Client</th>
-                                <th>Carried Forward</th>
+                                <th>Brought Forward</th>
                                 <th>New Total</th>
                                 <th>Status</th>
                             </tr>
@@ -4088,7 +4088,7 @@
                     
                     // Show success message with details
                     const details = result.details;
-                    showAlert(`Month-end process completed successfully!\n\nCredits carried forward: ${details.creditsCarried}\nCredits expired: ${details.creditsExpired}\nNew renewal date: ${formatDate(details.newRenewalDate)}`, 'success');
+                    showAlert(`Month-end process completed successfully!\n\nCredits brought forward: ${details.creditsCarried}\nCredits expired: ${details.creditsExpired}\nNew renewal date: ${formatDate(details.newRenewalDate)}`, 'success');
                 } else {
                     showAlert('Failed to process month-end: ' + result.message, 'danger');
                 }
