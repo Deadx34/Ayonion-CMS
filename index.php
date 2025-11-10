@@ -3938,20 +3938,8 @@
                 if (response.ok) {
                     const htmlContent = await response.text();
                     
-                    // Show report in modal with print/download buttons
-                    const html = `
-                        <div class="mb-3 d-print-none" style="display: flex; gap: 10px; justify-content: center;">
-                            <button class="btn btn-primary" onclick="printSelectedContentReport()">
-                                <i class="fas fa-print me-2"></i>Print Report
-                            </button>
-                            <button class="btn btn-success" onclick="downloadSelectedContentReportPDF()">
-                                <i class="fas fa-download me-2"></i>Download PDF
-                            </button>
-                        </div>
-                        <div id="selectedContentReportContent">${htmlContent}</div>
-                    `;
-                    
-                    document.getElementById('documentPreview').innerHTML = html;
+                    // Show report in modal
+                    document.getElementById('documentPreview').innerHTML = htmlContent;
                     
                     // Store report HTML for print/download functions
                     window.currentSelectedReportHTML = htmlContent;
@@ -4040,20 +4028,8 @@
                 </div>
             `;
 
-            // Show report in modal with print/download buttons
-            const html = `
-                <div class="mb-3 d-print-none" style="display: flex; gap: 10px; justify-content: center;">
-                    <button class="btn btn-primary" onclick="printSelectedContentReport()">
-                        <i class="fas fa-print me-2"></i>Print Report
-                    </button>
-                    <button class="btn btn-success" onclick="downloadSelectedContentReportPDF()">
-                        <i class="fas fa-download me-2"></i>Download PDF
-                    </button>
-                </div>
-                <div id="selectedContentReportContent">${reportHtml}</div>
-            `;
-            
-            document.getElementById('documentPreview').innerHTML = html;
+            // Show report in modal
+            document.getElementById('documentPreview').innerHTML = reportHtml;
             
             // Store report HTML for print/download functions
             window.currentSelectedReportHTML = reportHtml;
@@ -4551,18 +4527,9 @@
                     
                     // Show report in modal with print/download buttons
                     const html = `
-                        <div class="mb-3 d-print-none" style="display: flex; gap: 10px; justify-content: center;">
-                            <button class="btn btn-primary" onclick="printContentReport()">
-                                <i class="fas fa-print me-2"></i>Print Report
-                            </button>
-                            <button class="btn btn-success" onclick="downloadContentReportPDF()">
-                                <i class="fas fa-download me-2"></i>Download PDF
-                            </button>
-                        </div>
-                        <div id="contentReportContent">${htmlContent}</div>
-                    `;
                     
-                    document.getElementById('documentPreview').innerHTML = html;
+                    // Show report in modal
+                    document.getElementById('documentPreview').innerHTML = htmlContent;
                     
                     // Store report HTML for print/download functions
                     window.currentContentReportHTML = htmlContent;
@@ -4622,20 +4589,8 @@
                 </div>
             `;
 
-            // Show report in modal with print/download buttons
-            const html = `
-                <div class="mb-3 d-print-none" style="display: flex; gap: 10px; justify-content: center;">
-                    <button class="btn btn-primary" onclick="printContentReport()">
-                        <i class="fas fa-print me-2"></i>Print Report
-                    </button>
-                    <button class="btn btn-success" onclick="downloadContentReportPDF()">
-                        <i class="fas fa-download me-2"></i>Download PDF
-                    </button>
-                </div>
-                <div id="contentReportContent">${reportHtml}</div>
-            `;
-            
-            document.getElementById('documentPreview').innerHTML = html;
+            // Show report in modal
+            document.getElementById('documentPreview').innerHTML = reportHtml;
             
             // Store report HTML for print/download functions
             window.currentContentReportHTML = reportHtml;
