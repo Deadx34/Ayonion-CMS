@@ -5627,8 +5627,8 @@
                             <thead>
                                 <tr style="background: #f8f9fa; border-bottom: 2px solid #ecf0f1;">
                                     <th style="padding: 8px 6px; text-align: left; font-weight: bold; color: #2c3e50;">Description</th>
-                                    <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: #2c3e50;">Unit Price</th>
                                     <th style="padding: 8px 6px; text-align: center; font-weight: bold; color: #2c3e50;">Quantity</th>
+                                    <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: #2c3e50;">Unit Price</th>
                                     <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: #2c3e50;">Amount (Rs.)</th>
                                 </tr>
                             </thead>
