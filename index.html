@@ -612,7 +612,7 @@
                 <div class="modal-body">
                     <div class="row mb-4">
                         <div class="col-md-2 text-center">
-                            <img id="clientDetailLogo" class="logo-preview" style="width: 120px; height: 120px;" src="" alt="Logo">
+                            <img id="clientDetailLogo" class="logo-preview" style="width: 32px; height: 32px; object-fit: contain;" src="" alt="Logo">
                         </div>
                         <div class="col-md-10">
                             <h3 id="clientDetailName" class="mb-3"></h3>
@@ -3864,7 +3864,7 @@
             const reportHtml = `
                 <div style="font-family: Arial; padding: 20px;">
                     <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
-                        ${client.logoUrl ? `<img src="${client.logoUrl}" style="width: 80px; height: 80px; margin-right: 20px; border-radius: 8px;">` : ''}
+                        ${client.logoUrl ? `<img src="${client.logoUrl}" style="width: 32px; height: 32px; object-fit: contain; margin-right: 20px; border-radius: 8px;">` : ''}
                         <div>
                             <h1 style="margin: 0; color: #1f2937; font-size: 28px;">${client.companyName}</h1>
                             <p style="margin: 5px 0 0 0; color: #6b7280;">Content Credit Report - Selected Items</p>
