@@ -3249,7 +3249,7 @@
                     data-platforms="${(c.managingPlatforms || '-').toLowerCase()}"
                     data-industry="${c.industry.toLowerCase()}">
                     <td style="cursor: pointer;">
-                        ${c.logoUrl ? `<img src="${c.logoUrl}" class="logo-preview" alt="Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\\'fas fa-building fa-2x text-muted\\'></i>'">` : '<i class="fas fa-building fa-2x text-muted"></i>'}
+                        ${c.logoUrl ? `<img src="${c.logoUrl}" class="logo-preview" style="width: 32px; height: 32px; object-fit: contain;" alt="Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\\'fas fa-building text-muted\\' style=\\'font-size: 32px;\\'></i>'">` : '<i class="fas fa-building text-muted" style="font-size: 32px;"></i>'}
                     </td>
                     <td style="cursor: pointer;">${c.partnerId}</td>
                     <td>${c.companyName}</td>
