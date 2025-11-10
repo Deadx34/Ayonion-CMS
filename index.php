@@ -112,7 +112,7 @@
             display: none;
         }
         }
-        .logo-preview { width: 60px; height: 60px; object-fit: contain; border: 2px solid #e2e8f0; border-radius: 8px; padding: 5px; cursor: pointer; transition: all 0.3s; }
+        .logo-preview { width: 32px; height: 32px; object-fit: contain; border: 2px solid #e2e8f0; border-radius: 8px; padding: 5px; cursor: pointer; transition: all 0.3s; }
         .logo-preview:hover { transform: scale(1.1); border-color: var(--primary); }
         .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
         .empty-state i { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
@@ -130,7 +130,7 @@
             .page-title { font-size: 1.3rem; max-width: 70vw; }
             .stat-card { padding: 18px; }
             .document-preview { padding: 20px; }
-            .logo-preview { width: 48px; height: 48px; }
+            .logo-preview { width: 32px; height: 32px; }
             .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         }
         @media (max-width: 575.98px) {
