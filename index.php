@@ -3927,8 +3927,6 @@
             
             // Generate PDF using server-side generation
             try {
-                const printWindow = window.open('', '_blank', 'width=800,height=600');
-                
                 const response = await fetch('generate_content_report.php', {
                     method: 'POST',
                     headers: {
@@ -3939,14 +3937,27 @@
                 
                 if (response.ok) {
                     const htmlContent = await response.text();
-                    printWindow.document.write(htmlContent);
                     
-                    printWindow.onload = function() {
-                        setTimeout(() => {
-                            printWindow.print();
-                        }, 1000);
-                    };
+                    // Show report in modal with print/download buttons
+                    const html = `
+                        <div class="mb-3 d-print-none" style="display: flex; gap: 10px; justify-content: center;">
+                            <button class="btn btn-primary" onclick="printSelectedContentReport()">
+                                <i class="fas fa-print me-2"></i>Print Report
+                            </button>
+                            <button class="btn btn-success" onclick="downloadSelectedContentReportPDF()">
+                                <i class="fas fa-download me-2"></i>Download PDF
+                            </button>
+                        </div>
+                        <div id="selectedContentReportContent">${htmlContent}</div>
+                    `;
                     
+                    document.getElementById('documentPreview').innerHTML = html;
+                    
+                    // Store report HTML for print/download functions
+                    window.currentSelectedReportHTML = htmlContent;
+                    window.currentSelectedReportFilename = `${client.companyName.replace(/[^a-z0-9]/gi, '_')}_Selected_Content_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+                    
+                    showDocumentModal();
                     showAlert(`Selected content report (${selectedContents.length} items) generated successfully! 📄`, 'success');
                     return;
                 }
@@ -4526,9 +4537,6 @@
             
             // Generate PDF using browser's built-in PDF generation
             try {
-                // Create a new window for PDF generation
-                const printWindow = window.open('', '_blank', 'width=800,height=600');
-                
                 // Send data to server for HTML generation
                 const response = await fetch('generate_content_report.php', {
                     method: 'POST',
@@ -4540,15 +4548,27 @@
                 
                 if (response.ok) {
                     const htmlContent = await response.text();
-                    printWindow.document.write(htmlContent);
                     
-                    // Wait for content to load, then trigger print
-                    printWindow.onload = function() {
-                        setTimeout(() => {
-                            printWindow.print();
-                        }, 1000);
-                    };
+                    // Show report in modal with print/download buttons
+                    const html = `
+                        <div class="mb-3 d-print-none" style="display: flex; gap: 10px; justify-content: center;">
+                            <button class="btn btn-primary" onclick="printContentReport()">
+                                <i class="fas fa-print me-2"></i>Print Report
+                            </button>
+                            <button class="btn btn-success" onclick="downloadContentReportPDF()">
+                                <i class="fas fa-download me-2"></i>Download PDF
+                            </button>
+                        </div>
+                        <div id="contentReportContent">${htmlContent}</div>
+                    `;
                     
+                    document.getElementById('documentPreview').innerHTML = html;
+                    
+                    // Store report HTML for print/download functions
+                    window.currentContentReportHTML = htmlContent;
+                    window.currentContentReportFilename = `${client.companyName.replace(/[^a-z0-9]/gi, '_')}_Content_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+                    
+                    showDocumentModal();
                     showAlert('Content report generated successfully! 📄', 'success');
                     return;
                 }
