@@ -780,9 +780,90 @@
                                 <label class="form-label">Monthly Renewal Date</label>
                                 <input type="date" class="form-control" id="editRenewalDate" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Managing Platforms</label>
-                                <input type="text" class="form-control" id="editManagingPlatforms" placeholder="e.g., Facebook, Instagram, Google">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label d-block">Managing Platforms</label>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="Facebook" id="edit_platform_facebook">
+                                            <label class="form-check-label" for="edit_platform_facebook">
+                                                <i class="fab fa-facebook text-primary"></i> Facebook
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="Instagram" id="edit_platform_instagram">
+                                            <label class="form-check-label" for="edit_platform_instagram">
+                                                <i class="fab fa-instagram text-danger"></i> Instagram
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="Twitter/X" id="edit_platform_twitter">
+                                            <label class="form-check-label" for="edit_platform_twitter">
+                                                <i class="fab fa-twitter text-info"></i> Twitter/X
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="LinkedIn" id="edit_platform_linkedin">
+                                            <label class="form-check-label" for="edit_platform_linkedin">
+                                                <i class="fab fa-linkedin text-primary"></i> LinkedIn
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="YouTube" id="edit_platform_youtube">
+                                            <label class="form-check-label" for="edit_platform_youtube">
+                                                <i class="fab fa-youtube text-danger"></i> YouTube
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="TikTok" id="edit_platform_tiktok">
+                                            <label class="form-check-label" for="edit_platform_tiktok">
+                                                <i class="fab fa-tiktok text-dark"></i> TikTok
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="Google Ads" id="edit_platform_google">
+                                            <label class="form-check-label" for="edit_platform_google">
+                                                <i class="fab fa-google text-danger"></i> Google Ads
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="WhatsApp Business" id="edit_platform_whatsapp">
+                                            <label class="form-check-label" for="edit_platform_whatsapp">
+                                                <i class="fab fa-whatsapp text-success"></i> WhatsApp Business
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="Pinterest" id="edit_platform_pinterest">
+                                            <label class="form-check-label" for="edit_platform_pinterest">
+                                                <i class="fab fa-pinterest text-danger"></i> Pinterest
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="Snapchat" id="edit_platform_snapchat">
+                                            <label class="form-check-label" for="edit_platform_snapchat">
+                                                <i class="fab fa-snapchat text-warning"></i> Snapchat
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="Telegram" id="edit_platform_telegram">
+                                            <label class="form-check-label" for="edit_platform_telegram">
+                                                <i class="fab fa-telegram text-primary"></i> Telegram
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input edit-managing-platform" type="checkbox" value="Other" id="edit_platform_other">
+                                            <label class="form-check-label" for="edit_platform_other">
+                                                <i class="fas fa-ellipsis-h"></i> Other
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Industry Category</label>
@@ -872,9 +953,90 @@
                                 <label class="form-label">Package Content Credits</label>
                                 <input type="number" class="form-control" id="newClientPackageCredits" required min="0">
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Managing Platforms</label>
-                                <input type="text" class="form-control" id="managingPlatforms" placeholder="e.g., Facebook, Instagram, Google">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label d-block">Managing Platforms</label>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="Facebook" id="platform_facebook">
+                                            <label class="form-check-label" for="platform_facebook">
+                                                <i class="fab fa-facebook text-primary"></i> Facebook
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="Instagram" id="platform_instagram">
+                                            <label class="form-check-label" for="platform_instagram">
+                                                <i class="fab fa-instagram text-danger"></i> Instagram
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="Twitter/X" id="platform_twitter">
+                                            <label class="form-check-label" for="platform_twitter">
+                                                <i class="fab fa-twitter text-info"></i> Twitter/X
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="LinkedIn" id="platform_linkedin">
+                                            <label class="form-check-label" for="platform_linkedin">
+                                                <i class="fab fa-linkedin text-primary"></i> LinkedIn
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="YouTube" id="platform_youtube">
+                                            <label class="form-check-label" for="platform_youtube">
+                                                <i class="fab fa-youtube text-danger"></i> YouTube
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="TikTok" id="platform_tiktok">
+                                            <label class="form-check-label" for="platform_tiktok">
+                                                <i class="fab fa-tiktok text-dark"></i> TikTok
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="Google Ads" id="platform_google">
+                                            <label class="form-check-label" for="platform_google">
+                                                <i class="fab fa-google text-danger"></i> Google Ads
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="WhatsApp Business" id="platform_whatsapp">
+                                            <label class="form-check-label" for="platform_whatsapp">
+                                                <i class="fab fa-whatsapp text-success"></i> WhatsApp Business
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="Pinterest" id="platform_pinterest">
+                                            <label class="form-check-label" for="platform_pinterest">
+                                                <i class="fab fa-pinterest text-danger"></i> Pinterest
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="Snapchat" id="platform_snapchat">
+                                            <label class="form-check-label" for="platform_snapchat">
+                                                <i class="fab fa-snapchat text-warning"></i> Snapchat
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="Telegram" id="platform_telegram">
+                                            <label class="form-check-label" for="platform_telegram">
+                                                <i class="fab fa-telegram text-primary"></i> Telegram
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input managing-platform" type="checkbox" value="Other" id="platform_other">
+                                            <label class="form-check-label" for="platform_other">
+                                                <i class="fas fa-ellipsis-h"></i> Other
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Industry Category</label>
@@ -2984,6 +3146,12 @@
                 return;
             }
             document.getElementById('addClientForm').reset();
+            
+            // Reset all platform checkboxes
+            document.querySelectorAll('.managing-platform').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
             clearClientLogoPreview();
             new bootstrap.Modal(document.getElementById('addClientModal')).show();
         }
@@ -2999,12 +3167,19 @@
             const logoInput = document.getElementById('clientLogoUpload');
             const logoUrl = logoInput && logoInput.dataset.logoUrl ? logoInput.dataset.logoUrl : '';
 
+            // Collect selected platforms from checkboxes
+            const selectedPlatforms = [];
+            document.querySelectorAll('.managing-platform:checked').forEach(checkbox => {
+                selectedPlatforms.push(checkbox.value);
+            });
+            const managingPlatformsStr = selectedPlatforms.join(', ');
+
             const newClientData = {
                 partnerId: document.getElementById('partnerId').value.trim(),
                 companyName: companyName,
                 renewalDate: document.getElementById('renewalDate').value,
                 packageCredits: packageCreditsValue,
-                managingPlatforms: document.getElementById('managingPlatforms').value,
+                managingPlatforms: managingPlatformsStr,
                 industry: document.getElementById('industry').value,
                 logoUrl: logoUrl
             };
@@ -3247,7 +3422,23 @@
             document.getElementById('editPartnerId').value = client.partnerId;
             document.getElementById('editCompanyName').value = client.companyName;
             document.getElementById('editRenewalDate').value = client.renewalDate;
-            document.getElementById('editManagingPlatforms').value = client.managingPlatforms || '';
+            
+            // Set managing platforms checkboxes
+            document.querySelectorAll('.edit-managing-platform').forEach(checkbox => {
+                checkbox.checked = false; // Reset all checkboxes first
+            });
+            if (client.managingPlatforms) {
+                const platforms = client.managingPlatforms.split(',').map(p => p.trim());
+                platforms.forEach(platform => {
+                    const checkbox = Array.from(document.querySelectorAll('.edit-managing-platform')).find(
+                        cb => cb.value === platform
+                    );
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+            
             document.getElementById('editIndustry').value = client.industry;
             document.getElementById('editTotalAdBudget').value = client.totalAdBudget || 0;
 
@@ -3376,12 +3567,19 @@
                 logoUrl = editLogoUpload.dataset.newLogoUrl; // Use new logo
             }
             
+            // Collect selected platforms from checkboxes
+            const selectedPlatforms = [];
+            document.querySelectorAll('.edit-managing-platform:checked').forEach(checkbox => {
+                selectedPlatforms.push(checkbox.value);
+            });
+            const managingPlatformsStr = selectedPlatforms.join(', ');
+            
             const updateData = {
                 clientId: clientId,
                 partnerId: document.getElementById('editPartnerId').value.trim(),
                 companyName: document.getElementById('editCompanyName').value.trim(),
                 renewalDate: document.getElementById('editRenewalDate').value,
-                managingPlatforms: document.getElementById('editManagingPlatforms').value.trim(),
+                managingPlatforms: managingPlatformsStr,
                 industry: document.getElementById('editIndustry').value,
                 totalAdBudget: parseFloat(document.getElementById('editTotalAdBudget').value) || 0,
                 logoUrl: logoUrl
