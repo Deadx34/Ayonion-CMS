@@ -391,7 +391,10 @@
                             </div>
                             <div class="col-md-8 text-end">
                                 <button class="btn btn-success me-2 mt-2" id="generateInvoiceBtn" onclick="showInvoiceModal()" style="display:none;">
-                                    <i class="fas fa-file-invoice me-2"></i>Generate Report
+                                    <i class="fas fa-file-invoice me-2"></i>Quick Invoice
+                                </button>
+                                <button class="btn btn-warning me-2 mt-2" id="generateCampaignReportBtn" onclick="showCampaignReportModal()" style="display:none;">
+                                    <i class="fas fa-chart-bar me-2"></i>Performance Report
                                 </button>
                                 <button class="btn btn-primary mt-2" onclick="showAddCampaignModal()">
                                     <i class="fas fa-plus me-2"></i>Add Campaign
@@ -1907,6 +1910,155 @@
                     </button>
                     <button type="button" class="btn btn-primary" onclick="saveInvoice()">
                         <i class="fas fa-save me-2"></i>Save Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Report Creator Modal -->
+    <div class="modal fade" id="campaignReportModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-chart-line me-2"></i>Create Campaign Performance Report
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="background: #f8f9fa;">
+                    <div class="container-fluid">
+                        <!-- Report Builder Form -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Report Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Client</label>
+                                        <input type="text" class="form-control" id="reportClientName" readonly>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">Report Period From</label>
+                                        <input type="date" class="form-control" id="reportPeriodFrom">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label class="form-label">To</label>
+                                        <input type="date" class="form-control" id="reportPeriodTo">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campaign Data Table -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0"><i class="fas fa-table me-2"></i>Campaign Performance Data</h6>
+                                <button class="btn btn-sm btn-primary" onclick="addCampaignRow()">
+                                    <i class="fas fa-plus me-2"></i>Add Campaign Row
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0" id="reportCampaignsTable">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th style="width: 200px;">Ad Name</th>
+                                                <th style="width: 120px;">Result Type</th>
+                                                <th style="width: 100px;">Results</th>
+                                                <th style="width: 120px;">Cost/Result (Rs)</th>
+                                                <th style="width: 100px;">Reach</th>
+                                                <th style="width: 120px;">Impressions</th>
+                                                <th style="width: 120px;">Spend (Rs)</th>
+                                                <th style="width: 150px;">Quality Ranking</th>
+                                                <th style="width: 150px;">Conv. Rate Ranking</th>
+                                                <th style="width: 100px;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reportCampaignsTableBody">
+                                            <!-- Rows will be added dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Creative Images Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0"><i class="fas fa-images me-2"></i>Creative Images (Evidence)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Upload Creative Images</label>
+                                        <input type="file" class="form-control" id="reportCreativeImages" accept="image/*" multiple onchange="handleReportImageUpload(this)">
+                                        <small class="text-muted">You can select multiple images (Max 10 images, 5MB each)</small>
+                                    </div>
+                                </div>
+                                <div class="row" id="reportImagesPreview">
+                                    <!-- Image previews will be shown here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary & Insights -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Summary & Insights</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label"><strong>Total Spend (Rs)</strong></label>
+                                        <input type="number" class="form-control" id="reportTotalSpend" readonly style="font-size: 1.2rem; font-weight: bold; background: #e3f2fd;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label"><strong>Total Reach</strong></label>
+                                        <input type="number" class="form-control" id="reportTotalReach" readonly style="font-size: 1.2rem; font-weight: bold; background: #e8f5e9;">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label"><strong>Total Impressions</strong></label>
+                                        <input type="number" class="form-control" id="reportTotalImpressions" readonly style="font-size: 1.2rem; font-weight: bold; background: #fff3e0;">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label"><strong>Cost Efficiency Analysis</strong></label>
+                                        <textarea class="form-control" id="reportCostEfficiency" rows="5" placeholder="Enter bullet points describing cost efficiency:&#10;• Point 1&#10;• Point 2&#10;• Point 3"></textarea>
+                                        <small class="text-muted">Describe the cost efficiency of campaigns (use bullet points with • symbol)</small>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label class="form-label"><strong>Additional Evidence/Notes</strong></label>
+                                        <textarea class="form-control" id="reportEvidence" rows="4" placeholder="Enter any additional evidence, observations, or notes about campaign performance..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Preview -->
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="fas fa-eye me-2"></i>Report Preview</h6>
+                            </div>
+                            <div class="card-body" id="reportPreviewContent" style="background: white; min-height: 400px;">
+                                <p class="text-center text-muted py-5">Click "Generate Preview" to see the report</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Close
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="generateCampaignReportPreview()">
+                        <i class="fas fa-eye me-2"></i>Generate Preview
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="printCampaignReport()">
+                        <i class="fas fa-print me-2"></i>Print Report
                     </button>
                 </div>
             </div>
@@ -6247,10 +6399,14 @@
             selectedCampaigns = Array.from(checkboxes).map(cb => parseInt(cb.value));
             
             const generateBtn = document.getElementById('generateInvoiceBtn');
+            const reportBtn = document.getElementById('generateCampaignReportBtn');
+            
             if (selectedCampaigns.length > 0) {
                 generateBtn.style.display = 'inline-block';
+                reportBtn.style.display = 'inline-block';
             } else {
                 generateBtn.style.display = 'none';
+                reportBtn.style.display = 'none';
             }
         }
 
@@ -6584,6 +6740,436 @@
             printWindow.document.write(htmlContent);
             printWindow.document.close();
             showAlert('Invoice opening for printing! 🖨️', 'info');
+        }
+
+        // ============================================
+        // CAMPAIGN PERFORMANCE REPORT SYSTEM
+        // ============================================
+        let reportCampaignData = [];
+        let reportCreativeImages = [];
+
+        function showCampaignReportModal() {
+            const clientId = parseInt(document.getElementById('campaignClientSelect').value);
+            if (!clientId) {
+                showAlert('Please select a client first.', 'warning');
+                return;
+            }
+
+            const client = appData.clients.find(c => c.id === clientId);
+            if (!client) {
+                showAlert('Client not found.', 'danger');
+                return;
+            }
+
+            // Set client name
+            document.getElementById('reportClientName').value = client.companyName;
+
+            // Set default date range (current month)
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            document.getElementById('reportPeriodFrom').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('reportPeriodTo').value = today.toISOString().split('T')[0];
+
+            // Reset data
+            reportCampaignData = [];
+            reportCreativeImages = [];
+            document.getElementById('reportCampaignsTableBody').innerHTML = '';
+            document.getElementById('reportImagesPreview').innerHTML = '';
+            document.getElementById('reportTotalSpend').value = '0';
+            document.getElementById('reportTotalReach').value = '0';
+            document.getElementById('reportTotalImpressions').value = '0';
+            document.getElementById('reportCostEfficiency').value = '';
+            document.getElementById('reportEvidence').value = '';
+            document.getElementById('reportPreviewContent').innerHTML = '<p class="text-center text-muted py-5">Click "Generate Preview" to see the report</p>';
+
+            // Load existing campaigns for this client
+            const existingCampaigns = appData.campaigns.filter(c => c.clientId === clientId);
+            if (existingCampaigns.length > 0) {
+                existingCampaigns.forEach(campaign => {
+                    addCampaignRow({
+                        adName: campaign.adName,
+                        resultType: 'Link Clicks',
+                        results: campaign.results || 0,
+                        costPerResult: campaign.cpr || 0,
+                        reach: campaign.reach || 0,
+                        impressions: 0,
+                        spend: campaign.spend || 0,
+                        qualityRanking: 'Average',
+                        conversionRanking: 'Average'
+                    });
+                });
+                calculateTotals();
+            } else {
+                // Add one empty row
+                addCampaignRow();
+            }
+
+            new bootstrap.Modal(document.getElementById('campaignReportModal')).show();
+        }
+
+        function addCampaignRow(data = null) {
+            const tbody = document.getElementById('reportCampaignsTableBody');
+            const rowIndex = reportCampaignData.length;
+            
+            const rowData = data || {
+                adName: '',
+                resultType: 'Link Clicks',
+                results: 0,
+                costPerResult: 0,
+                reach: 0,
+                impressions: 0,
+                spend: 0,
+                qualityRanking: 'Average',
+                conversionRanking: 'Average'
+            };
+
+            reportCampaignData.push(rowData);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="form-control form-control-sm" value="${rowData.adName}" onchange="updateCampaignData(${rowIndex}, 'adName', this.value)"></td>
+                <td>
+                    <select class="form-select form-select-sm" onchange="updateCampaignData(${rowIndex}, 'resultType', this.value)">
+                        <option value="Link Clicks" ${rowData.resultType === 'Link Clicks' ? 'selected' : ''}>Link Clicks</option>
+                        <option value="Leads" ${rowData.resultType === 'Leads' ? 'selected' : ''}>Leads</option>
+                        <option value="Conversions" ${rowData.resultType === 'Conversions' ? 'selected' : ''}>Conversions</option>
+                        <option value="Page Likes" ${rowData.resultType === 'Page Likes' ? 'selected' : ''}>Page Likes</option>
+                        <option value="Post Engagement" ${rowData.resultType === 'Post Engagement' ? 'selected' : ''}>Post Engagement</option>
+                        <option value="Video Views" ${rowData.resultType === 'Video Views' ? 'selected' : ''}>Video Views</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control form-control-sm" value="${rowData.results}" onchange="updateCampaignData(${rowIndex}, 'results', parseFloat(this.value))"></td>
+                <td><input type="number" step="0.01" class="form-control form-control-sm" value="${rowData.costPerResult}" onchange="updateCampaignData(${rowIndex}, 'costPerResult', parseFloat(this.value))"></td>
+                <td><input type="number" class="form-control form-control-sm" value="${rowData.reach}" onchange="updateCampaignData(${rowIndex}, 'reach', parseFloat(this.value)); calculateTotals();"></td>
+                <td><input type="number" class="form-control form-control-sm" value="${rowData.impressions}" onchange="updateCampaignData(${rowIndex}, 'impressions', parseFloat(this.value)); calculateTotals();"></td>
+                <td><input type="number" step="0.01" class="form-control form-control-sm" value="${rowData.spend}" onchange="updateCampaignData(${rowIndex}, 'spend', parseFloat(this.value)); calculateTotals();"></td>
+                <td>
+                    <select class="form-select form-select-sm" onchange="updateCampaignData(${rowIndex}, 'qualityRanking', this.value)">
+                        <option value="Above Average" ${rowData.qualityRanking === 'Above Average' ? 'selected' : ''}>Above Average</option>
+                        <option value="Average" ${rowData.qualityRanking === 'Average' ? 'selected' : ''}>Average</option>
+                        <option value="Below Average" ${rowData.qualityRanking === 'Below Average' ? 'selected' : ''}>Below Average</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select form-select-sm" onchange="updateCampaignData(${rowIndex}, 'conversionRanking', this.value)">
+                        <option value="Above Average" ${rowData.conversionRanking === 'Above Average' ? 'selected' : ''}>Above Average</option>
+                        <option value="Average" ${rowData.conversionRanking === 'Average' ? 'selected' : ''}>Average</option>
+                        <option value="Below Average" ${rowData.conversionRanking === 'Below Average' ? 'selected' : ''}>Below Average</option>
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="removeCampaignRow(${rowIndex})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(row);
+        }
+
+        function updateCampaignData(index, field, value) {
+            if (reportCampaignData[index]) {
+                reportCampaignData[index][field] = value;
+            }
+        }
+
+        function removeCampaignRow(index) {
+            reportCampaignData.splice(index, 1);
+            const tbody = document.getElementById('reportCampaignsTableBody');
+            tbody.innerHTML = '';
+            reportCampaignData.forEach((data, idx) => {
+                addCampaignRow(data);
+            });
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            const totalSpend = reportCampaignData.reduce((sum, item) => sum + (parseFloat(item.spend) || 0), 0);
+            const totalReach = reportCampaignData.reduce((sum, item) => sum + (parseFloat(item.reach) || 0), 0);
+            const totalImpressions = reportCampaignData.reduce((sum, item) => sum + (parseFloat(item.impressions) || 0), 0);
+
+            document.getElementById('reportTotalSpend').value = totalSpend.toFixed(2);
+            document.getElementById('reportTotalReach').value = totalReach;
+            document.getElementById('reportTotalImpressions').value = totalImpressions;
+        }
+
+        function handleReportImageUpload(input) {
+            const files = input.files;
+            const previewContainer = document.getElementById('reportImagesPreview');
+
+            if (files.length + reportCreativeImages.length > 10) {
+                showAlert('Maximum 10 images allowed.', 'warning');
+                input.value = '';
+                return;
+            }
+
+            Array.from(files).forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert(`File "${file.name}" is too large. Max size is 5MB.`, 'warning');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgData = {
+                        name: file.name,
+                        data: e.target.result
+                    };
+                    reportCreativeImages.push(imgData);
+
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 mb-3';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${e.target.result}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted d-block text-truncate">${file.name}</small>
+                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeReportImage(${reportCreativeImages.length - 1})">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    previewContainer.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            input.value = '';
+        }
+
+        function removeReportImage(index) {
+            reportCreativeImages.splice(index, 1);
+            const previewContainer = document.getElementById('reportImagesPreview');
+            previewContainer.innerHTML = '';
+            reportCreativeImages.forEach((img, idx) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-3';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${img.data}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${img.name}</small>
+                            <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeReportImage(${idx})">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                previewContainer.appendChild(col);
+            });
+        }
+
+        function generateCampaignReportPreview() {
+            const clientName = document.getElementById('reportClientName').value;
+            const periodFrom = document.getElementById('reportPeriodFrom').value;
+            const periodTo = document.getElementById('reportPeriodTo').value;
+            const totalSpend = document.getElementById('reportTotalSpend').value;
+            const totalReach = document.getElementById('reportTotalReach').value;
+            const totalImpressions = document.getElementById('reportTotalImpressions').value;
+            const costEfficiency = document.getElementById('reportCostEfficiency').value;
+            const evidence = document.getElementById('reportEvidence').value;
+
+            if (reportCampaignData.length === 0) {
+                showAlert('Please add at least one campaign row.', 'warning');
+                return;
+            }
+
+            // Generate table rows
+            const tableRows = reportCampaignData.map(campaign => `
+                <tr>
+                    <td style="padding: 12px; border: 1px solid #ddd;">${campaign.adName || '-'}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd;">${campaign.resultType}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${campaign.results}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">Rs. ${parseFloat(campaign.costPerResult || 0).toFixed(2)}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${campaign.reach.toLocaleString()}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${campaign.impressions.toLocaleString()}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">Rs. ${parseFloat(campaign.spend || 0).toFixed(2)}</td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
+                        <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; background: ${campaign.qualityRanking === 'Above Average' ? '#d4edda' : campaign.qualityRanking === 'Average' ? '#fff3cd' : '#f8d7da'}; color: ${campaign.qualityRanking === 'Above Average' ? '#155724' : campaign.qualityRanking === 'Average' ? '#856404' : '#721c24'};">
+                            ${campaign.qualityRanking}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
+                        <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; background: ${campaign.conversionRanking === 'Above Average' ? '#d4edda' : campaign.conversionRanking === 'Average' ? '#fff3cd' : '#f8d7da'}; color: ${campaign.conversionRanking === 'Above Average' ? '#155724' : campaign.conversionRanking === 'Average' ? '#856404' : '#721c24'};">
+                            ${campaign.conversionRanking}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Generate image gallery
+            const imagesHTML = reportCreativeImages.length > 0 ? `
+                <div style="margin-top: 40px;">
+                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                        <i class="fas fa-images"></i> Creative Images (Evidence)
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                        ${reportCreativeImages.map((img, idx) => `
+                            <div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <img src="${img.data}" style="width: 100%; height: 200px; object-fit: cover;">
+                                <div style="padding: 10px; background: #f8f9fa;">
+                                    <small style="color: #666;">Image ${idx + 1}: ${img.name}</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            // Format cost efficiency with bullets
+            const costEfficiencyHTML = costEfficiency ? costEfficiency.split('\n').map(line => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('*')) {
+                    return `<li style="margin-bottom: 8px;">${trimmed.substring(1).trim()}</li>`;
+                } else if (trimmed) {
+                    return `<li style="margin-bottom: 8px;">${trimmed}</li>`;
+                }
+                return '';
+            }).join('') : '<li style="color: #999;">No cost efficiency analysis provided</li>';
+
+            const reportHTML = `
+                <div style="font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; background: white; padding: 40px;">
+                    <!-- Header -->
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #667eea; padding-bottom: 20px;">
+                        <h1 style="color: #667eea; margin: 0; font-size: 32px;">Ad Campaign Performance Report</h1>
+                        <p style="color: #666; margin: 10px 0 5px 0; font-size: 18px;">${clientName}</p>
+                        <p style="color: #999; margin: 0; font-size: 14px;">Report Period: ${formatDate(periodFrom)} - ${formatDate(periodTo)}</p>
+                        <p style="color: #999; margin: 5px 0 0 0; font-size: 12px;">Generated on ${formatDate(new Date())}</p>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Spend</div>
+                            <div style="font-size: 32px; font-weight: bold;">Rs. ${parseFloat(totalSpend).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Reach</div>
+                            <div style="font-size: 32px; font-weight: bold;">${parseInt(totalReach).toLocaleString()}</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 25px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Impressions</div>
+                            <div style="font-size: 32px; font-weight: bold;">${parseInt(totalImpressions).toLocaleString()}</div>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Performance Table -->
+                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                        <i class="fas fa-chart-line"></i> Campaign Performance Details
+                    </h3>
+                    <div style="overflow-x: auto; margin-bottom: 40px;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                            <thead>
+                                <tr style="background: #667eea; color: white;">
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ad Name</th>
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Result Type</th>
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Results</th>
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Cost/Result</th>
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Reach</th>
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Impressions</th>
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Spend (Rs)</th>
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Quality</th>
+                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Conv. Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Cost Efficiency Analysis -->
+                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                        <i class="fas fa-dollar-sign"></i> Cost Efficiency Analysis
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 40px;">
+                        <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+                            ${costEfficiencyHTML}
+                        </ul>
+                    </div>
+
+                    <!-- Evidence/Notes -->
+                    ${evidence ? `
+                        <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                            <i class="fas fa-clipboard-list"></i> Evidence & Additional Notes
+                        </h3>
+                        <div style="background: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 40px;">
+                            <p style="margin: 0; white-space: pre-wrap; line-height: 1.6;">${evidence}</p>
+                        </div>
+                    ` : ''}
+
+                    ${imagesHTML}
+
+                    <!-- Footer -->
+                    <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e0e0e0; text-align: center; color: #999; font-size: 12px;">
+                        <p style="margin: 5px 0;">Report generated by ${COMPANY_INFO.name}</p>
+                        <p style="margin: 5px 0;">${COMPANY_INFO.email} | ${COMPANY_INFO.tel}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('reportPreviewContent').innerHTML = reportHTML;
+            showAlert('Report preview generated successfully! 📊', 'success');
+            
+            // Scroll to preview
+            document.getElementById('reportPreviewContent').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function printCampaignReport() {
+            const reportContent = document.getElementById('reportPreviewContent').innerHTML;
+            
+            if (!reportContent || reportContent.includes('Click "Generate Preview"')) {
+                showAlert('Please generate the report preview first.', 'warning');
+                return;
+            }
+
+            const printWindow = window.open('', '_blank', 'width=1200,height=800');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Campaign Performance Report - ${document.getElementById('reportClientName').value}</title>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                            background: white;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                            }
+                            @page {
+                                margin: 1cm;
+                                size: A4;
+                            }
+                        }
+                        table {
+                            page-break-inside: auto;
+                        }
+                        tr {
+                            page-break-inside: avoid;
+                            page-break-after: auto;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${reportContent}
+                    <scr` + `ipt>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                            }, 500);
+                        };
+                    </scr` + `ipt>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            showAlert('Opening print dialog for campaign report... 🖨️', 'success');
         }
 
         // ============================================
