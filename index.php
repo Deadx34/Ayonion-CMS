@@ -6613,11 +6613,11 @@
                         <div class="info-grid">
                             <div class="info-item">
                                 <span class="info-label">Client Name:</span>
-                                <span class="info-value">${client.company_name || 'N/A'}</span>
+                                <span class="info-value">${client.companyName || 'N/A'}</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Partner ID:</span>
-                                <span class="info-value">${client.partner_id || 'undefined'}</span>
+                                <span class="info-value">${client.partnerId || 'N/A'}</span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Industry:</span>
