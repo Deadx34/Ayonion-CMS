@@ -6008,7 +6008,7 @@
                                 window.print();
                             }, 500);
                         };
-                    </script>
+                    <\/script>
                 </body>
                 </html>
             `;
