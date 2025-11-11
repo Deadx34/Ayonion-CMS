@@ -4397,9 +4397,6 @@
                 if (response.ok) {
                     const htmlContent = await response.text();
                     
-                    // Show report in modal with print/download buttons
-                    const html = `
-                    
                     // Show report in modal
                     document.getElementById('documentPreview').innerHTML = htmlContent;
                     
