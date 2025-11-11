@@ -27,37 +27,46 @@ Manual data entry for each campaign with the following columns:
 - **Auto-calculation**: Totals update automatically
 
 ### ✅ 4. Creative Images Upload
-- Upload multiple images (max 10 images)
+- Upload ad creatives, designs, social media posts
+- Multiple images supported (max 10 images)
 - 5MB per image limit
 - Preview with remove option
-- Images displayed in report as evidence
+- Separate section in report
 
-### ✅ 5. Automatic Totals
+### ✅ 5. Evidence Images Upload
+- Upload performance screenshots, analytics, proof of results
+- Multiple images supported (max 10 images)
+- 5MB per image limit
+- Preview with remove option
+- Separate section in report (distinct from creative images)
+
+### ✅ 6. Automatic Totals
 Real-time calculation of:
 - **Total Spend**: Sum of all campaign spending
 - **Total Reach**: Combined reach across campaigns
 - **Total Impressions**: Combined impressions
 
-### ✅ 6. Cost Efficiency Analysis
+### ✅ 7. Cost Efficiency Analysis
 - Text area for bullet-point analysis
 - Supports multiple formats: `•`, `-`, `*`
 - Auto-formats into bullet list in report
 
-### ✅ 7. Evidence & Notes
+### ✅ 8. Evidence & Notes
 - Additional notes section
 - Observations and insights
 - Performance commentary
 
-### ✅ 8. Report Preview
+### ✅ 9. Report Preview
 - Live preview before printing
 - Professional layout with:
   - Color-coded summary cards
   - Formatted data table
   - Quality/conversion ranking badges
-  - Image gallery
+  - Separate creative images gallery
+  - Separate evidence images gallery
   - Organized sections
 
-### ✅ 9. Print Functionality
+### ✅ 10. Print Functionality
 - Print-optimized layout
 - Proper page breaks
 - High-quality output
@@ -85,12 +94,18 @@ Real-time calculation of:
 4. Totals calculate automatically
 
 ### Step 4: Upload Creative Images
-1. Click **"Choose Files"** button
-2. Select multiple images (screenshots, creatives, evidence)
+1. Click **"Choose Files"** in **Creative Images** section
+2. Select ad creatives, designs, social media posts
 3. Review previews
 4. Remove any unwanted images
 
-### Step 5: Add Analysis
+### Step 5: Upload Evidence Images
+1. Click **"Choose Files"** in **Evidence Images** section
+2. Select performance screenshots, analytics, proof of results
+3. Review previews
+4. Remove any unwanted images
+
+### Step 6: Add Analysis
 1. **Cost Efficiency**: Enter bullet points like:
    ```
    • Cost per click decreased by 15%
@@ -105,13 +120,13 @@ Real-time calculation of:
    Conversion rate ranking shows consistent growth.
    ```
 
-### Step 6: Generate & Review
+### Step 7: Generate & Review
 1. Click **"Generate Preview"** button
 2. Review the formatted report
 3. Check all data is correct
 4. Scroll through all sections
 
-### Step 7: Print Report
+### Step 8: Print Report
 1. Click **"Print Report"** button
 2. Choose printer or "Save as PDF"
 3. Configure print settings
@@ -150,10 +165,17 @@ Comprehensive data table with:
 - Observations
 - Commentary
 
-### 🖼️ Creative Gallery
-- Grid layout of all uploaded images
+### 🎨 Creative Images Gallery
+- Grid layout of all uploaded creative images
+- Ad designs, posts, creatives
 - Image names displayed
-- High-quality presentation
+- Purple/blue theme
+
+### 📊 Evidence Images Gallery
+- Grid layout of all uploaded evidence images
+- Performance screenshots, analytics, proof
+- Image names displayed
+- Green theme (separate from creatives)
 
 ### 📄 Footer
 - Company information
@@ -170,9 +192,11 @@ Comprehensive data table with:
 
 ### Images
 - ✅ Upload high-quality screenshots
-- ✅ Include creative designs
-- ✅ Add performance screenshots
-- ✅ Max 10 images for clean layout
+- ✅ **Creative Images**: Ad designs, posts, creatives
+- ✅ **Evidence Images**: Performance screenshots, analytics, proofs
+- ✅ Keep creatives and evidence separate for clarity
+- ✅ Max 10 images per section
+- ✅ Use descriptive file names
 
 ### Analysis
 - ✅ Be specific in cost efficiency points

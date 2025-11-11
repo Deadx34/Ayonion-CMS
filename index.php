@@ -1987,18 +1987,37 @@
                         <!-- Creative Images Section -->
                         <div class="card mb-4">
                             <div class="card-header bg-white">
-                                <h6 class="mb-0"><i class="fas fa-images me-2"></i>Creative Images (Evidence)</h6>
+                                <h6 class="mb-0"><i class="fas fa-images me-2"></i>Creative Images</h6>
                             </div>
                             <div class="card-body">
                                 <div class="row mb-3">
                                     <div class="col-12">
                                         <label class="form-label">Upload Creative Images</label>
                                         <input type="file" class="form-control" id="reportCreativeImages" accept="image/*" multiple onchange="handleReportImageUpload(this)">
-                                        <small class="text-muted">You can select multiple images (Max 10 images, 5MB each)</small>
+                                        <small class="text-muted">Upload ad creatives, designs, posts (Max 10 images, 5MB each)</small>
                                     </div>
                                 </div>
                                 <div class="row" id="reportImagesPreview">
                                     <!-- Image previews will be shown here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Evidence Images Section -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-white">
+                                <h6 class="mb-0"><i class="fas fa-file-image me-2"></i>Evidence Images</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Upload Evidence Screenshots</label>
+                                        <input type="file" class="form-control" id="reportEvidenceImages" accept="image/*" multiple onchange="handleEvidenceImageUpload(this)">
+                                        <small class="text-muted">Upload performance screenshots, analytics, proof (Max 10 images, 5MB each)</small>
+                                    </div>
+                                </div>
+                                <div class="row" id="reportEvidenceImagesPreview">
+                                    <!-- Evidence image previews will be shown here -->
                                 </div>
                             </div>
                         </div>
@@ -6747,6 +6766,7 @@
         // ============================================
         let reportCampaignData = [];
         let reportCreativeImages = [];
+        let reportEvidenceImages = [];
 
         function showCampaignReportModal() {
             const clientId = parseInt(document.getElementById('campaignClientSelect').value);
@@ -6773,8 +6793,10 @@
             // Reset data
             reportCampaignData = [];
             reportCreativeImages = [];
+            reportEvidenceImages = [];
             document.getElementById('reportCampaignsTableBody').innerHTML = '';
             document.getElementById('reportImagesPreview').innerHTML = '';
+            document.getElementById('reportEvidenceImagesPreview').innerHTML = '';
             document.getElementById('reportTotalSpend').value = '0';
             document.getElementById('reportTotalReach').value = '0';
             document.getElementById('reportTotalImpressions').value = '0';
@@ -6960,6 +6982,78 @@
             });
         }
 
+        // EVIDENCE IMAGES HANDLER
+        function handleEvidenceImageUpload(input) {
+            const files = Array.from(input.files);
+            
+            if (reportEvidenceImages.length + files.length > 10) {
+                showAlert('Maximum 10 evidence images allowed.', 'warning');
+                return;
+            }
+
+            const previewContainer = document.getElementById('reportEvidenceImagesPreview');
+
+            files.forEach(file => {
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert(`File ${file.name} is too large. Maximum size is 5MB.`, 'warning');
+                    return;
+                }
+
+                if (!file.type.startsWith('image/')) {
+                    showAlert(`File ${file.name} is not an image.`, 'warning');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    reportEvidenceImages.push({
+                        name: file.name,
+                        data: e.target.result
+                    });
+
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 mb-3';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${e.target.result}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted d-block text-truncate">${file.name}</small>
+                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeEvidenceImage(${reportEvidenceImages.length - 1})">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    previewContainer.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            input.value = '';
+        }
+
+        function removeEvidenceImage(index) {
+            reportEvidenceImages.splice(index, 1);
+            const previewContainer = document.getElementById('reportEvidenceImagesPreview');
+            previewContainer.innerHTML = '';
+            reportEvidenceImages.forEach((img, idx) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-3';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${img.data}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${img.name}</small>
+                            <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeEvidenceImage(${idx})">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                previewContainer.appendChild(col);
+            });
+        }
+
         function generateCampaignReportPreview() {
             const clientName = document.getElementById('reportClientName').value;
             const periodFrom = document.getElementById('reportPeriodFrom').value;
@@ -6998,18 +7092,37 @@
                 </tr>
             `).join('');
 
-            // Generate image gallery
-            const imagesHTML = reportCreativeImages.length > 0 ? `
+            // Generate creative images gallery
+            const creativeImagesHTML = reportCreativeImages.length > 0 ? `
                 <div style="margin-top: 40px;">
                     <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
-                        <i class="fas fa-images"></i> Creative Images (Evidence)
+                        <i class="fas fa-palette"></i> Creative Images
                     </h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
                         ${reportCreativeImages.map((img, idx) => `
                             <div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                                 <img src="${img.data}" style="width: 100%; height: 200px; object-fit: cover;">
                                 <div style="padding: 10px; background: #f8f9fa;">
-                                    <small style="color: #666;">Image ${idx + 1}: ${img.name}</small>
+                                    <small style="color: #666;">Creative ${idx + 1}: ${img.name}</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : '';
+
+            // Generate evidence images gallery
+            const evidenceImagesHTML = reportEvidenceImages.length > 0 ? `
+                <div style="margin-top: 40px;">
+                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
+                        <i class="fas fa-chart-line"></i> Evidence Images
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                        ${reportEvidenceImages.map((img, idx) => `
+                            <div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <img src="${img.data}" style="width: 100%; height: 200px; object-fit: cover;">
+                                <div style="padding: 10px; background: #f8f9fa;">
+                                    <small style="color: #666;">Evidence ${idx + 1}: ${img.name}</small>
                                 </div>
                             </div>
                         `).join('')}
@@ -7099,7 +7212,8 @@
                         </div>
                     ` : ''}
 
-                    ${imagesHTML}
+                    ${creativeImagesHTML}
+                    ${evidenceImagesHTML}
 
                     <!-- Footer -->
                     <div style="margin-top: 60px; padding-top: 20px; border-top: 2px solid #e0e0e0; text-align: center; color: #999; font-size: 12px;">
