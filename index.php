@@ -289,61 +289,6 @@
                         </form>
                     </div>
                 </div>
-                
-                <!-- Auto Carry Forward System Card -->
-                <div class="card mt-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-sync-alt me-2"></i>Auto Carry Forward System</span>
-                        <span class="badge bg-success">Active</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>How it works:</h6>
-                            <ul class="mb-0">
-                                <li>Each month starts with <strong>40 credits</strong> as package credits</li>
-                                <li>Any unused credits automatically carry forward to the next month</li>
-                                <li>Example: Used 30 credits → 10 carry forward → Next month starts with 50 total credits (40 + 10)</li>
-                                <li>System runs automatically when client's renewal date is reached</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5 class="text-primary">40</h5>
-                                        <p class="mb-0">Default Monthly Credits</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5 class="text-success">Auto</h5>
-                                        <p class="mb-0">Unused Credits Carry Forward</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <button class="btn btn-primary" onclick="runAutoCarryForward()">
-                                <i class="fas fa-play-circle me-2"></i>Run Auto Carry Forward Now
-                            </button>
-                            <button class="btn btn-outline-secondary ms-2" onclick="viewCarryForwardLog()">
-                                <i class="fas fa-history me-2"></i>View Process Log
-                            </button>
-                        </div>
-                        
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                <i class="fas fa-clock me-1"></i>
-                                <strong>Note:</strong> For production, set up a cron job to run this automatically:
-                                <code class="ms-2">0 0 1 * * php handler_auto_carry_forward.php</code>
-                            </small>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div id="clients" class="section">
@@ -780,6 +725,11 @@
                                 <label class="form-label">Monthly Renewal Date</label>
                                 <input type="date" class="form-control" id="editRenewalDate" required>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Subscription Duration (Months)</label>
+                                <input type="number" class="form-control" id="editSubscriptionMonths" required min="1">
+                                <small class="text-muted">Auto carry forward will work for this duration</small>
+                            </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label d-block">Managing Platforms</label>
                                 <div class="row">
@@ -948,6 +898,11 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Monthly Renewal Date</label>
                                 <input type="date" class="form-control" id="renewalDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Subscription Duration (Months)</label>
+                                <input type="number" class="form-control" id="subscriptionMonths" required min="1" value="12">
+                                <small class="text-muted">Auto carry forward will work for this duration</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Package Content Credits</label>
@@ -2280,6 +2235,9 @@
             
             // Load company settings for sidebar header and reports
             await loadCompanySettings();
+            
+            // Automatically check and run carry forward for eligible clients
+            await checkAndRunAutoCarryForward();
         }
 
         // Load company settings for reports and sidebar
@@ -2548,35 +2506,23 @@
         // AUTO CARRY FORWARD SYSTEM
         // ============================================
         
-        async function runAutoCarryForward() {
-            const confirmed = await showConfirm(
-                'This will process all clients whose renewal dates have passed and automatically carry forward their unused credits. Continue?',
-                'Run Auto Carry Forward',
-                'warning'
-            );
-            
-            if (!confirmed) return;
-            
+        // AUTO CARRY FORWARD SYSTEM - Automated & Silent
+        async function checkAndRunAutoCarryForward() {
             try {
-                showAlert('Processing auto carry forward... Please wait.', 'info', 3000);
-                
-                const response = await fetch('handler_auto_carry_forward.php?manual=true', {
-                    method: 'GET',
+                const response = await fetch('handler_clients.php', {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin'
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ action: 'auto_carry_forward' })
                 });
                 
                 const result = await response.json();
                 
-                if (result.success) {
-                    showAlert(`✅ ${result.message}`, 'success', 5000);
+                if (result.success && result.processed_count > 0) {
+                    console.log(`✅ Auto Carry Forward: ${result.processed_count} client(s) processed`);
+                    console.log('Results:', result.results);
                     
-                    // Show detailed results in a modal
-                    if (result.results && result.results.length > 0) {
-                        showCarryForwardResults(result.results, result.processed_count, result.error_count);
-                    }
-                    
-                    // Reload data to reflect changes
+                    // Silently reload data to reflect changes
                     await loadAllDataFromPHP();
                     
                     // Reload current view if on clients or content page
@@ -2585,84 +2531,11 @@
                     } else if (document.getElementById('content').classList.contains('active')) {
                         loadContentCredits();
                     }
-                } else {
-                    showAlert('Auto carry forward failed: ' + result.message, 'danger');
                 }
             } catch (error) {
-                console.error('Auto carry forward error:', error);
-                showAlert('Failed to run auto carry forward: ' + error.message, 'danger');
+                console.error('Auto carry forward check error:', error);
             }
         }
-        
-        function showCarryForwardResults(results, successCount, errorCount) {
-            let html = `
-                <div style="max-height: 400px; overflow-y: auto;">
-                    <div class="alert alert-${errorCount > 0 ? 'warning' : 'success'}">
-                        <strong>Summary:</strong> ${successCount} client(s) processed successfully${errorCount > 0 ? `, ${errorCount} error(s)` : ''}.
-                    </div>
-                    <table class="table table-sm table-striped">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Brought Forward</th>
-                                <th>New Total</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            results.forEach(r => {
-                if (r.status === 'success') {
-                    html += `
-                        <tr>
-                            <td>${r.client_name}</td>
-                            <td><span class="badge bg-info">${r.carried_forward} credits</span></td>
-                            <td><span class="badge bg-success">${r.new_total} total</span></td>
-                            <td><i class="fas fa-check-circle text-success"></i> Success</td>
-                        </tr>
-                    `;
-                } else {
-                    html += `
-                        <tr>
-                            <td>${r.client_name}</td>
-                            <td colspan="2"><small class="text-danger">${r.error}</small></td>
-                            <td><i class="fas fa-exclamation-circle text-danger"></i> Error</td>
-                        </tr>
-                    `;
-                }
-            });
-            
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            document.getElementById('documentPreview').innerHTML = html;
-            showDocumentModal();
-        }
-        
-        async function viewCarryForwardLog() {
-            try {
-                const response = await fetch('logs/auto_carry_forward.log');
-                if (response.ok) {
-                    const logContent = await response.text();
-                    
-                    let html = `
-                        <div style="background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; max-height: 600px; overflow-y: auto;">
-                            <h5 style="color: #4ec9b0; margin-bottom: 15px;">
-                                <i class="fas fa-file-alt"></i> Auto Carry Forward Process Log
-                            </h5>
-                            <pre style="color: #d4d4d4; margin: 0; white-space: pre-wrap;">${logContent || 'No log entries found.'}</pre>
-                        </div>
-                    `;
-                    
-                    document.getElementById('documentPreview').innerHTML = html;
-                    showDocumentModal();
-                } else {
-                    showAlert('Log file not found. No carry forward process has been run yet.', 'info');
-                }
             } catch (error) {
                 showAlert('Unable to load log file: ' + error.message, 'warning');
             }
@@ -3178,6 +3051,7 @@
                 partnerId: document.getElementById('partnerId').value.trim(),
                 companyName: companyName,
                 renewalDate: document.getElementById('renewalDate').value,
+                subscriptionMonths: parseInt(document.getElementById('subscriptionMonths').value) || 12,
                 packageCredits: packageCreditsValue,
                 managingPlatforms: managingPlatformsStr,
                 industry: document.getElementById('industry').value,
@@ -3422,6 +3296,7 @@
             document.getElementById('editPartnerId').value = client.partnerId;
             document.getElementById('editCompanyName').value = client.companyName;
             document.getElementById('editRenewalDate').value = client.renewalDate;
+            document.getElementById('editSubscriptionMonths').value = client.subscriptionMonths || 12;
             
             // Set managing platforms checkboxes
             document.querySelectorAll('.edit-managing-platform').forEach(checkbox => {
@@ -3579,6 +3454,7 @@
                 partnerId: document.getElementById('editPartnerId').value.trim(),
                 companyName: document.getElementById('editCompanyName').value.trim(),
                 renewalDate: document.getElementById('editRenewalDate').value,
+                subscriptionMonths: parseInt(document.getElementById('editSubscriptionMonths').value) || 12,
                 managingPlatforms: managingPlatformsStr,
                 industry: document.getElementById('editIndustry').value,
                 totalAdBudget: parseFloat(document.getElementById('editTotalAdBudget').value) || 0,

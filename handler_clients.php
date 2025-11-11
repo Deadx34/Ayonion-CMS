@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
     $partnerId = $conn->real_escape_string($input['partnerId'] ?? '');
     $companyName = $conn->real_escape_string($input['companyName'] ?? '');
     $renewalDate = $conn->real_escape_string($input['renewalDate'] ?? null);
+    $subscriptionMonths = (int)($input['subscriptionMonths'] ?? 12);
     $packageCredits = (int)($input['packageCredits'] ?? 0);
     $managingPlatforms = $conn->real_escape_string($input['managingPlatforms'] ?? '');
     $industry = $conn->real_escape_string($input['industry'] ?? '');
@@ -26,12 +27,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
         $logoUrl = '';
     }
     
+    // Calculate subscription dates
+    $subscriptionStartDate = $renewalDate;
+    $subscriptionEndDate = null;
+    if ($renewalDate) {
+        $subscriptionEndDate = date('Y-m-d', strtotime($renewalDate . " +{$subscriptionMonths} months"));
+    }
+    
     // FIX: Using NULL for renewalDate if not provided.
     $sql = "INSERT INTO clients (
-        id, partner_id, company_name, renewal_date, package_credits, managing_platforms, industry, logo_url,
+        id, partner_id, company_name, renewal_date, subscription_months, subscription_start_date, subscription_end_date,
+        package_credits, managing_platforms, industry, logo_url,
         extra_credits, carried_forward_credits, used_credits, total_ad_budget, total_spent
     ) VALUES (
-        '$id', '$partnerId', '$companyName', " . ($renewalDate ? "'$renewalDate'" : "NULL") . ", $packageCredits, 
+        '$id', '$partnerId', '$companyName', " . ($renewalDate ? "'$renewalDate'" : "NULL") . ", 
+        $subscriptionMonths, " . ($subscriptionStartDate ? "'$subscriptionStartDate'" : "NULL") . ", 
+        " . ($subscriptionEndDate ? "'$subscriptionEndDate'" : "NULL") . ", $packageCredits, 
         '$managingPlatforms', '$industry', '$logoUrl', 
         0, 0, 0, 0.00, 0.00
     )";
@@ -102,15 +113,21 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
     $partnerId = $conn->real_escape_string($input['partnerId'] ?? '');
     $companyName = $conn->real_escape_string($input['companyName'] ?? '');
     $renewalDate = $conn->real_escape_string($input['renewalDate'] ?? '');
+    $subscriptionMonths = (int)($input['subscriptionMonths'] ?? 12);
     $managingPlatforms = $conn->real_escape_string($input['managingPlatforms'] ?? '');
     $industry = $conn->real_escape_string($input['industry'] ?? '');
     $totalAdBudget = (float)($input['totalAdBudget'] ?? 0);
     $logoUrl = $conn->real_escape_string($input['logoUrl'] ?? '');
     
+    // Recalculate subscription end date if subscription months changed
+    $subscriptionEndDate = date('Y-m-d', strtotime($renewalDate . " +{$subscriptionMonths} months"));
+    
     $sql = "UPDATE clients SET 
         partner_id = '$partnerId',
         company_name = '$companyName',
         renewal_date = '$renewalDate',
+        subscription_months = $subscriptionMonths,
+        subscription_end_date = '$subscriptionEndDate',
         managing_platforms = '$managingPlatforms',
         industry = '$industry',
         total_ad_budget = $totalAdBudget,
@@ -127,7 +144,71 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
         echo json_encode(["success" => false, "message" => "Failed to update client: " . $conn->error]);
     }
 }
-// --- 5. ERROR HANDLING ---
+// --- 5. HANDLE AUTO CARRY FORWARD (POST) ---
+else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'auto_carry_forward') {
+    $today = date('Y-m-d');
+    $results = [];
+    $processed = 0;
+    
+    // Get clients whose renewal date has passed and subscription is still active
+    // Only process if last carry forward was not done for current renewal period
+    $sql = "SELECT * FROM clients 
+            WHERE renewal_date <= '$today' 
+            AND (subscription_end_date IS NULL OR subscription_end_date >= '$today')
+            AND (last_carry_forward_date IS NULL OR last_carry_forward_date < renewal_date)";
+    
+    $result = query_db($conn, $sql);
+    
+    if ($result && $result->num_rows > 0) {
+        while ($client = $result->fetch_assoc()) {
+            $clientId = $client['id'];
+            $currentRenewal = $client['renewal_date'];
+            
+            // Calculate unused credits
+            $totalCredits = $client['package_credits'] + $client['extra_credits'] + $client['carried_forward_credits'];
+            $unusedCredits = $totalCredits - $client['used_credits'];
+            
+            if ($unusedCredits > 0) {
+                // Move to next month
+                $newRenewalDate = date('Y-m-d', strtotime($currentRenewal . ' +1 month'));
+                
+                // Update client: carry forward unused credits, reset used credits, update renewal date
+                $updateSql = "UPDATE clients SET 
+                             carried_forward_credits = $unusedCredits,
+                             used_credits = 0,
+                             renewal_date = '$newRenewalDate',
+                             last_carry_forward_date = '$today'
+                             WHERE id = $clientId";
+                
+                if (query_db($conn, $updateSql)) {
+                    $processed++;
+                    $results[] = [
+                        'client_id' => $clientId,
+                        'client_name' => $client['company_name'],
+                        'carried_forward' => $unusedCredits,
+                        'new_renewal_date' => $newRenewalDate,
+                        'subscription_end_date' => $client['subscription_end_date']
+                    ];
+                }
+            } else {
+                // Even if no credits to carry forward, update renewal date
+                $newRenewalDate = date('Y-m-d', strtotime($currentRenewal . ' +1 month'));
+                $updateSql = "UPDATE clients SET 
+                             renewal_date = '$newRenewalDate',
+                             last_carry_forward_date = '$today'
+                             WHERE id = $clientId";
+                query_db($conn, $updateSql);
+            }
+        }
+    }
+    
+    echo json_encode([
+        'success' => true,
+        'processed_count' => $processed,
+        'results' => $results
+    ]);
+}
+// --- 6. ERROR HANDLING ---
 else {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "Invalid API endpoint request."]);
