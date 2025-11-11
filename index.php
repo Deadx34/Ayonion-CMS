@@ -2509,11 +2509,11 @@
         // AUTO CARRY FORWARD SYSTEM - Automated & Silent
         async function checkAndRunAutoCarryForward() {
             try {
-                const response = await fetch('handler_clients.php', {
+                const response = await fetch('handler_clients.php?action=auto_carry_forward', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ action: 'auto_carry_forward' })
+                    body: JSON.stringify({})
                 });
                 
                 const result = await response.json();
