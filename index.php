@@ -2536,10 +2536,6 @@
                 console.error('Auto carry forward check error:', error);
             }
         }
-            } catch (error) {
-                showAlert('Unable to load log file: ' + error.message, 'warning');
-            }
-        }
 
         // ✅ NEW: Content image upload handler
         async function handleContentImageUpload(input) {
