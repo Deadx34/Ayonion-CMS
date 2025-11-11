@@ -1,6 +1,111 @@
+# Configuration files with sensitive data
 includes/config.php
+
+# Dependencies
 /vendor/
 /node_modules/
+
+# Operating System files
 .DS_Store
 Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Environment files
 .env
+.env.local
+.env.*.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+*.code-workspace
+
+# Logs and temporary files
+*.log
+logs/
+*.tmp
+*.temp
+*.cache
+
+# Backup files
+*.bak
+*.backup
+*.old
+*~
+
+# Documentation markdown files (generated/temporary)
+AUTO_CARRY_FORWARD_COMPLETE.md
+AUTO_CARRY_FORWARD_REVAMP.md
+DATABASE_MIGRATION_GUIDE.md
+DEPLOYMENT_CHECKLIST.md
+QUICK_START.md
+SYSTEM_FLOW_DIAGRAM.md
+URL_ROUTING_FIX.md
+
+# Test files
+test_*.html
+test_*.php
+*_test.php
+*_test.html
+
+# Backup/Old files
+app.html
+cleanup_project.ps1
+
+# Database files (local development)
+*.sql.backup
+*.db.backup
+
+# Uploaded files (user content)
+uploads/logos/*
+!uploads/logos/.gitkeep
+uploads/content_images/*
+!uploads/content_images/.gitkeep
+
+# PHP temporary files
+*.php~
+*.phps
+
+# Windows
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+
+# macOS
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+.directory
+.Trash-*
+
+# Compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Package files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Session files
+sessions/
+tmp/
+temp/

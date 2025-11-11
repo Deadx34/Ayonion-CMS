@@ -4,11 +4,28 @@
     SecFilterScanPOST Off
 </IfModule>
 
-# Allow POST requests
+# Set default index file - index.php has priority
+DirectoryIndex index.php?i=1 index.php index.html
+
+# Allow POST requests and handle routing
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /ayonion-cms/
+    
+    # Force ?i=1 parameter when accessing root directory
+    RewriteCond %{REQUEST_URI} ^/ayonion-cms/?$ [NC]
+    RewriteCond %{QUERY_STRING} !i= [NC]
+    RewriteRule ^(.*)$ /ayonion-cms/index.php?i=1 [R=301,L]
+    
+    # Ensure session handling works for POST requests
     RewriteCond %{REQUEST_METHOD} POST
     RewriteRule .* - [E=HTTP_X_REQUESTED_WITH:XMLHttpRequest]
+    
+    # Redirect other requests to index.php with parameter
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !\.(css|js|jpg|jpeg|png|gif|svg|ico|woff|woff2|ttf|eot|php)$ [NC]
+    RewriteRule ^(.*)$ index.php?i=1 [L,QSA]
 </IfModule>
 
 # Allow access to uploads directory
