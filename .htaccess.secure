@@ -1,0 +1,211 @@
+# =================================================
+# AYONION CMS - SECURE .HTACCESS CONFIGURATION
+# =================================================
+
+# Security headers and ModSecurity bypass for free hosting
+<IfModule mod_security.c>
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>
+
+# =================================================
+# SECURITY HEADERS
+# =================================================
+
+# Prevent clickjacking attacks
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    
+    # Remove server signature
+    Header unset Server
+    Header unset X-Powered-By
+    
+    # HSTS (HTTPS only - uncomment if using SSL)
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+</IfModule>
+
+# =================================================
+# DIRECTORY INDEX
+# =================================================
+
+DirectoryIndex index.php?i=1 index.php index.html
+
+# Disable directory browsing
+Options -Indexes
+
+# =================================================
+# URL REWRITING
+# =================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /ayonion-cms/
+    
+    # Force ?i=1 parameter when accessing root directory
+    RewriteCond %{REQUEST_URI} ^/ayonion-cms/?$ [NC]
+    RewriteCond %{QUERY_STRING} !i= [NC]
+    RewriteRule ^(.*)$ /ayonion-cms/index.php?i=1 [R=301,L]
+    
+    # Block access to sensitive files
+    RewriteRule ^includes/ - [F,L]
+    RewriteRule ^\.git/ - [F,L]
+    RewriteRule ^\.env$ - [F,L]
+    RewriteRule \.sql$ - [F,L]
+    RewriteRule \.md$ - [F,L]
+    
+    # Ensure session handling works for POST requests
+    RewriteCond %{REQUEST_METHOD} POST
+    RewriteRule .* - [E=HTTP_X_REQUESTED_WITH:XMLHttpRequest]
+    
+    # Redirect other requests to index.php with parameter
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !\.(css|js|jpg|jpeg|png|gif|svg|ico|woff|woff2|ttf|eot|php)$ [NC]
+    RewriteRule ^(.*)$ index.php?i=1 [L,QSA]
+</IfModule>
+
+# =================================================
+# FILE ACCESS RESTRICTIONS
+# =================================================
+
+# Protect config files
+<Files "config.php">
+    Require all denied
+</Files>
+
+<Files ".htaccess">
+    Require all denied
+</Files>
+
+<Files ".env">
+    Require all denied
+</Files>
+
+# Protect git files
+<FilesMatch "^\.git">
+    Require all denied
+</FilesMatch>
+
+# Protect database files
+<FilesMatch "\.(sql|db|sqlite)$">
+    Require all denied
+</FilesMatch>
+
+# Protect markdown documentation
+<FilesMatch "\.md$">
+    Require all denied
+</FilesMatch>
+
+# Protect backup files
+<FilesMatch "\.(bak|backup|old|swp|swo|~)$">
+    Require all denied
+</FilesMatch>
+
+# =================================================
+# UPLOADS DIRECTORY SECURITY
+# =================================================
+
+# Allow access but prevent directory listing
+<Directory "uploads">
+    Options -Indexes +FollowSymLinks
+    AllowOverride None
+    Require all granted
+    
+    # Prevent PHP execution in uploads
+    <FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+        Require all denied
+    </FilesMatch>
+</Directory>
+
+# Extra protection for logos directory
+<Directory "uploads/logos">
+    Options -Indexes -ExecCGI
+    AddHandler cgi-script .php .php3 .php4 .php5 .phtml .pl .py .jsp .asp .sh .cgi
+    
+    <FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+        Require all denied
+    </FilesMatch>
+</Directory>
+
+# Extra protection for content_images directory
+<Directory "uploads/content_images">
+    Options -Indexes -ExecCGI
+    AddHandler cgi-script .php .php3 .php4 .php5 .phtml .pl .py .jsp .asp .sh .cgi
+    
+    <FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+        Require all denied
+    </FilesMatch>
+</Directory>
+
+# =================================================
+# INCLUDES DIRECTORY PROTECTION
+# =================================================
+
+<Directory "includes">
+    Require all denied
+</Directory>
+
+# =================================================
+# MIME TYPES & CHARACTER ENCODING
+# =================================================
+
+<IfModule mod_mime.c>
+    AddType application/javascript js
+    AddType application/json json
+    AddCharset utf-8 .html .css .js .json .xml .txt
+</IfModule>
+
+# =================================================
+# DISABLE SERVER SIGNATURE
+# =================================================
+
+ServerSignature Off
+
+# =================================================
+# LIMIT REQUEST METHODS
+# =================================================
+
+<LimitExcept GET POST HEAD>
+    Require all denied
+</LimitExcept>
+
+# =================================================
+# PHP SECURITY SETTINGS
+# =================================================
+
+<IfModule mod_php7.c>
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_flag expose_php Off
+    php_value session.cookie_httponly 1
+    php_value session.cookie_secure 1
+    php_value session.use_strict_mode 1
+    php_value session.use_only_cookies 1
+</IfModule>
+
+# =================================================
+# COMPRESSION (Optional - for performance)
+# =================================================
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# =================================================
+# BROWSER CACHING (Optional - for performance)
+# =================================================
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
