@@ -7282,10 +7282,6 @@
             printWindow.document.close();
             showAlert('Opening print dialog for campaign report... 🖨️', 'success');
         }
-
-        // ============================================
-        // INITIALIZE APP ON LOAD
-        // ============================================
         document.addEventListener('DOMContentLoaded', function() {
             initializeTableSorting();
         });
