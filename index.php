@@ -4794,6 +4794,7 @@
                     const result = await response.json();
                     
                     if (result.success && result.image_url) {
+                        const currentIndex = campaignEvidenceImages.length;
                         campaignEvidenceImages.push({
                             url: result.image_url,
                             name: file.name
@@ -4807,25 +4808,23 @@
                                 <img src="${result.image_url}" class="card-img-top" style="height: 120px; object-fit: cover;">
                                 <div class="card-body p-2">
                                     <small class="text-muted d-block text-truncate">${file.name}</small>
-                                    <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeCampaignEvidenceImage(${campaignEvidenceImages.length - 1})">
+                                    <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeCampaignEvidenceImage(${currentIndex})">
                                         <i class="fas fa-trash me-1"></i>Remove
                                     </button>
                                 </div>
                             </div>
                         `;
                         previewContainer.appendChild(col);
+                        showAlert(`${file.name} uploaded! ✅`, 'success');
                     } else {
                         throw new Error(result.message || 'Upload failed');
                     }
                 } catch (error) {
-                    showAlert('Error uploading evidence image: ' + error.message, 'danger');
+                    showAlert('Error uploading ' + file.name + ': ' + error.message, 'danger');
                 }
             }
             
             input.value = '';
-            if (campaignEvidenceImages.length > 0) {
-                showAlert(`${campaignEvidenceImages.length} evidence image(s) uploaded! ✅`, 'success');
-            }
         }
 
         // Handle Creative Image Upload (Multiple)
@@ -4848,6 +4847,7 @@
                     const result = await response.json();
                     
                     if (result.success && result.image_url) {
+                        const currentIndex = campaignCreativeImages.length;
                         campaignCreativeImages.push({
                             url: result.image_url,
                             name: file.name
@@ -4861,25 +4861,23 @@
                                 <img src="${result.image_url}" class="card-img-top" style="height: 120px; object-fit: cover;">
                                 <div class="card-body p-2">
                                     <small class="text-muted d-block text-truncate">${file.name}</small>
-                                    <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeCampaignCreativeImage(${campaignCreativeImages.length - 1})">
+                                    <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeCampaignCreativeImage(${currentIndex})">
                                         <i class="fas fa-trash me-1"></i>Remove
                                     </button>
                                 </div>
                             </div>
                         `;
                         previewContainer.appendChild(col);
+                        showAlert(`${file.name} uploaded! ✅`, 'success');
                     } else {
                         throw new Error(result.message || 'Upload failed');
                     }
                 } catch (error) {
-                    showAlert('Error uploading creative image: ' + error.message, 'danger');
+                    showAlert('Error uploading ' + file.name + ': ' + error.message, 'danger');
                 }
             }
             
             input.value = '';
-            if (campaignCreativeImages.length > 0) {
-                showAlert(`${campaignCreativeImages.length} creative image(s) uploaded! ✅`, 'success');
-            }
         }
 
         function removeCampaignEvidenceImage(index) {
