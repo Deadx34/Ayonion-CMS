@@ -7161,7 +7161,7 @@
                         results: campaign.results || 0,
                         costPerResult: campaign.cpr || 0,
                         reach: campaign.reach || 0,
-                        impressions: 0,
+                        impressions: campaign.impressions || 0,
                         spend: campaign.spend || 0,
                         qualityRanking: 'Average',
                         conversionRanking: 'Average'
