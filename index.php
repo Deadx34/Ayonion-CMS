@@ -7502,20 +7502,20 @@
             // Generate table rows
             const tableRows = reportCampaignData.map(campaign => `
                 <tr>
-                    <td style="padding: 12px; border: 1px solid #ddd;">${campaign.adName || '-'}</td>
-                    <td style="padding: 12px; border: 1px solid #ddd;">${campaign.resultType}</td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${campaign.results}</td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">Rs. ${parseFloat(campaign.costPerResult || 0).toFixed(2)}</td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${campaign.reach.toLocaleString()}</td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">${campaign.impressions.toLocaleString()}</td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: right;">Rs. ${parseFloat(campaign.spend || 0).toFixed(2)}</td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
-                        <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; background: ${campaign.qualityRanking === 'Above Average' ? '#d4edda' : campaign.qualityRanking === 'Average' ? '#fff3cd' : '#f8d7da'}; color: ${campaign.qualityRanking === 'Above Average' ? '#155724' : campaign.qualityRanking === 'Average' ? '#856404' : '#721c24'};">
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">${campaign.adName || '-'}</td>
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; font-size: 11px;">${campaign.resultType}</td>
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; font-size: 11px;">${campaign.results}</td>
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: right; font-size: 11px; white-space: nowrap;">Rs. ${parseFloat(campaign.costPerResult || 0).toFixed(2)}</td>
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; font-size: 11px;">${campaign.reach.toLocaleString()}</td>
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; font-size: 11px;">${campaign.impressions.toLocaleString()}</td>
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: right; font-size: 11px; white-space: nowrap;">Rs. ${parseFloat(campaign.spend || 0).toFixed(2)}</td>
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: center;">
+                        <span style="padding: 3px 6px; border-radius: 10px; font-size: 10px; white-space: nowrap; background: ${campaign.qualityRanking === 'Above Average' ? '#d4edda' : campaign.qualityRanking === 'Average' ? '#fff3cd' : '#f8d7da'}; color: ${campaign.qualityRanking === 'Above Average' ? '#155724' : campaign.qualityRanking === 'Average' ? '#856404' : '#721c24'};">
                             ${campaign.qualityRanking}
                         </span>
                     </td>
-                    <td style="padding: 12px; border: 1px solid #ddd; text-align: center;">
-                        <span style="padding: 4px 8px; border-radius: 12px; font-size: 12px; background: ${campaign.conversionRanking === 'Above Average' ? '#d4edda' : campaign.conversionRanking === 'Average' ? '#fff3cd' : '#f8d7da'}; color: ${campaign.conversionRanking === 'Above Average' ? '#155724' : campaign.conversionRanking === 'Average' ? '#856404' : '#721c24'};">
+                    <td style="padding: 8px 6px; border: 1px solid #ddd; text-align: center;">
+                        <span style="padding: 3px 6px; border-radius: 10px; font-size: 10px; white-space: nowrap; background: ${campaign.conversionRanking === 'Above Average' ? '#d4edda' : campaign.conversionRanking === 'Average' ? '#fff3cd' : '#f8d7da'}; color: ${campaign.conversionRanking === 'Above Average' ? '#155724' : campaign.conversionRanking === 'Average' ? '#856404' : '#721c24'};">
                             ${campaign.conversionRanking}
                         </span>
                     </td>
@@ -7528,12 +7528,12 @@
                     <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
                         <i class="fas fa-palette"></i> Creative Images
                     </h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
                         ${reportCreativeImages.map((img, idx) => `
                             <div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                                <img src="${img.data}" style="width: 100%; height: 200px; object-fit: cover;">
-                                <div style="padding: 10px; background: #f8f9fa;">
-                                    <small style="color: #666;">Creative ${idx + 1}: ${img.name}</small>
+                                <img src="${img.data}" style="width: 100%; height: 120px; object-fit: cover;">
+                                <div style="padding: 8px; background: #f8f9fa;">
+                                    <small style="color: #666; font-size: 11px;">Creative ${idx + 1}: ${img.name}</small>
                                 </div>
                             </div>
                         `).join('')}
@@ -7547,12 +7547,12 @@
                     <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
                         <i class="fas fa-chart-line"></i> Evidence Images
                     </h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
                         ${reportEvidenceImages.map((img, idx) => `
                             <div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                                <img src="${img.data}" style="width: 100%; height: 200px; object-fit: cover;">
-                                <div style="padding: 10px; background: #f8f9fa;">
-                                    <small style="color: #666;">Evidence ${idx + 1}: ${img.name}</small>
+                                <img src="${img.data}" style="width: 100%; height: 120px; object-fit: cover;">
+                                <div style="padding: 8px; background: #f8f9fa;">
+                                    <small style="color: #666; font-size: 11px;">Evidence ${idx + 1}: ${img.name}</small>
                                 </div>
                             </div>
                         `).join('')}
@@ -7602,18 +7602,18 @@
                         <i class="fas fa-chart-line"></i> Campaign Performance Details
                     </h3>
                     <div style="overflow-x: auto; margin-bottom: 40px;">
-                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                             <thead>
                                 <tr style="background: #667eea; color: white;">
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Ad Name</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Result Type</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Results</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Cost/Result</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Reach</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Impressions</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">Spend (Rs)</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Quality</th>
-                                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Conv. Rate</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">Ad Name</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">Result Type</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap;">Results</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: right; white-space: nowrap;">Cost/Result</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap;">Reach</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap;">Impressions</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: right; white-space: nowrap;">Spend (Rs)</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap;">Quality</th>
+                                    <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap;">Conv. Rate</th>
                                 </tr>
                             </thead>
                             <tbody>
