@@ -332,9 +332,6 @@
                                 <select class="form-select" id="contentClientSelect" onchange="loadContentCredits()"></select>
                             </div>
                             <div class="col-md-8 text-end">
-                                <button class="btn btn-warning mt-2" onclick="showManageCreditsModal()">
-                                    <i class="fas fa-recycle me-2"></i>Month End Process
-                                </button>
                                 <button class="btn btn-primary mt-2" onclick="showAddContentModal()">
                                     <i class="fas fa-plus me-2"></i>Add Content
                                 </button>
