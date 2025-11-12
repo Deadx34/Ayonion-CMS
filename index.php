@@ -2009,7 +2009,7 @@
                                 <div class="row mb-3">
                                     <div class="col-12">
                                         <label class="form-label">Upload Evidence Screenshots</label>
-                                        <input type="file" class="form-control" id="reportEvidenceImages" accept="image/*" multiple onchange="handleEvidenceImageUpload(this)">
+                                        <input type="file" class="form-control" id="reportEvidenceImages" accept="image/*" multiple onchange="handleReportEvidenceImageUpload(this)">
                                         <small class="text-muted">Upload performance screenshots, analytics, proof (Max 10 images, 5MB each)</small>
                                     </div>
                                 </div>
@@ -6979,8 +6979,8 @@
             });
         }
 
-        // EVIDENCE IMAGES HANDLER
-        function handleEvidenceImageUpload(input) {
+        // EVIDENCE IMAGES HANDLER (for Campaign Report)
+        function handleReportEvidenceImageUpload(input) {
             const files = Array.from(input.files);
             
             if (reportEvidenceImages.length + files.length > 10) {
@@ -7015,7 +7015,7 @@
                             <img src="${e.target.result}" class="card-img-top" style="height: 200px; object-fit: cover;">
                             <div class="card-body p-2">
                                 <small class="text-muted d-block text-truncate">${file.name}</small>
-                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeEvidenceImage(${reportEvidenceImages.length - 1})">
+                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeReportEvidenceImage(${reportEvidenceImages.length - 1})">
                                     <i class="fas fa-trash me-1"></i>Remove
                                 </button>
                             </div>
@@ -7029,7 +7029,7 @@
             input.value = '';
         }
 
-        function removeEvidenceImage(index) {
+        function removeReportEvidenceImage(index) {
             reportEvidenceImages.splice(index, 1);
             const previewContainer = document.getElementById('reportEvidenceImagesPreview');
             previewContainer.innerHTML = '';
@@ -7041,7 +7041,7 @@
                         <img src="${img.data}" class="card-img-top" style="height: 200px; object-fit: cover;">
                         <div class="card-body p-2">
                             <small class="text-muted d-block text-truncate">${img.name}</small>
-                            <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeEvidenceImage(${idx})">
+                            <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeReportEvidenceImage(${idx})">
                                 <i class="fas fa-trash me-1"></i>Remove
                             </button>
                         </div>
