@@ -1304,24 +1304,20 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Evidence Image</label>
-                                <input type="file" class="form-control" id="evidenceImageUpload" accept="image/*" onchange="handleEvidenceImageUpload(this)">
-                                <input type="hidden" id="evidenceImageUrl">
-                                <div id="evidenceImagePreview" class="mt-2" style="display: none;">
-                                    <img id="evidenceImagePreviewImg" src="" alt="Evidence Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeEvidenceImage()">Remove</button>
+                                <label class="form-label">Evidence Images</label>
+                                <input type="file" class="form-control" id="evidenceImageUpload" accept="image/*" multiple onchange="handleEvidenceImageUpload(this)">
+                                <div id="evidenceImagePreview" class="mt-2 row">
+                                    <!-- Evidence image previews will appear here -->
                                 </div>
-                                <small class="text-muted">Upload campaign performance evidence/screenshot</small>
+                                <small class="text-muted">Upload campaign performance evidence/screenshots (Multiple files allowed)</small>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Creative Image</label>
-                                <input type="file" class="form-control" id="creativeImageUpload" accept="image/*" onchange="handleCreativeImageUpload(this)">
-                                <input type="hidden" id="creativeImageUrl">
-                                <div id="creativeImagePreview" class="mt-2" style="display: none;">
-                                    <img id="creativeImagePreviewImg" src="" alt="Creative Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeCreativeImage()">Remove</button>
+                                <label class="form-label">Creative Images</label>
+                                <input type="file" class="form-control" id="creativeImageUpload" accept="image/*" multiple onchange="handleCreativeImageUpload(this)">
+                                <div id="creativeImagePreview" class="mt-2 row">
+                                    <!-- Creative image previews will appear here -->
                                 </div>
-                                <small class="text-muted">Upload ad creative/design used in campaign</small>
+                                <small class="text-muted">Upload ad creative/design used in campaign (Multiple files allowed)</small>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Save Campaign</button>
@@ -4767,93 +4763,167 @@
             const clientId = document.getElementById('campaignClientSelect').value;
             if(!clientId) { showAlert('Please select a client first', 'warning'); return; }
             document.getElementById('addCampaignForm').reset();
-            clearEvidenceImagePreview();
-            clearCreativeImagePreview();
+            campaignEvidenceImages = [];
+            campaignCreativeImages = [];
+            document.getElementById('evidenceImagePreview').innerHTML = '';
+            document.getElementById('creativeImagePreview').innerHTML = '';
             new bootstrap.Modal(document.getElementById('addCampaignModal')).show();
         }
 
-        // Handle Evidence Image Upload
+        // Arrays to store multiple campaign images
+        let campaignEvidenceImages = [];
+        let campaignCreativeImages = [];
+
+        // Handle Evidence Image Upload (Multiple)
         async function handleEvidenceImageUpload(input) {
-            if (!input.files || !input.files[0]) return;
+            if (!input.files || input.files.length === 0) return;
             
-            const file = input.files[0];
-            const formData = new FormData();
-            formData.append('contentImage', file);
+            const files = Array.from(input.files);
+            const previewContainer = document.getElementById('evidenceImagePreview');
             
-            try {
-                const response = await fetch('upload_content_image.php', {
-                    method: 'POST',
-                    body: formData
-                });
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('contentImage', file);
                 
-                const result = await response.json();
-                
-                if (result.success && result.image_url) {
-                    document.getElementById('evidenceImageUrl').value = result.image_url;
-                    document.getElementById('evidenceImagePreviewImg').src = result.image_url;
-                    document.getElementById('evidenceImagePreview').style.display = 'block';
-                    showAlert('Evidence image uploaded successfully! ✅', 'success');
-                } else {
-                    throw new Error(result.message || 'Upload failed');
+                try {
+                    const response = await fetch('upload_content_image.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success && result.image_url) {
+                        campaignEvidenceImages.push({
+                            url: result.image_url,
+                            name: file.name
+                        });
+                        
+                        // Add preview card
+                        const col = document.createElement('div');
+                        col.className = 'col-md-6 mb-2';
+                        col.innerHTML = `
+                            <div class="card">
+                                <img src="${result.image_url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-muted d-block text-truncate">${file.name}</small>
+                                    <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeCampaignEvidenceImage(${campaignEvidenceImages.length - 1})">
+                                        <i class="fas fa-trash me-1"></i>Remove
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.appendChild(col);
+                    } else {
+                        throw new Error(result.message || 'Upload failed');
+                    }
+                } catch (error) {
+                    showAlert('Error uploading evidence image: ' + error.message, 'danger');
                 }
-            } catch (error) {
-                showAlert('Error uploading evidence image: ' + error.message, 'danger');
-                input.value = '';
+            }
+            
+            input.value = '';
+            if (campaignEvidenceImages.length > 0) {
+                showAlert(`${campaignEvidenceImages.length} evidence image(s) uploaded! ✅`, 'success');
             }
         }
 
-        // Handle Creative Image Upload
+        // Handle Creative Image Upload (Multiple)
         async function handleCreativeImageUpload(input) {
-            if (!input.files || !input.files[0]) return;
+            if (!input.files || input.files.length === 0) return;
             
-            const file = input.files[0];
-            const formData = new FormData();
-            formData.append('contentImage', file);
+            const files = Array.from(input.files);
+            const previewContainer = document.getElementById('creativeImagePreview');
             
-            try {
-                const response = await fetch('upload_content_image.php', {
-                    method: 'POST',
-                    body: formData
-                });
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('contentImage', file);
                 
-                const result = await response.json();
-                
-                if (result.success && result.image_url) {
-                    document.getElementById('creativeImageUrl').value = result.image_url;
-                    document.getElementById('creativeImagePreviewImg').src = result.image_url;
-                    document.getElementById('creativeImagePreview').style.display = 'block';
-                    showAlert('Creative image uploaded successfully! ✅', 'success');
-                } else {
-                    throw new Error(result.message || 'Upload failed');
+                try {
+                    const response = await fetch('upload_content_image.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success && result.image_url) {
+                        campaignCreativeImages.push({
+                            url: result.image_url,
+                            name: file.name
+                        });
+                        
+                        // Add preview card
+                        const col = document.createElement('div');
+                        col.className = 'col-md-6 mb-2';
+                        col.innerHTML = `
+                            <div class="card">
+                                <img src="${result.image_url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-muted d-block text-truncate">${file.name}</small>
+                                    <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeCampaignCreativeImage(${campaignCreativeImages.length - 1})">
+                                        <i class="fas fa-trash me-1"></i>Remove
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.appendChild(col);
+                    } else {
+                        throw new Error(result.message || 'Upload failed');
+                    }
+                } catch (error) {
+                    showAlert('Error uploading creative image: ' + error.message, 'danger');
                 }
-            } catch (error) {
-                showAlert('Error uploading creative image: ' + error.message, 'danger');
-                input.value = '';
+            }
+            
+            input.value = '';
+            if (campaignCreativeImages.length > 0) {
+                showAlert(`${campaignCreativeImages.length} creative image(s) uploaded! ✅`, 'success');
             }
         }
 
-        function removeEvidenceImage() {
-            document.getElementById('evidenceImageUrl').value = '';
-            document.getElementById('evidenceImageUpload').value = '';
-            document.getElementById('evidenceImagePreview').style.display = 'none';
+        function removeCampaignEvidenceImage(index) {
+            campaignEvidenceImages.splice(index, 1);
+            const previewContainer = document.getElementById('evidenceImagePreview');
+            previewContainer.innerHTML = '';
+            campaignEvidenceImages.forEach((img, idx) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-2';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${img.name}</small>
+                            <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeCampaignEvidenceImage(${idx})">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                previewContainer.appendChild(col);
+            });
         }
 
-        function removeCreativeImage() {
-            document.getElementById('creativeImageUrl').value = '';
-            document.getElementById('creativeImageUpload').value = '';
-            document.getElementById('creativeImagePreview').style.display = 'none';
-        }
-
-        function clearEvidenceImagePreview() {
-            document.getElementById('evidenceImageUrl').value = '';
-            document.getElementById('evidenceImageUpload').value = '';
-            document.getElementById('evidenceImagePreview').style.display = 'none';
-        }
-
-        function clearCreativeImagePreview() {
-            document.getElementById('creativeImageUrl').value = '';
-            document.getElementById('creativeImageUpload').value = '';
-            document.getElementById('creativeImagePreview').style.display = 'none';
+        function removeCampaignCreativeImage(index) {
+            campaignCreativeImages.splice(index, 1);
+            const previewContainer = document.getElementById('creativeImagePreview');
+            previewContainer.innerHTML = '';
+            campaignCreativeImages.forEach((img, idx) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-2';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${img.name}</small>
+                            <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeCampaignCreativeImage(${idx})">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                previewContainer.appendChild(col);
+            });
         }
 
         // FIX: Add Campaign using PHP handler
@@ -4885,8 +4955,8 @@
                 spend: spend,
                 qualityRanking: document.getElementById('qualityRanking').value,
                 conversionRanking: document.getElementById('conversionRanking').value,
-                evidenceImageUrl: document.getElementById('evidenceImageUrl').value || null,
-                creativeImageUrl: document.getElementById('creativeImageUrl').value || null
+                evidenceImageUrl: campaignEvidenceImages.length > 0 ? JSON.stringify(campaignEvidenceImages) : null,
+                creativeImageUrl: campaignCreativeImages.length > 0 ? JSON.stringify(campaignCreativeImages) : null
             };
 
             try {
@@ -6816,7 +6886,90 @@
                         qualityRanking: 'Average',
                         conversionRanking: 'Average'
                     });
+                    
+                    // Load Evidence Images from campaigns (handle both single URL and array)
+                    if (campaign.evidenceImageUrl) {
+                        try {
+                            // Try to parse as JSON array
+                            const evidenceImages = JSON.parse(campaign.evidenceImageUrl);
+                            if (Array.isArray(evidenceImages)) {
+                                evidenceImages.forEach(img => {
+                                    reportEvidenceImages.push({
+                                        name: `Evidence - ${campaign.adName}`,
+                                        data: img.url
+                                    });
+                                });
+                            }
+                        } catch (e) {
+                            // If not JSON, treat as single URL
+                            reportEvidenceImages.push({
+                                name: `Evidence - ${campaign.adName}`,
+                                data: campaign.evidenceImageUrl
+                            });
+                        }
+                    }
+                    
+                    // Load Creative Images from campaigns (handle both single URL and array)
+                    if (campaign.creativeImageUrl) {
+                        try {
+                            // Try to parse as JSON array
+                            const creativeImages = JSON.parse(campaign.creativeImageUrl);
+                            if (Array.isArray(creativeImages)) {
+                                creativeImages.forEach(img => {
+                                    reportCreativeImages.push({
+                                        name: `Creative - ${campaign.adName}`,
+                                        data: img.url
+                                    });
+                                });
+                            }
+                        } catch (e) {
+                            // If not JSON, treat as single URL
+                            reportCreativeImages.push({
+                                name: `Creative - ${campaign.adName}`,
+                                data: campaign.creativeImageUrl
+                            });
+                        }
+                    }
                 });
+                
+                // Display loaded evidence images
+                const evidencePreview = document.getElementById('reportEvidenceImagesPreview');
+                reportEvidenceImages.forEach((img, idx) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 mb-3';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${img.data}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted d-block text-truncate">${img.name}</small>
+                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeReportEvidenceImage(${idx})">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    evidencePreview.appendChild(col);
+                });
+                
+                // Display loaded creative images
+                const creativePreview = document.getElementById('reportImagesPreview');
+                reportCreativeImages.forEach((img, idx) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 mb-3';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${img.data}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted d-block text-truncate">${img.name}</small>
+                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeReportImage(${idx})">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    creativePreview.appendChild(col);
+                });
+                
                 calculateTotals();
             } else {
                 // Add one empty row
