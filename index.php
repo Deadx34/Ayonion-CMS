@@ -5135,9 +5135,9 @@
                 });
 
                 const result = await response.json();
-                if (result.success) {
-                    document.getElementById('editEvidenceImageUrl').value = result.imageUrl;
-                    document.getElementById('editEvidenceImagePreviewImg').src = result.imageUrl;
+                if (result.success && result.image_url) {
+                    document.getElementById('editEvidenceImageUrl').value = result.image_url;
+                    document.getElementById('editEvidenceImagePreviewImg').src = result.image_url;
                     document.getElementById('editEvidenceImagePreview').style.display = 'block';
                     showAlert('Evidence image uploaded successfully! ✅', 'success');
                 } else {
@@ -5170,9 +5170,9 @@
                 });
 
                 const result = await response.json();
-                if (result.success) {
-                    document.getElementById('editCreativeImageUrl').value = result.imageUrl;
-                    document.getElementById('editCreativeImagePreviewImg').src = result.imageUrl;
+                if (result.success && result.image_url) {
+                    document.getElementById('editCreativeImageUrl').value = result.image_url;
+                    document.getElementById('editCreativeImagePreviewImg').src = result.image_url;
                     document.getElementById('editCreativeImagePreview').style.display = 'block';
                     showAlert('Creative image uploaded successfully! ✅', 'success');
                 } else {
