@@ -1453,36 +1453,28 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Evidence Image</label>
-                                <!-- Current Evidence Image -->
-                                <div id="editCurrentEvidenceImage" style="display: none;" class="mb-2">
-                                    <img id="editCurrentEvidenceImageImg" src="" alt="Current Evidence" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeCurrentEvidenceImage()">Remove</button>
-                                    <p class="text-muted small mb-0 mt-1">Current evidence image</p>
+                                <label class="form-label">Evidence Images</label>
+                                <!-- Current Evidence Images -->
+                                <div id="editCurrentEvidenceImages" class="mb-2 row">
+                                    <!-- Current evidence images will be shown here -->
                                 </div>
-                                <input type="file" class="form-control" id="editEvidenceImageUpload" accept="image/*" onchange="handleEditEvidenceImageUpload(this)">
-                                <input type="hidden" id="editEvidenceImageUrl">
-                                <div id="editEvidenceImagePreview" class="mt-2" style="display: none;">
-                                    <img id="editEvidenceImagePreviewImg" src="" alt="Evidence Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeEditEvidenceImage()">Remove</button>
+                                <input type="file" class="form-control" id="editEvidenceImageUpload" accept="image/*" multiple onchange="handleEditEvidenceImageUpload(this)">
+                                <div id="editEvidenceImagePreview" class="mt-2 row">
+                                    <!-- New evidence image previews will appear here -->
                                 </div>
-                                <small class="text-muted">Upload new evidence image (optional - leave empty to keep current)</small>
+                                <small class="text-muted">Upload new evidence images (optional - leave empty to keep current)</small>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Creative Image</label>
-                                <!-- Current Creative Image -->
-                                <div id="editCurrentCreativeImage" style="display: none;" class="mb-2">
-                                    <img id="editCurrentCreativeImageImg" src="" alt="Current Creative" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeCurrentCreativeImage()">Remove</button>
-                                    <p class="text-muted small mb-0 mt-1">Current creative image</p>
+                                <label class="form-label">Creative Images</label>
+                                <!-- Current Creative Images -->
+                                <div id="editCurrentCreativeImages" class="mb-2 row">
+                                    <!-- Current creative images will be shown here -->
                                 </div>
-                                <input type="file" class="form-control" id="editCreativeImageUpload" accept="image/*" onchange="handleEditCreativeImageUpload(this)">
-                                <input type="hidden" id="editCreativeImageUrl">
-                                <div id="editCreativeImagePreview" class="mt-2" style="display: none;">
-                                    <img id="editCreativeImagePreviewImg" src="" alt="Creative Preview" style="max-width: 150px; max-height: 150px; object-fit: cover; border: 1px solid #ddd; border-radius: 4px;">
-                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeEditCreativeImage()">Remove</button>
+                                <input type="file" class="form-control" id="editCreativeImageUpload" accept="image/*" multiple onchange="handleEditCreativeImageUpload(this)">
+                                <div id="editCreativeImagePreview" class="mt-2 row">
+                                    <!-- New creative image previews will appear here -->
                                 </div>
-                                <small class="text-muted">Upload new creative image (optional - leave empty to keep current)</small>
+                                <small class="text-muted">Upload new creative images (optional - leave empty to keep current)</small>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Update Campaign</button>
@@ -5086,28 +5078,104 @@
             document.getElementById('editConversionRanking').value = campaign.conversionRanking;
 
             // Set hidden field values for existing images
-            document.getElementById('editEvidenceImageUrl').value = campaign.evidenceImageUrl || '';
-            document.getElementById('editCreativeImageUrl').value = campaign.creativeImageUrl || '';
+            editCampaignCurrentEvidenceImages = [];
+            editCampaignCurrentCreativeImages = [];
+            editCampaignNewEvidenceImages = [];
+            editCampaignNewCreativeImages = [];
 
-            // Show current evidence image if exists
+            // Show current evidence images if exist
+            const evidenceContainer = document.getElementById('editCurrentEvidenceImages');
+            evidenceContainer.innerHTML = '';
             if (campaign.evidenceImageUrl) {
-                document.getElementById('editCurrentEvidenceImage').style.display = 'block';
-                document.getElementById('editCurrentEvidenceImageImg').src = campaign.evidenceImageUrl;
-            } else {
-                document.getElementById('editCurrentEvidenceImage').style.display = 'none';
+                try {
+                    const evidenceImages = JSON.parse(campaign.evidenceImageUrl);
+                    if (Array.isArray(evidenceImages)) {
+                        evidenceImages.forEach((img, idx) => {
+                            editCampaignCurrentEvidenceImages.push(img);
+                            const col = document.createElement('div');
+                            col.className = 'col-md-6 mb-2';
+                            col.innerHTML = `
+                                <div class="card">
+                                    <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                    <div class="card-body p-2">
+                                        <small class="text-muted d-block text-truncate">${img.name || 'Current Evidence'}</small>
+                                        <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditCurrentEvidenceImage(${idx})">
+                                            <i class="fas fa-trash me-1"></i>Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            evidenceContainer.appendChild(col);
+                        });
+                    }
+                } catch (e) {
+                    // Single image (legacy)
+                    editCampaignCurrentEvidenceImages.push({ url: campaign.evidenceImageUrl, name: 'Current Evidence' });
+                    const col = document.createElement('div');
+                    col.className = 'col-md-6 mb-2';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${campaign.evidenceImageUrl}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted d-block text-truncate">Current Evidence</small>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditCurrentEvidenceImage(0)">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    evidenceContainer.appendChild(col);
+                }
             }
 
-            // Show current creative image if exists
+            // Show current creative images if exist
+            const creativeContainer = document.getElementById('editCurrentCreativeImages');
+            creativeContainer.innerHTML = '';
             if (campaign.creativeImageUrl) {
-                document.getElementById('editCurrentCreativeImage').style.display = 'block';
-                document.getElementById('editCurrentCreativeImageImg').src = campaign.creativeImageUrl;
-            } else {
-                document.getElementById('editCurrentCreativeImage').style.display = 'none';
+                try {
+                    const creativeImages = JSON.parse(campaign.creativeImageUrl);
+                    if (Array.isArray(creativeImages)) {
+                        creativeImages.forEach((img, idx) => {
+                            editCampaignCurrentCreativeImages.push(img);
+                            const col = document.createElement('div');
+                            col.className = 'col-md-6 mb-2';
+                            col.innerHTML = `
+                                <div class="card">
+                                    <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                    <div class="card-body p-2">
+                                        <small class="text-muted d-block text-truncate">${img.name || 'Current Creative'}</small>
+                                        <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditCurrentCreativeImage(${idx})">
+                                            <i class="fas fa-trash me-1"></i>Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            creativeContainer.appendChild(col);
+                        });
+                    }
+                } catch (e) {
+                    // Single image (legacy)
+                    editCampaignCurrentCreativeImages.push({ url: campaign.creativeImageUrl, name: 'Current Creative' });
+                    const col = document.createElement('div');
+                    col.className = 'col-md-6 mb-2';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${campaign.creativeImageUrl}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted d-block text-truncate">Current Creative</small>
+                                <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditCurrentCreativeImage(0)">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    creativeContainer.appendChild(col);
+                }
             }
 
             // Clear new upload previews
-            document.getElementById('editEvidenceImagePreview').style.display = 'none';
-            document.getElementById('editCreativeImagePreview').style.display = 'none';
+            document.getElementById('editEvidenceImagePreview').innerHTML = '';
+            document.getElementById('editCreativeImagePreview').innerHTML = '';
             document.getElementById('editEvidenceImageUpload').value = '';
             document.getElementById('editCreativeImageUpload').value = '';
 
@@ -5198,20 +5266,230 @@
             document.getElementById('editCreativeImagePreview').style.display = 'none';
         }
 
-        // Remove current evidence image (existing image)
-        function removeCurrentEvidenceImage() {
-            document.getElementById('editCurrentEvidenceImage').style.display = 'none';
-            document.getElementById('editEvidenceImageUrl').value = '';
-            document.getElementById('editEvidenceImageUrl').dataset.original = '';
-            showAlert('Evidence image will be removed when you update the campaign.', 'info');
+        // Arrays to store edit campaign images
+        let editCampaignCurrentEvidenceImages = [];
+        let editCampaignCurrentCreativeImages = [];
+        let editCampaignNewEvidenceImages = [];
+        let editCampaignNewCreativeImages = [];
+
+        // Handle Edit Evidence Image Upload (Multiple)
+        async function handleEditEvidenceImageUpload(input) {
+            if (!input.files || input.files.length === 0) return;
+            
+            const files = Array.from(input.files);
+            const previewContainer = document.getElementById('editEvidenceImagePreview');
+            
+            for (const file of files) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert(`${file.name} is too large. Maximum size is 5MB`, 'danger');
+                    continue;
+                }
+
+                const formData = new FormData();
+                formData.append('contentImage', file);
+
+                try {
+                    const response = await fetch('upload_content_image.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    if (result.success && result.image_url) {
+                        const currentIndex = editCampaignNewEvidenceImages.length;
+                        editCampaignNewEvidenceImages.push({
+                            url: result.image_url,
+                            name: file.name
+                        });
+                        
+                        // Add preview card
+                        const col = document.createElement('div');
+                        col.className = 'col-md-6 mb-2';
+                        col.innerHTML = `
+                            <div class="card">
+                                <img src="${result.image_url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-muted d-block text-truncate">${file.name}</small>
+                                    <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditNewEvidenceImage(${currentIndex})">
+                                        <i class="fas fa-trash me-1"></i>Remove
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.appendChild(col);
+                        showAlert(`${file.name} uploaded! ✅`, 'success');
+                    } else {
+                        throw new Error(result.message || 'Upload failed');
+                    }
+                } catch (error) {
+                    showAlert('Error uploading ' + file.name + ': ' + error.message, 'danger');
+                }
+            }
+            
+            input.value = '';
         }
 
-        // Remove current creative image (existing image)
+        // Handle Edit Creative Image Upload (Multiple)
+        async function handleEditCreativeImageUpload(input) {
+            if (!input.files || input.files.length === 0) return;
+            
+            const files = Array.from(input.files);
+            const previewContainer = document.getElementById('editCreativeImagePreview');
+            
+            for (const file of files) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert(`${file.name} is too large. Maximum size is 5MB`, 'danger');
+                    continue;
+                }
+
+                const formData = new FormData();
+                formData.append('contentImage', file);
+
+                try {
+                    const response = await fetch('upload_content_image.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    if (result.success && result.image_url) {
+                        const currentIndex = editCampaignNewCreativeImages.length;
+                        editCampaignNewCreativeImages.push({
+                            url: result.image_url,
+                            name: file.name
+                        });
+                        
+                        // Add preview card
+                        const col = document.createElement('div');
+                        col.className = 'col-md-6 mb-2';
+                        col.innerHTML = `
+                            <div class="card">
+                                <img src="${result.image_url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                <div class="card-body p-2">
+                                    <small class="text-muted d-block text-truncate">${file.name}</small>
+                                    <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditNewCreativeImage(${currentIndex})">
+                                        <i class="fas fa-trash me-1"></i>Remove
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.appendChild(col);
+                        showAlert(`${file.name} uploaded! ✅`, 'success');
+                    } else {
+                        throw new Error(result.message || 'Upload failed');
+                    }
+                } catch (error) {
+                    showAlert('Error uploading ' + file.name + ': ' + error.message, 'danger');
+                }
+            }
+            
+            input.value = '';
+        }
+
+        // Remove current evidence image
+        function removeEditCurrentEvidenceImage(index) {
+            editCampaignCurrentEvidenceImages.splice(index, 1);
+            const container = document.getElementById('editCurrentEvidenceImages');
+            container.innerHTML = '';
+            editCampaignCurrentEvidenceImages.forEach((img, idx) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-2';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${img.name || 'Current Evidence'}</small>
+                            <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditCurrentEvidenceImage(${idx})">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        // Remove current creative image
+        function removeEditCurrentCreativeImage(index) {
+            editCampaignCurrentCreativeImages.splice(index, 1);
+            const container = document.getElementById('editCurrentCreativeImages');
+            container.innerHTML = '';
+            editCampaignCurrentCreativeImages.forEach((img, idx) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-2';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${img.name || 'Current Creative'}</small>
+                            <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditCurrentCreativeImage(${idx})">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        // Remove new evidence image
+        function removeEditNewEvidenceImage(index) {
+            editCampaignNewEvidenceImages.splice(index, 1);
+            const previewContainer = document.getElementById('editEvidenceImagePreview');
+            previewContainer.innerHTML = '';
+            editCampaignNewEvidenceImages.forEach((img, idx) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-2';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${img.name}</small>
+                            <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditNewEvidenceImage(${idx})">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                previewContainer.appendChild(col);
+            });
+        }
+
+        // Remove new creative image
+        function removeEditNewCreativeImage(index) {
+            editCampaignNewCreativeImages.splice(index, 1);
+            const previewContainer = document.getElementById('editCreativeImagePreview');
+            previewContainer.innerHTML = '';
+            editCampaignNewCreativeImages.forEach((img, idx) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-6 mb-2';
+                col.innerHTML = `
+                    <div class="card">
+                        <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            <small class="text-muted d-block text-truncate">${img.name}</small>
+                            <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditNewCreativeImage(${idx})">
+                                <i class="fas fa-trash me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+                previewContainer.appendChild(col);
+            });
+        }
+
+        // Remove current evidence image (existing image) - DEPRECATED
+        function removeCurrentEvidenceImage() {
+            // Kept for compatibility
+            editCampaignCurrentEvidenceImages = [];
+            document.getElementById('editCurrentEvidenceImages').innerHTML = '';
+        }
+
+        // Remove current creative image (existing image) - DEPRECATED
         function removeCurrentCreativeImage() {
-            document.getElementById('editCurrentCreativeImage').style.display = 'none';
-            document.getElementById('editCreativeImageUrl').value = '';
-            document.getElementById('editCreativeImageUrl').dataset.original = '';
-            showAlert('Creative image will be removed when you update the campaign.', 'info');
+            // Kept for compatibility
+            editCampaignCurrentCreativeImages = [];
+            document.getElementById('editCurrentCreativeImages').innerHTML = '';
         }
 
         // Handle Edit Campaign Form Submit
@@ -5228,6 +5506,10 @@
 
             const spend = parseFloat(document.getElementById('editSpend').value);
 
+            // Combine current and new images
+            const allEvidenceImages = [...editCampaignCurrentEvidenceImages, ...editCampaignNewEvidenceImages];
+            const allCreativeImages = [...editCampaignCurrentCreativeImages, ...editCampaignNewCreativeImages];
+
             const updatedCampaignData = {
                 id: campaignId,
                 clientId: clientId,
@@ -5242,8 +5524,8 @@
                 spend: spend,
                 qualityRanking: document.getElementById('editQualityRanking').value,
                 conversionRanking: document.getElementById('editConversionRanking').value,
-                evidenceImageUrl: document.getElementById('editEvidenceImageUrl').value || null,
-                creativeImageUrl: document.getElementById('editCreativeImageUrl').value || null
+                evidenceImageUrl: allEvidenceImages.length > 0 ? JSON.stringify(allEvidenceImages) : null,
+                creativeImageUrl: allCreativeImages.length > 0 ? JSON.stringify(allCreativeImages) : null
             };
 
             try {
