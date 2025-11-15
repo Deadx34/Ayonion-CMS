@@ -6176,7 +6176,7 @@
                                 <div style="font-size: 28px; font-weight: bold; color: #2c3e50; margin-bottom: 10px;">${titles[type]}</div>
                                 <div style="font-size: 12px; color: #7f8c8d;">
                                     <div style="margin-bottom: 3px;">Date: ${formatDate(doc.date)}</div>
-                                    <div style="margin-bottom: 3px;">${titles[type]} #: ${doc.documentNumber || (docNum[type] + String(doc.id).slice(-6))}</div>
+                                    <div style="margin-bottom: 3px;">${titles[type]}: ${doc.documentNumber || (docNum[type] + String(doc.id).slice(-6))}</div>
                                     <div style="margin-bottom: 3px;">Valid Until: ${formatDate(new Date(new Date(doc.date).getTime() + 14 * 24 * 60 * 60 * 1000))}</div>
                                 </div>
                             </div>
