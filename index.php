@@ -9,63 +9,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --secondary: #8b5cf6;
+            --primary: #F7C935;
+            --secondary: #618698;
             --success: #10b981;
             --danger: #ef4444;
-            --warning: #f59e0b;
-            --dark: #1e293b;
-            --light: #f8fafc;
+            --warning: #F7C935;
+            --dark: #052C47;
+            --dark-secondary: #1A364A;
+            --dark-tertiary: #2E404C;
+            --light: #BDDFE8;
+            --text-dark: #030B0D;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Lato', 'Segoe UI', sans-serif; background: var(--light); }
+        body { font-family: 'Lato', 'Segoe UI', sans-serif; background: #f0f7f9; }
         .sidebar { background: var(--dark); min-height: 100vh; position: fixed; left: 0; top: 0; width: 260px; z-index: 1000; overflow-y: auto; transition: transform 0.3s ease; scrollbar-width: none; -ms-overflow-style: none; }
         .sidebar::-webkit-scrollbar { display: none; }
-        .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; }
         .sidebar-header h3 { font-size: 1.4rem; font-weight: 700; margin: 0; }
         .sidebar-header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.85rem; }
         .nav-item { margin: 5px 15px; }
         .nav-link { color: #94a3b8; padding: 12px 20px; border-radius: 10px; transition: all 0.3s; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
-        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
-        .nav-link.active { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .nav-link:hover { background: rgba(247,201,53,0.15); color: var(--primary); transform: translateX(5px); }
+        .nav-link.active { background: linear-gradient(135deg, var(--primary), #e0b42d); color: var(--dark); font-weight: 600; }
         .nav-link i { width: 20px; text-align: center; }
         .content-area { margin-left: 260px; padding: 30px; min-height: 100vh; transition: margin-left 0.3s ease; }
         /* Adjust content area when warning banner is shown */
         body:has(#tempPasswordWarning[style*="display: block"]) .content-area { padding-top: 60px; }
-        .top-bar { background: rgba(255,255,255,0.9); padding: 16px 24px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 900; backdrop-filter: saturate(180%) blur(8px); border: 1px solid rgba(99,102,241,0.08); }
+        .top-bar { background: rgba(255,255,255,0.95); padding: 16px 24px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(5,44,71,0.08); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 900; backdrop-filter: saturate(180%) blur(8px); border: 1px solid rgba(97,134,152,0.1); }
         .page-title { font-size: 1.6rem; font-weight: 700; color: var(--dark); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-info { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
-        .user-chip { display: inline-flex; align-items: center; gap: 8px; background: #f0f1ff; color: #4f46e5; padding: 6px 10px; border-radius: 999px; font-weight: 600; }
-        .user-chip i { color: #4f46e5; }
-        .card { border: none; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; animation: fadeIn 0.5s ease; }
+        .user-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--light); color: var(--dark); padding: 6px 10px; border-radius: 999px; font-weight: 600; }
+        .user-chip i { color: var(--secondary); }
+        .card { border: none; border-radius: 15px; box-shadow: 0 2px 10px rgba(5,44,71,0.08); margin-bottom: 30px; animation: fadeIn 0.5s ease; background: white; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .card-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 15px 15px 0 0 !important; padding: 20px 25px; font-weight: 600; }
-        .stat-card { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; transition: transform 0.3s; }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .card-header { background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; border-radius: 15px 15px 0 0 !important; padding: 20px 25px; font-weight: 600; }
+        .stat-card { background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(247,201,53,0.25); }
         .stat-card h3 { font-size: 2rem; font-weight: 700; margin: 10px 0; }
         .stat-card p { margin: 0; opacity: 0.9; }
         .table { margin: 0; }
-        .table thead { background: var(--light); }
+        .table thead { background: #f8fafb; }
         .table-hover > tbody > tr { transition: all 0.2s; }
-        .table-hover > tbody > tr:hover { --bs-table-hover-bg: #f0f1ff; cursor: pointer; transform: scale(1.01); }
+        .table-hover > tbody > tr:hover { --bs-table-hover-bg: #BDDFE8; cursor: pointer; transform: scale(1.01); }
         .table th { border: none; padding: 15px; font-weight: 600; color: var(--dark); }
         .table td { padding: 15px; vertical-align: middle; }
         .sortable { cursor: pointer; user-select: none; position: relative; padding-right: 25px !important; }
-        .sortable:hover { background: #e7e9fd; }
+        .sortable:hover { background: #d4ebf0; }
         .sortable::after { content: '⇅'; position: absolute; right: 8px; opacity: 0.3; font-size: 12px; }
         .sortable.asc::after { content: '↑'; opacity: 1; color: var(--primary); }
         .sortable.desc::after { content: '↓'; opacity: 1; color: var(--primary); }
         .badge { padding: 6px 12px; border-radius: 6px; font-weight: 500; }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.3s; cursor: pointer; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #e0b42d); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.3s; cursor: pointer; color: var(--dark); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(247, 201, 53, 0.4); }
         .modal-content { border: none; border-radius: 15px; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .modal-header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 15px 15px 0 0; }
+        .modal-header { background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; border-radius: 15px 15px 0 0; }
         .form-label { font-weight: 600; color: var(--dark); margin-bottom: 8px; }
-        .form-control, .form-select { border-radius: 8px; border: 2px solid #e2e8f0; padding: 10px 15px; transition: all 0.3s; }
-        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.15); }
+        .form-control, .form-select { border-radius: 8px; border: 2px solid #d1dee4; padding: 10px 15px; transition: all 0.3s; }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(247, 201, 53, 0.25); }
         .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
-        .form-check-input:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.15); }
+        .form-check-input:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(247, 201, 53, 0.25); }
         .form-check-label { font-weight: 500; color: var(--dark); }
         .section { display: none; }
         .section.active { display: block; }
@@ -166,17 +169,17 @@
             .modal-dialog { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
             .modal-content, .modal-body { box-shadow: none !important; border: none !important; padding: 0 !important; }
             .document-preview { box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
-            .document-preview table thead tr { background-color: #f0f1ff !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
+            .document-preview table thead tr { background-color: #BDDFE8 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
         }
     </style>
 </head>
 <body>
-    <div id="loginPage" class="login-container" style="display: none; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-        <div class="login-card" style="background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 50px; max-width: 450px; width: 100%;">
+    <div id="loginPage" class="login-container" style="display: none; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #052C47 0%, #1A364A 50%, #2E404C 100%);">
+        <div class="login-card" style="background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(3,11,13,0.4); padding: 50px; max-width: 450px; width: 100%;">
             <div style="text-align: center; margin-bottom: 40px;">
-                <i class="fas fa-palette fa-3x mb-3" style="color: #6366f1;"></i>
-                <h1 style="color: #6366f1; font-weight: 700; font-size: 2rem; margin-bottom: 10px;">Ayonion Studios</h1>
-                <p style="color: #64748b; font-size: 0.95rem;">Management System</p>
+                <i class="fas fa-palette fa-3x mb-3" style="color: #F7C935;"></i>
+                <h1 style="color: #052C47; font-weight: 700; font-size: 2rem; margin-bottom: 10px;">Ayonion Studios</h1>
+                <p style="color: #618698; font-size: 0.95rem;">Management System</p>
             </div>
             <form id="loginForm">
                 <div class="mb-3">
@@ -235,14 +238,14 @@
             <div id="dashboard" class="section active">
                 <div class="row">
                     <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #052C47 0%, #1A364A 100%)">
                             <i class="fas fa-users fa-2x mb-2"></i>
                             <h3 id="totalClients">0</h3>
                             <p>Total Clients</p>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #618698 0%, #2E404C 100%)">
                             <i class="fas fa-file-alt fa-2x mb-2"></i>
                             <h3 id="totalContentUsed">0</h3>
                             <p>Content Credits Used</p>
@@ -607,7 +610,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4 text-center">
-                                        <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                        <div style="background: linear-gradient(135deg, #052C47, #1A364A); color: white; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
                                             <h3 class="mb-0" id="clientDetailAvailable">0</h3>
                                             <small>Available Credits</small>
                                         </div>
@@ -6082,7 +6085,7 @@
                 return;
             }
 
-            const colors = { quotation: '#6366f1', invoice: '#10b981', receipt: '#f59e0b' };
+            const colors = { quotation: '#618698', invoice: '#052C47', receipt: '#F7C935' };
             const titles = { quotation: 'QUOTATION', invoice: 'INVOICE', receipt: 'RECEIPT' };
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
 
@@ -6439,7 +6442,7 @@
         
         // ✅ Generate print content for documents
         function generatePrintContent(doc, docType) {
-            const colors = { quotation: '#6366f1', invoice: '#10b981', receipt: '#f59e0b' };
+            const colors = { quotation: '#618698', invoice: '#052C47', receipt: '#F7C935' };
             const titles = { quotation: 'QUOTATION', invoice: 'INVOICE', receipt: 'RECEIPT' };
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
             
