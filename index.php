@@ -3144,7 +3144,7 @@
                 const delJson = await delRes.json();
                 if (delJson.success) {
                     await loadUsersTable();
-                    showAlert(`User ${username} deleted.`, 'danger');
+                    showAlert(`User ${username} deleted successfully.`, 'success');
                 } else {
                     showAlert(delJson.message || 'Failed to delete user.', 'danger');
                 }
