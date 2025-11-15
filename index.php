@@ -2402,6 +2402,13 @@
         async function loadCompanySettings() {
             try {
                 const res = await fetch('handler_settings.php?action=get', { credentials: 'same-origin' });
+                
+                // If unauthorized (non-admin user), silently use defaults
+                if (res.status === 401) {
+                    COMPANY_INFO = { ...DEFAULT_COMPANY_INFO };
+                    return;
+                }
+                
                 const data = await res.json();
                 if (data.success && data.settings) {
                     const settings = data.settings;
