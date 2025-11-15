@@ -6211,6 +6211,16 @@
                             </div>
                         </div>
                         
+                        ${type === 'receipt' ? `
+                        <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid ${colors[type]};">
+                            <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Payment Confirmation.</div>
+                            <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you!</div>
+                            <div style="font-size: 12px; line-height: 1.6; color: #555;">
+                                We have successfully received your payment, thank you! We are grateful for your trust and for choosing to work with us. 
+                                Should you have any questions, please do not hesitate to contact us.
+                            </div>
+                        </div>
+                        ` : `
                         <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px;">
                             <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you</div>
                             <div style="font-size: 12px; line-height: 1.4; color: #555;">
@@ -6228,6 +6238,7 @@
                                 </div>
                             </div>
                         </div>
+                        `}
                         
                         <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; font-size: 12px;">
                             Thank you and have a good day! Team Ayonion Studios.
