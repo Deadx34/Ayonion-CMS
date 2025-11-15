@@ -2254,7 +2254,7 @@
                     // NOTE: Users are loaded via the successful login, but we update the cache too
                     
                     saveToLocalStorage(); 
-                    console.log('✅ Data loaded from SQL successfully.');
+                    console.log('Data loaded from SQL successfully.');
                 } else {
                     throw new Error(data.message || 'Failed to fetch data from PHP handler.');
                 }
