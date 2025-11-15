@@ -2238,7 +2238,6 @@
 
         async function loadAllDataFromPHP() {
             try {
-                showAlert('Loading latest data from server...', 'info', 2000);
                 const response = await fetch('handler_data.php');
                 const data = await response.json();
 
