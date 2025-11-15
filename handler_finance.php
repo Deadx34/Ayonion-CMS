@@ -8,6 +8,7 @@ ini_set('display_errors', 0); // Don't display errors in output
 
 try {
     include 'includes/config.php';
+    include 'includes/document_number_generator.php';
     $conn = connect_db();
 } catch (Exception $e) {
     http_response_code(500);
@@ -107,6 +108,10 @@ try {
         throw new Exception("Description is required when 'Other Service' is selected.", 400);
     }
     
+    // Generate document number in new format (Q10P001202511, I10P001202511, R10P001202511)
+    $documentNumber = generateDocumentNumber($conn, $docType);
+    $documentNumberEscaped = $conn->real_escape_string($documentNumber);
+    
     // Calculate total from all item details
     $total = 0;
     foreach ($itemDetails as $item) {
@@ -133,9 +138,9 @@ try {
     $avgUnitPrice = array_sum(array_column($itemDetails, 'unitPrice')) / count($itemDetails);
     
     $sql_insert_doc = "INSERT INTO documents 
-        (id, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+        (id, document_number, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
         VALUES 
-        ('$id', $clientId, '$clientName', '$docType', '$itemDetailsJson', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
+        ('$id', '$documentNumberEscaped', $clientId, '$clientName', '$docType', '$itemDetailsJson', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
 
     if (!query_db($conn, $sql_insert_doc)) {
         throw new Exception("Failed to save document to the database.");
@@ -182,8 +187,9 @@ try {
     $conn->commit();
     echo json_encode([
         "success" => true, 
-        "message" => ucfirst($docType) . " created successfully with " . count($itemDetails) . " item type(s) and total amount Rs. " . number_format($total, 2) . "!",
+        "message" => ucfirst($docType) . " " . $documentNumber . " created successfully with " . count($itemDetails) . " item type(s) and total amount Rs. " . number_format($total, 2) . "!",
         "documentId" => $id,
+        "documentNumber" => $documentNumber,
         "itemTypes" => $itemTypes,
         "itemDetails" => $itemDetails,
         "totalAmount" => $total

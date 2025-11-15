@@ -113,6 +113,7 @@ if ($document_result) {
         
         $formatted_doc = [
             'id' => (int)$row['id'],
+            'documentNumber' => $row['document_number'] ?? '',
             'clientId' => (int)$row['client_id'],
             'clientName' => $row['client_name'] ?: 'Unknown Client',
             'docType' => $row['doc_type'],

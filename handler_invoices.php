@@ -7,6 +7,7 @@ ini_set('display_errors', 0); // Don't display errors in output
 
 try {
     include 'includes/config.php';
+    include 'includes/document_number_generator.php';
     $conn = connect_db();
 } catch (Exception $e) {
     http_response_code(500);
@@ -56,8 +57,8 @@ try {
             throw new Exception("No valid campaigns found or total amount is zero.");
         }
 
-        // Generate invoice number
-        $invoiceNumber = 'INV-' . date('Y') . '-' . str_pad($invoiceId, 6, '0', STR_PAD_LEFT);
+        // Generate invoice number in new format (I10P001202511)
+        $invoiceNumber = generateDocumentNumber($conn, 'invoice');
         
         // Calculate due date (30 days from now)
         $dueDate = date('Y-m-d', strtotime('+30 days'));

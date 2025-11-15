@@ -5820,7 +5820,7 @@
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
             tbody.innerHTML = sortedDocs.map(doc => `
                 <tr onclick="viewDocument('${type}', ${doc.id})" style="cursor: pointer;">
-                    <td>${docNum[type]}${String(doc.id).slice(-6)}</td>
+                    <td><strong>${doc.documentNumber || docNum[type] + String(doc.id).slice(-6)}</strong></td>
                     <td>${doc.clientName || doc.client_name || 'Unknown Client'}</td>
                     <td><span class="badge bg-info">${doc.itemType || doc.item_type || 'General'}</span></td>
                     <td>${formatDate(doc.date)}</td>
@@ -6435,7 +6435,7 @@
             
             const color = colors[docType];
             const title = titles[docType];
-            const docNumber = docNum[docType] + String(doc.id).slice(-6);
+            const docNumber = doc.documentNumber || (docNum[docType] + String(doc.id).slice(-6));
             const clientName = doc.clientName || doc.client_name || 'Unknown Client';
             const itemType = doc.itemType || doc.item_type || 'General';
             const date = formatDate(doc.date);
@@ -6795,8 +6795,11 @@
                 totalAmount: totalAmount
             };
 
-            // Generate invoice preview HTML with modern design
-            const invoiceNumber = `INV-${Date.now().toString().slice(-12)}`;
+            // Generate invoice number preview (temporary - will be replaced with actual number from backend)
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const invoiceNumber = `I10P***${year}${month}`;
             const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             
