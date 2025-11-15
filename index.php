@@ -6515,6 +6515,17 @@
                         <h3>Total: Rs. ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
                     </div>
                     
+                    ${docType === 'receipt' ? `
+                    <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-left: 4px solid ${color}; border-radius: 4px;">
+                        <h3 style="color: ${color}; margin: 0 0 15px 0;">Payment Confirmation.</h3>
+                        <h4 style="color: #333; margin: 0 0 15px 0;">Thank you!</h4>
+                        <p style="line-height: 1.6; color: #555; margin: 0;">
+                            We have successfully received your payment, thank you! We are grateful for your trust and for choosing to work with us. 
+                            Should you have any questions, please do not hesitate to contact us.
+                        </p>
+                    </div>
+                    ` : ''}
+                    
                     <div class="footer">
                         <p>${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}</p>
                         <p>Generated on ${formatDate(new Date())}</p>
