@@ -24,7 +24,8 @@
         body { font-family: 'Lato', 'Segoe UI', sans-serif; background: #f0f7f9; }
         .sidebar { 
             background: var(--dark); 
-            min-height: 100vh; 
+            height: 100vh;
+            max-height: 100vh;
             position: fixed; 
             left: 0; 
             top: 0; 
