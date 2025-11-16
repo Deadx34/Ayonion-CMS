@@ -7759,25 +7759,25 @@
 
         // Load company logo for login screen (only if login page is visible)
         async function loadLoginLogo() {
-            const loginPage = document.getElementById('loginPage');
             const loginLogo = document.getElementById('loginLogo');
             const loginIcon = document.getElementById('loginIcon');
             
-            // Only run if we're on the login page
-            if (!loginPage || loginPage.style.display === 'none') return;
             if (!loginLogo || !loginIcon) return;
             
-            // Try to get logo from settings first (no auth needed for public endpoint)
-            try {
-                const response = await fetch('uploads/logos/company_logo.png', { method: 'HEAD' });
-                if (response.ok) {
-                    loginLogo.src = 'uploads/logos/company_logo.png';
-                    loginLogo.style.display = 'block';
-                    loginIcon.style.display = 'none';
-                }
-            } catch (e) {
-                // Keep icon visible if logo not found
-            }
+            // Try to load logo silently
+            loginLogo.onload = function() {
+                loginLogo.style.display = 'block';
+                loginIcon.style.display = 'none';
+            };
+            
+            loginLogo.onerror = function() {
+                // Keep icon visible if logo fails to load
+                loginLogo.style.display = 'none';
+                loginIcon.style.display = 'block';
+            };
+            
+            // Set source to trigger load attempt
+            loginLogo.src = 'uploads/logos/company_logo.png';
         }
 
     </script>
