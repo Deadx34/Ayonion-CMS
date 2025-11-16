@@ -7757,27 +7757,43 @@
             initializeTableSorting();
         });
 
-        // Load company logo for login screen (only if login page is visible)
+        // Load company logo for login screen
         async function loadLoginLogo() {
             const loginLogo = document.getElementById('loginLogo');
             const loginIcon = document.getElementById('loginIcon');
             
             if (!loginLogo || !loginIcon) return;
             
-            // Try to load logo silently
-            loginLogo.onload = function() {
-                loginLogo.style.display = 'block';
-                loginIcon.style.display = 'none';
-            };
+            try {
+                // Fetch logo from settings (public endpoint, no auth required)
+                const response = await fetch('handler_settings.php?action=get');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.settings && data.settings.logo_url) {
+                        const logoUrl = data.settings.logo_url;
+                        
+                        // Set up handlers
+                        loginLogo.onload = function() {
+                            loginLogo.style.display = 'block';
+                            loginIcon.style.display = 'none';
+                        };
+                        
+                        loginLogo.onerror = function() {
+                            loginLogo.style.display = 'none';
+                            loginIcon.style.display = 'block';
+                        };
+                        
+                        // Load the logo
+                        loginLogo.src = logoUrl;
+                        return;
+                    }
+                }
+            } catch (e) {
+                // Silently fail and show icon
+            }
             
-            loginLogo.onerror = function() {
-                // Keep icon visible if logo fails to load
-                loginLogo.style.display = 'none';
-                loginIcon.style.display = 'block';
-            };
-            
-            // Set source to trigger load attempt
-            loginLogo.src = 'uploads/logos/company_logo.png';
+            // If no logo in settings, show icon
+            loginIcon.style.display = 'block';
         }
 
     </script>

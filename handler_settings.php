@@ -28,7 +28,11 @@ try {
         session_start();
     }
 
-    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || ($_SESSION['role'] ?? '') !== 'admin') {
+    // Allow logo access for login page (public endpoint for get action only)
+    $isGetAction = ($action === 'get');
+    $requiresAuth = !$isGetAction;
+    
+    if ($requiresAuth && (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || ($_SESSION['role'] ?? '') !== 'admin')) {
         throw new Exception("Authentication required.", 401);
     }
 
