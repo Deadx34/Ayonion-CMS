@@ -22,7 +22,20 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Lato', 'Segoe UI', sans-serif; background: #f0f7f9; }
-        .sidebar { background: var(--dark); min-height: 100vh; position: fixed; left: 0; top: 0; width: 260px; z-index: 1000; overflow-y: auto; transition: transform 0.3s ease; scrollbar-width: none; -ms-overflow-style: none; }
+        .sidebar { 
+            background: var(--dark); 
+            min-height: 100vh; 
+            position: fixed; 
+            left: 0; 
+            top: 0; 
+            width: 260px; 
+            z-index: 1000; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            transition: transform 0.3s ease; 
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+        }
         .sidebar::-webkit-scrollbar { display: none; }
         .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; }
         .sidebar-header h3 { font-size: 1.4rem; font-weight: 700; margin: 0; }
