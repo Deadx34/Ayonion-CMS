@@ -37,11 +37,11 @@ try {
     }
 
     // Ensure a row exists (id=1 acts as singleton)
-    $conn->query("INSERT INTO settings (id, company_name, logo_url, email, phone, address) 
-                  SELECT 1, 'Ayonion Studios', '', '', '', '' WHERE NOT EXISTS (SELECT 1 FROM settings WHERE id=1)");
+    $conn->query("INSERT INTO settings (id, company_name, logo_url, email, phone, address, website) 
+                  SELECT 1, 'Ayonion Studios', '', '', '', '', '' WHERE NOT EXISTS (SELECT 1 FROM settings WHERE id=1)");
 
     if ($action === 'get') {
-        $sql = "SELECT company_name, logo_url, email, phone, address FROM settings WHERE id = 1";
+        $sql = "SELECT company_name, logo_url, email, phone, address, website FROM settings WHERE id = 1";
         $result = $conn->query($sql);
         if ($result && $row = $result->fetch_assoc()) {
             echo json_encode([ 'success' => true, 'settings' => $row ]);
@@ -54,6 +54,7 @@ try {
         $logoUrl = $conn->real_escape_string(trim($input['logoUrl'] ?? ''));
         $email = $conn->real_escape_string(trim($input['email'] ?? ''));
         $phone = $conn->real_escape_string(trim($input['phone'] ?? ''));
+        $website = $conn->real_escape_string(trim($input['website'] ?? ''));
         $address = $conn->real_escape_string(trim($input['address'] ?? ''));
 
         if ($companyName === '') {
@@ -62,7 +63,7 @@ try {
             exit;
         }
 
-        $sql = "UPDATE settings SET company_name='$companyName', logo_url='$logoUrl', email='$email', phone='$phone', address='$address' WHERE id = 1";
+        $sql = "UPDATE settings SET company_name='$companyName', logo_url='$logoUrl', email='$email', phone='$phone', website='$website', address='$address' WHERE id = 1";
         if ($conn->query($sql)) {
             echo json_encode([ 'success' => true, 'message' => 'Settings updated' ]);
         } else {

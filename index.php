@@ -299,6 +299,10 @@
                                 <label class="form-label">Phone</label>
                                 <input type="text" class="form-control" id="settingsPhone" placeholder="+1 555 0123">
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Website</label>
+                                <input type="text" class="form-control" id="settingsWebsite" placeholder="www.company.com">
+                            </div>
                             <div class="col-12">
                                 <label class="form-label">Address</label>
                                 <textarea class="form-control" id="settingsAddress" rows="3"></textarea>
@@ -2439,6 +2443,7 @@
                         email: settings.email || DEFAULT_COMPANY_INFO.email,
                         tel: settings.phone || DEFAULT_COMPANY_INFO.tel,
                         phone: settings.phone || DEFAULT_COMPANY_INFO.tel,
+                        website: settings.website || DEFAULT_COMPANY_INFO.website,
                         address: settings.address || DEFAULT_COMPANY_INFO.address,
                         logoUrl: settings.logo_url || ''
                     };
@@ -2580,6 +2585,7 @@
                     document.getElementById('settingsLogoUrl').value = s.logo_url || '';
                     document.getElementById('settingsEmail').value = s.email || '';
                     document.getElementById('settingsPhone').value = s.phone || '';
+                    document.getElementById('settingsWebsite').value = s.website || '';
                     document.getElementById('settingsAddress').value = s.address || '';
                     
                     // Show existing logo if available
@@ -2606,6 +2612,7 @@
                 logoUrl: document.getElementById('settingsLogoUrl').value.trim(),
                 email: document.getElementById('settingsEmail').value.trim(),
                 phone: document.getElementById('settingsPhone').value.trim(),
+                website: document.getElementById('settingsWebsite').value.trim(),
                 address: document.getElementById('settingsAddress').value.trim()
             };
             try {
