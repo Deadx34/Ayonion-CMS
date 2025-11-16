@@ -2152,7 +2152,9 @@
             tagline: 'Creative Digital Solutions',
             email: 'info@ayonionstudios.com',
             tel: '+94 (70) 610 1035',
+            phone: '+94 (70) 610 1035',
             address: 'No.59/1/C, Kaluwala road, Kossinna, Ganemulla.',
+            website: 'www.ayonionstudios.com',
             bank: 'NDB Bank',
             account: '101001037178',
             accountName: 'Ayonion Studios (pvt) Ltd'
@@ -2436,6 +2438,7 @@
                         name: settings.company_name || DEFAULT_COMPANY_INFO.name,
                         email: settings.email || DEFAULT_COMPANY_INFO.email,
                         tel: settings.phone || DEFAULT_COMPANY_INFO.tel,
+                        phone: settings.phone || DEFAULT_COMPANY_INFO.tel,
                         address: settings.address || DEFAULT_COMPANY_INFO.address,
                         logoUrl: settings.logo_url || ''
                     };
@@ -6165,19 +6168,19 @@
                             <div style="margin-bottom: 15px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 11px;">
                                     <span style="width: 14px; margin-right: 8px; text-align: center;">✉</span>
-                                    <span>${COMPANY_INFO.email || 'info@ayonionstudios.com'}</span>
+                                    <span>${COMPANY_INFO.email}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 11px;">
                                     <span style="width: 14px; margin-right: 8px; text-align: center;">📞</span>
-                                    <span>${COMPANY_INFO.phone || '+94 (70) 610 1035'}</span>
+                                    <span>${COMPANY_INFO.phone}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 11px;">
                                     <span style="width: 14px; margin-right: 8px; text-align: center;">📍</span>
-                                    <span>${COMPANY_INFO.address || 'No.59/1/C, Kaluwala road, Kossinna, Ganemulla. PV00231937'}</span>
+                                    <span>${COMPANY_INFO.address}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 11px;">
                                     <span style="width: 14px; margin-right: 8px; text-align: center;">🌐</span>
-                                    <span><strong>${COMPANY_INFO.website || 'www.ayonionstudios.com'}</strong></span>
+                                    <span><strong>${COMPANY_INFO.website}</strong></span>
                                 </div>
                             </div>
                             
