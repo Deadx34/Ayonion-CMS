@@ -177,7 +177,8 @@
     <div id="loginPage" class="login-container" style="display: none; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #052C47 0%, #1A364A 50%, #2E404C 100%);">
         <div class="login-card" style="background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(3,11,13,0.4); padding: 50px; max-width: 450px; width: 100%;">
             <div style="text-align: center; margin-bottom: 40px;">
-                <i class="fas fa-palette fa-3x mb-3" style="color: #F7C935;"></i>
+                <img src="uploads/logos/company_logo.png" alt="Ayonion Studios" style="height: 80px; margin-bottom: 20px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <i class="fas fa-palette fa-3x mb-3" style="color: #F7C935; display: none;"></i>
                 <h1 style="color: #052C47; font-weight: 700; font-size: 2rem; margin-bottom: 10px;">Ayonion Studios</h1>
                 <p style="color: #618698; font-size: 0.95rem;">Management System</p>
             </div>
