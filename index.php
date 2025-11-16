@@ -2342,6 +2342,7 @@
             document.getElementById('loginForm').reset();
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
+            loadLoginLogo(); // Load logo when showing login page
         }
 
         function hasPermission(action) {
@@ -2448,10 +2449,12 @@
                 } else {
                     // No valid session, show login page
                     document.getElementById('loginPage').style.display = 'flex';
+                    loadLoginLogo();
                 }
             } catch (_) {
                 // Session check failed, show login page
                 document.getElementById('loginPage').style.display = 'flex';
+                loadLoginLogo();
             }
         })();
         
@@ -7752,40 +7755,29 @@
         }
         document.addEventListener('DOMContentLoaded', function() {
             initializeTableSorting();
-            loadLoginLogo();
         });
 
-        // Load company logo for login screen
+        // Load company logo for login screen (only if login page is visible)
         async function loadLoginLogo() {
+            const loginPage = document.getElementById('loginPage');
             const loginLogo = document.getElementById('loginLogo');
             const loginIcon = document.getElementById('loginIcon');
             
+            // Only run if we're on the login page
+            if (!loginPage || loginPage.style.display === 'none') return;
             if (!loginLogo || !loginIcon) return;
             
-            // Try to load the logo from possible locations
-            const logoPaths = [
-                'uploads/logos/company_logo.png',
-                'uploads/logos/company_logo.jpg',
-                'uploads/logos/logo.png',
-                'uploads/logos/logo.jpg'
-            ];
-            
-            for (const path of logoPaths) {
-                try {
-                    const response = await fetch(path, { method: 'HEAD' });
-                    if (response.ok) {
-                        loginLogo.src = path;
-                        loginLogo.style.display = 'block';
-                        loginIcon.style.display = 'none';
-                        return;
-                    }
-                } catch (e) {
-                    // Continue to next path
+            // Try to get logo from settings first (no auth needed for public endpoint)
+            try {
+                const response = await fetch('uploads/logos/company_logo.png', { method: 'HEAD' });
+                if (response.ok) {
+                    loginLogo.src = 'uploads/logos/company_logo.png';
+                    loginLogo.style.display = 'block';
+                    loginIcon.style.display = 'none';
                 }
+            } catch (e) {
+                // Keep icon visible if logo not found
             }
-            
-            // If no logo found, keep the icon visible
-            loginIcon.style.display = 'block';
         }
 
     </script>
