@@ -177,8 +177,8 @@
     <div id="loginPage" class="login-container" style="display: none; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #052C47 0%, #1A364A 50%, #2E404C 100%);">
         <div class="login-card" style="background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(3,11,13,0.4); padding: 50px; max-width: 450px; width: 100%;">
             <div style="text-align: center; margin-bottom: 40px;">
-                <img src="uploads/logos/company_logo.png" alt="Ayonion Studios" style="height: 80px; margin-bottom: 20px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                <i class="fas fa-palette fa-3x mb-3" style="color: #F7C935; display: none;"></i>
+                <img id="loginLogo" src="" alt="Ayonion Studios" style="height: 80px; margin-bottom: 20px; object-fit: contain; display: none;">
+                <i id="loginIcon" class="fas fa-palette fa-3x mb-3" style="color: #F7C935;"></i>
                 <h1 style="color: #052C47; font-weight: 700; font-size: 2rem; margin-bottom: 10px;">Ayonion Studios</h1>
                 <p style="color: #618698; font-size: 0.95rem;">Management System</p>
             </div>
@@ -7752,7 +7752,41 @@
         }
         document.addEventListener('DOMContentLoaded', function() {
             initializeTableSorting();
+            loadLoginLogo();
         });
+
+        // Load company logo for login screen
+        async function loadLoginLogo() {
+            const loginLogo = document.getElementById('loginLogo');
+            const loginIcon = document.getElementById('loginIcon');
+            
+            if (!loginLogo || !loginIcon) return;
+            
+            // Try to load the logo from possible locations
+            const logoPaths = [
+                'uploads/logos/company_logo.png',
+                'uploads/logos/company_logo.jpg',
+                'uploads/logos/logo.png',
+                'uploads/logos/logo.jpg'
+            ];
+            
+            for (const path of logoPaths) {
+                try {
+                    const response = await fetch(path, { method: 'HEAD' });
+                    if (response.ok) {
+                        loginLogo.src = path;
+                        loginLogo.style.display = 'block';
+                        loginIcon.style.display = 'none';
+                        return;
+                    }
+                } catch (e) {
+                    // Continue to next path
+                }
+            }
+            
+            // If no logo found, keep the icon visible
+            loginIcon.style.display = 'block';
+        }
 
     </script>
 </body>
