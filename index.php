@@ -211,12 +211,14 @@
         <nav class="sidebar">
             <div class="sidebar-header">
                 <div class="d-flex align-items-center mb-2">
-                    <img id="sidebarLogo" src="" alt="Logo" style="width: 32px; height: 32px; object-fit: contain; margin-right: 10px; display: none;">
                     <h3 id="sidebarCompanyName">Ayonion</h3>
                 </div>
                 <p>Management System</p>
             </div>
             <ul class="nav flex-column mt-4" id="navMenu"></ul>
+            <div style="text-align: center; padding: 20px 0;">
+                <img id="sidebarLogo" src="" alt="Logo" style="max-width: 120px; height: auto; object-fit: contain; display: none; margin: 0 auto;">
+            </div>
             <div class="logout-btn">
                 <button class="btn btn-danger w-100" onclick="logout()">
                     <i class="fas fa-sign-out-alt me-2"></i>Logout
