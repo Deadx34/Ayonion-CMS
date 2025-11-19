@@ -212,7 +212,10 @@
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                    <div style="position: relative;">
+                        <input type="password" class="form-control" id="password" placeholder="Enter password" required style="padding-right: 45px;">
+                        <i class="fas fa-eye" id="togglePassword" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #6c757d;"></i>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary w-100" style="padding: 12px;">
                     <i class="fas fa-sign-in-alt me-2"></i>Login
@@ -2294,6 +2297,23 @@
         // ============================================
         // LOGIN SYSTEM (PHP Handlers)
         // ============================================
+        
+        // Password visibility toggle
+        document.getElementById('togglePassword')?.addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+        
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const role = document.getElementById('userRole').value;
