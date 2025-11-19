@@ -4769,7 +4769,7 @@
             const reportHtml = `
                 <div style="font-family: Arial; padding: 20px;">
                     <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
-                        ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 90px; margin-right: 20px; object-fit: contain;">` : ''}
+                        ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 125px; margin-right: 20px; object-fit: contain;">` : ''}
                         <div>
                             <h1 style="color: #6366f1; margin: 0; font-size: 2rem;">${COMPANY_INFO.name}</h1>
                             <p style="color: #666; margin: 5px 0;">Content Credit Usage Report</p>
@@ -6325,7 +6325,7 @@
                     <!-- Sidebar -->
                     <div style="width: 30%; background: #2c3e50; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
                         <div style="margin-bottom: 15px; text-align: center;">
-                            ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 67.5px; margin-bottom: 5px; object-fit: contain;">` : ''}
+                            ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 125px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
                         </div>
                         
