@@ -7076,10 +7076,6 @@
                                 <span class="info-label">Due Date:</span>
                                 <span class="info-value">${dueDate}</span>
                             </div>
-                            <div class="info-item">
-                                <span class="info-label">Status:</span>
-                                <span class="info-value"><span class="badge bg-warning text-dark">Draft</span></span>
-                            </div>
                         </div>
                     </div>
                     
