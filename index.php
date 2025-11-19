@@ -14,7 +14,7 @@
             --success: #10b981;
             --danger: #ef4444;
             --warning: #F7C935;
-            --dark: #052C47;
+            --dark: #030B0D ;
             --dark-secondary: #1A364A;
             --dark-tertiary: #2E404C;
             --light: #BDDFE8;
