@@ -298,6 +298,10 @@
                                 <input type="text" class="form-control" id="settingsCompanyName" required>
                             </div>
                             <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="settingsEmail" placeholder="info@company.com">
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Logo for Light Backgrounds</label>
                                 <input type="file" class="form-control" id="settingsLogoLightFile" accept="image/*" onchange="handleLogoLightUpload(this)">
                                 <input type="hidden" id="settingsLogoLightUrl">
@@ -317,10 +321,7 @@
                                 </div>
                                 <small class="text-muted">Used on dark backgrounds (e.g., sidebar, login screen)</small>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" id="settingsEmail" placeholder="info@company.com">
-                            </div>
+                            
                             <div class="col-md-6">
                                 <label class="form-label">Phone</label>
                                 <input type="text" class="form-control" id="settingsPhone" placeholder="+1 555 0123">
