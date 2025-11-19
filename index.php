@@ -7214,6 +7214,11 @@
                 return;
             }
 
+            if (selectedCampaigns.length === 0) {
+                showAlert('Please select at least one campaign to include in the report.', 'warning');
+                return;
+            }
+
             const client = appData.clients.find(c => c.id === clientId);
             if (!client) {
                 showAlert('Client not found.', 'danger');
@@ -7243,8 +7248,104 @@
             document.getElementById('reportEvidence').value = '';
             document.getElementById('reportPreviewContent').innerHTML = '<p class="text-center text-muted py-5">Click "Generate Preview" to see the report</p>';
 
-            // Add one empty row for manual data entry
-            addCampaignRow();
+            // Load selected campaigns
+            const selectedCampaignObjects = appData.campaigns.filter(c => selectedCampaigns.includes(c.id));
+            
+            if (selectedCampaignObjects.length > 0) {
+                selectedCampaignObjects.forEach(campaign => {
+                    addCampaignRow({
+                        adName: campaign.adName,
+                        resultType: campaign.resultType || 'Link Clicks',
+                        results: campaign.results || 0,
+                        costPerResult: campaign.cpr || 0,
+                        reach: campaign.reach || 0,
+                        impressions: campaign.impressions || 0,
+                        spend: campaign.spend || 0,
+                        qualityRanking: 'Average',
+                        conversionRanking: 'Average'
+                    });
+                    
+                    // Load Evidence Images from campaigns
+                    if (campaign.evidenceImageUrl) {
+                        try {
+                            const evidenceImages = JSON.parse(campaign.evidenceImageUrl);
+                            if (Array.isArray(evidenceImages)) {
+                                evidenceImages.forEach(img => {
+                                    reportEvidenceImages.push({
+                                        name: `Evidence - ${campaign.adName}`,
+                                        data: img.url
+                                    });
+                                });
+                            }
+                        } catch (e) {
+                            reportEvidenceImages.push({
+                                name: `Evidence - ${campaign.adName}`,
+                                data: campaign.evidenceImageUrl
+                            });
+                        }
+                    }
+                    
+                    // Load Creative Images from campaigns
+                    if (campaign.creativeImageUrl) {
+                        try {
+                            const creativeImages = JSON.parse(campaign.creativeImageUrl);
+                            if (Array.isArray(creativeImages)) {
+                                creativeImages.forEach(img => {
+                                    reportCreativeImages.push({
+                                        name: `Creative - ${campaign.adName}`,
+                                        data: img.url
+                                    });
+                                });
+                            }
+                        } catch (e) {
+                            reportCreativeImages.push({
+                                name: `Creative - ${campaign.adName}`,
+                                data: campaign.creativeImageUrl
+                            });
+                        }
+                    }
+                });
+                
+                // Display loaded evidence images
+                const evidencePreview = document.getElementById('reportEvidenceImagesPreview');
+                reportEvidenceImages.forEach((img, idx) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 mb-3';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${img.data}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted d-block text-truncate">${img.name}</small>
+                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeReportEvidenceImage(${idx})">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    evidencePreview.appendChild(col);
+                });
+                
+                // Display loaded creative images
+                const creativePreview = document.getElementById('reportImagesPreview');
+                reportCreativeImages.forEach((img, idx) => {
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 mb-3';
+                    col.innerHTML = `
+                        <div class="card">
+                            <img src="${img.data}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <div class="card-body p-2">
+                                <small class="text-muted d-block text-truncate">${img.name}</small>
+                                <button class="btn btn-sm btn-danger w-100 mt-2" onclick="removeReportImage(${idx})">
+                                    <i class="fas fa-trash me-1"></i>Remove
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    creativePreview.appendChild(col);
+                });
+                
+                calculateTotals();
+            }
 
             new bootstrap.Modal(document.getElementById('campaignReportModal')).show();
         }
