@@ -35,7 +35,7 @@
             overflow-x: hidden;
             transition: transform 0.3s ease; 
             scrollbar-width: thin; 
-            scrollbar-color: rgba(247, 201, 53, 0.5) rgba(255, 255, 255, 0.1); 
+            scrollbar-color: rgba(255, 255, 255, 0.81) rgba(255, 255, 255, 0.1); 
         }
         .sidebar::-webkit-scrollbar { 
             width: 8px; 
@@ -51,7 +51,7 @@
         .sidebar::-webkit-scrollbar-thumb:hover { 
             background: rgba(247, 201, 53, 0.8); 
         }
-        .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; }
+        .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; text-align: center; }
         .sidebar-header h3 { font-size: 1.4rem; font-weight: 700; margin: 0; }
         .sidebar-header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.85rem; }
         .nav-item { margin: 5px 15px; }
