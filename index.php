@@ -298,13 +298,24 @@
                                 <input type="text" class="form-control" id="settingsCompanyName" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Company Logo</label>
-                                <input type="file" class="form-control" id="settingsLogoFile" accept="image/*" onchange="handleLogoUpload(this)">
-                                <input type="hidden" id="settingsLogoUrl">
-                                <div id="logoPreview" class="mt-2" style="display: none;">
-                                    <img id="logoPreviewImg" src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;">
-                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeLogo()">Remove</button>
+                                <label class="form-label">Logo for Light Backgrounds</label>
+                                <input type="file" class="form-control" id="settingsLogoLightFile" accept="image/*" onchange="handleLogoLightUpload(this)">
+                                <input type="hidden" id="settingsLogoLightUrl">
+                                <div id="logoLightPreview" class="mt-2" style="display: none;">
+                                    <img id="logoLightPreviewImg" src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa; padding: 5px;">
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeLogoLight()">Remove</button>
                                 </div>
+                                <small class="text-muted">Used on light/white backgrounds (e.g., documents, invoices)</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Logo for Dark Backgrounds</label>
+                                <input type="file" class="form-control" id="settingsLogoDarkFile" accept="image/*" onchange="handleLogoDarkUpload(this)">
+                                <input type="hidden" id="settingsLogoDarkUrl">
+                                <div id="logoDarkPreview" class="mt-2" style="display: none;">
+                                    <img id="logoDarkPreviewImg" src="" alt="Logo Preview" style="max-width: 100px; max-height: 100px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px; background: #2E404C; padding: 5px;">
+                                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeLogoDark()">Remove</button>
+                                </div>
+                                <small class="text-muted">Used on dark backgrounds (e.g., sidebar, login screen)</small>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Email</label>
@@ -2477,10 +2488,12 @@
                         phone: settings.phone || DEFAULT_COMPANY_INFO.tel,
                         website: settings.website || DEFAULT_COMPANY_INFO.website,
                         address: settings.address || DEFAULT_COMPANY_INFO.address,
-                        logoUrl: settings.logo_url || ''
+                        logoUrl: settings.logo_light || settings.logo_url || '', // Use light logo for documents
+                        logoLight: settings.logo_light || settings.logo_url || '',
+                        logoDark: settings.logo_dark || settings.logo_url || ''
                     };
-                    // Update sidebar header
-                    updateSidebarHeader(settings.company_name, settings.logo_url);
+                    // Update sidebar header (uses dark logo for dark sidebar background)
+                    updateSidebarHeader(settings.company_name, settings.logo_dark || settings.logo_url);
                 }
             } catch (_) {
                 // Use default company info if settings can't be loaded
@@ -2614,20 +2627,27 @@
                 if (data.success) {
                     const s = data.settings || {};
                     document.getElementById('settingsCompanyName').value = s.company_name || '';
-                    document.getElementById('settingsLogoUrl').value = s.logo_url || '';
+                    document.getElementById('settingsLogoLightUrl').value = s.logo_light || '';
+                    document.getElementById('settingsLogoDarkUrl').value = s.logo_dark || '';
                     document.getElementById('settingsEmail').value = s.email || '';
                     document.getElementById('settingsPhone').value = s.phone || '';
                     document.getElementById('settingsWebsite').value = s.website || '';
                     document.getElementById('settingsAddress').value = s.address || '';
                     
-                    // Show existing logo if available
-                    if (s.logo_url) {
-                        document.getElementById('logoPreviewImg').src = s.logo_url;
-                        document.getElementById('logoPreview').style.display = 'block';
+                    // Show existing light logo if available
+                    if (s.logo_light) {
+                        document.getElementById('logoLightPreviewImg').src = s.logo_light;
+                        document.getElementById('logoLightPreview').style.display = 'block';
                     }
                     
-                    // Update sidebar immediately
-                    updateSidebarHeader(s.company_name, s.logo_url);
+                    // Show existing dark logo if available
+                    if (s.logo_dark) {
+                        document.getElementById('logoDarkPreviewImg').src = s.logo_dark;
+                        document.getElementById('logoDarkPreview').style.display = 'block';
+                    }
+                    
+                    // Update sidebar immediately (uses dark logo)
+                    updateSidebarHeader(s.company_name, s.logo_dark);
                 } else {
                     showAlert('Failed to load settings: ' + (data.message || ''), 'danger');
                 }
@@ -2641,7 +2661,9 @@
             if (currentUser.role !== 'admin') { showAlert('Access denied', 'danger'); return; }
             const payload = {
                 companyName: document.getElementById('settingsCompanyName').value.trim(),
-                logoUrl: document.getElementById('settingsLogoUrl').value.trim(),
+                logoUrl: document.getElementById('settingsLogoLightUrl').value.trim() || document.getElementById('settingsLogoDarkUrl').value.trim(), // Backward compatibility
+                logoLight: document.getElementById('settingsLogoLightUrl').value.trim(),
+                logoDark: document.getElementById('settingsLogoDarkUrl').value.trim(),
                 email: document.getElementById('settingsEmail').value.trim(),
                 phone: document.getElementById('settingsPhone').value.trim(),
                 website: document.getElementById('settingsWebsite').value.trim(),
@@ -2657,10 +2679,10 @@
                 const data = await res.json();
                 if (data.success) {
                     showAlert('Settings saved', 'success');
-                    // Update sidebar immediately after saving
+                    // Update sidebar immediately after saving (uses dark logo)
                     const companyName = document.getElementById('settingsCompanyName').value;
-                    const logoUrl = document.getElementById('settingsLogoUrl').value;
-                    updateSidebarHeader(companyName, logoUrl);
+                    const logoDark = document.getElementById('settingsLogoDarkUrl').value;
+                    updateSidebarHeader(companyName, logoDark);
                     // Reload company settings for reports
                     await loadCompanySettings();
                 } else {
@@ -2727,6 +2749,110 @@
             document.getElementById('settingsLogoFile').value = '';
             document.getElementById('settingsLogoUrl').value = '';
             document.getElementById('logoPreview').style.display = 'none';
+        }
+
+        // Handle Logo Light Upload
+        async function handleLogoLightUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showAlert('Please select a valid image file.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            if (file.size > 2 * 1024 * 1024) {
+                showAlert('Logo file is too large. Please choose an image smaller than 2MB.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('logo', file);
+            
+            try {
+                const response = await fetch('upload_logo_handler_simple.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('settingsLogoLightUrl').value = result.logo_url;
+                    const preview = document.getElementById('logoLightPreview');
+                    const previewImg = document.getElementById('logoLightPreviewImg');
+                    previewImg.src = result.logo_url;
+                    preview.style.display = 'block';
+                    showAlert('Light logo uploaded successfully!', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                    input.value = '';
+                }
+            } catch (error) {
+                showAlert('Upload error: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        function removeLogoLight() {
+            document.getElementById('settingsLogoLightFile').value = '';
+            document.getElementById('settingsLogoLightUrl').value = '';
+            document.getElementById('logoLightPreview').style.display = 'none';
+        }
+
+        // Handle Logo Dark Upload
+        async function handleLogoDarkUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                showAlert('Please select a valid image file.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            if (file.size > 2 * 1024 * 1024) {
+                showAlert('Logo file is too large. Please choose an image smaller than 2MB.', 'danger');
+                input.value = '';
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('logo', file);
+            
+            try {
+                const response = await fetch('upload_logo_handler_simple.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('settingsLogoDarkUrl').value = result.logo_url;
+                    const preview = document.getElementById('logoDarkPreview');
+                    const previewImg = document.getElementById('logoDarkPreviewImg');
+                    previewImg.src = result.logo_url;
+                    preview.style.display = 'block';
+                    showAlert('Dark logo uploaded successfully!', 'success');
+                } else {
+                    showAlert('Upload failed: ' + result.message, 'danger');
+                    input.value = '';
+                }
+            } catch (error) {
+                showAlert('Upload error: ' + error.message, 'danger');
+                input.value = '';
+            }
+        }
+
+        function removeLogoDark() {
+            document.getElementById('settingsLogoDarkFile').value = '';
+            document.getElementById('settingsLogoDarkUrl').value = '';
+            document.getElementById('logoDarkPreview').style.display = 'none';
         }
 
         // ============================================
@@ -7829,10 +7955,9 @@
                             loginCompanyName.textContent = data.settings.company_name;
                         }
                         
-                        // Update logo if available
-                        if (data.settings.logo_url) {
-                            const logoUrl = data.settings.logo_url;
-                            
+                        // Update logo if available (use dark logo for dark card background)
+                        const logoUrl = data.settings.logo_dark || data.settings.logo_url;
+                        if (logoUrl) {
                             // Set up handlers
                             loginLogo.onload = function() {
                                 loginLogo.style.display = 'block';
