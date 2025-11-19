@@ -43,7 +43,7 @@
         .sidebar-header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.85rem; }
         .nav-item { margin: 5px 15px; }
         .nav-link { color: #94a3b8; padding: 12px 20px; border-radius: 10px; transition: all 0.3s; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
-        .nav-link:hover { background: rgba(247,201,53,0.15); color: var(--primary); transform: translateX(5px); }
+        .nav-link:hover { background: rgba(189, 223, 232, 0.4); color: var(--primary); transform: translateX(5px); }
         .nav-link.active { background: var(--primary); color: var(--dark); font-weight: 600; }
         .nav-link i { width: 20px; text-align: center; }
         .content-area { margin-left: 260px; padding: 30px; min-height: 100vh; transition: margin-left 0.3s ease; }
