@@ -188,7 +188,7 @@
     </style>
 </head>
 <body>
-    <div id="loginPage" class="login-container" style="display: none; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div id="loginPage" class="login-container" style="display: none; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #BDDFE8 0%, #618698 100%);">
         <div class="login-card" style="background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(102,126,234,0.4); padding: 50px; max-width: 450px; width: 100%;">
             <div style="text-align: center; margin-bottom: 40px;">
                 <img id="loginLogo" src="" alt="CMS" style="height: 80px; margin: 0 auto 20px auto; display: none; object-fit: contain;">
