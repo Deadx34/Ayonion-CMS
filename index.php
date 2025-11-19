@@ -95,7 +95,7 @@
         #loginPage .form-label { color: #BDDFE8; }
         .form-control, .form-select { border-radius: 8px; border: 2px solid #d1dee4; padding: 10px 15px; transition: all 0.3s; }
         .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(247, 201, 53, 0.25); }
-        .form-check-input:checked { background-color: var(--primary); border-color: var(--primary); }
+        .form-check-input:checked { background-color: #618698; border-color: #618698; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e"); }
         .form-check-input:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(247, 201, 53, 0.25); }
         .form-check-label { font-weight: 500; color: var(--dark); }
         .section { display: none; }
