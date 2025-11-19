@@ -241,9 +241,7 @@
     <div id="mainApp" style="display: none;">
         <nav class="sidebar">
             <div class="sidebar-header">
-                <div class="d-flex align-items-center mb-2">
-                    <h3 id="sidebarCompanyName">Ayonion</h3>
-                </div>
+                <h3 id="sidebarCompanyName">Ayonion</h3>
                 <p>Management System</p>
             </div>
             <ul class="nav flex-column mt-4" id="navMenu"></ul>
