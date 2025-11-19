@@ -192,7 +192,7 @@
     <div id="loginPage" class="login-container" style="display: none; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #BDDFE8 0%, #618698 100%);">
         <div class="login-card" style="background: #030B0D; border-radius: 20px; box-shadow: 0 20px 60px rgba(3,11,13,0.6); padding: 50px; max-width: 450px; width: 100%;">
             <div style="text-align: center; margin-bottom: 40px;">
-                <img id="loginLogo" src="" alt="CMS" style="height: 100px; margin: 0 auto 20px auto; display: none; object-fit: contain;">
+                <img id="loginLogo" src="" alt="CMS" style="height: 125px; margin: 0 auto 20px auto; display: none; object-fit: contain;">
                 <i id="loginIcon" class="fas fa-palette fa-3x mb-3" style="color: #F7C935; display: block; margin: 0 auto;"></i>
                 <h1 id="loginCompanyName" style="color: #BDDFE8; font-weight: 700; font-size: 2rem; margin-bottom: 10px;">CMS</h1>
                 <p style="color: #BDDFE8; font-size: 0.95rem; opacity: 0.8;">Management System</p>
