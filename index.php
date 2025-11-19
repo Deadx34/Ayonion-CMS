@@ -73,7 +73,7 @@
         .sortable.asc::after { content: '↑'; opacity: 1; color: var(--primary); }
         .sortable.desc::after { content: '↓'; opacity: 1; color: var(--primary); }
         .badge { padding: 6px 12px; border-radius: 6px; font-weight: 500; }
-        .btn-primary { background: var(--primary); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.3s; cursor: pointer; color: var(--dark); }
+        .btn-primary { background: var(--primary); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.3s; cursor: pointer; color: var(--light); }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(247, 201, 53, 0.4); }
         .modal-content { border: none; border-radius: 15px; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
