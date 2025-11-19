@@ -34,10 +34,23 @@
             overflow-y: auto; 
             overflow-x: hidden;
             transition: transform 0.3s ease; 
-            scrollbar-width: none; 
-            -ms-overflow-style: none; 
+            scrollbar-width: thin; 
+            scrollbar-color: rgba(247, 201, 53, 0.5) rgba(255, 255, 255, 0.1); 
         }
-        .sidebar::-webkit-scrollbar { display: none; }
+        .sidebar::-webkit-scrollbar { 
+            width: 8px; 
+        }
+        .sidebar::-webkit-scrollbar-track { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 10px; 
+        }
+        .sidebar::-webkit-scrollbar-thumb { 
+            background: rgba(247, 201, 53, 0.5); 
+            border-radius: 10px; 
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover { 
+            background: rgba(247, 201, 53, 0.8); 
+        }
         .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; }
         .sidebar-header h3 { font-size: 1.4rem; font-weight: 700; margin: 0; }
         .sidebar-header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.85rem; }
