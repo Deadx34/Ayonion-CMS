@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #F7C935;
+            --primary: linear-gradient(to bottom right, var(--light), var(--secondary));
             --secondary: #618698;
             --success: #10b981;
             --danger: #ef4444;
