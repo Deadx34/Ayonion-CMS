@@ -1,15 +1,22 @@
 <?php
 // AYONION-CMS/handler_clients.php - Handles CRUD operations for clients
 
+// Error handling for production
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
 header('Content-Type: application/json');
-include 'includes/config.php';
-$conn = connect_db();
 
-$action = $_GET['action'] ?? '';
-$input = json_decode(file_get_contents("php://input"), true);
+try {
+    include 'includes/config.php';
+    $conn = connect_db();
 
-// --- 1. HANDLE ADD CLIENT (POST) ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
+    $action = $_GET['action'] ?? '';
+    $input = json_decode(file_get_contents("php://input"), true);
+
+    // --- 1. HANDLE ADD CLIENT (POST) ---
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
     
     $id = time() . mt_rand(100, 999); 
     
@@ -215,4 +222,20 @@ else {
 }
 
 $conn->close();
+
+} catch (Exception $e) {
+    error_log("Handler error: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        "success" => false, 
+        "message" => "Server error: " . $e->getMessage()
+    ]);
+} catch (Error $e) {
+    error_log("PHP Error: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        "success" => false, 
+        "message" => "Fatal error occurred"
+    ]);
+}
 ?>
