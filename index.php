@@ -6330,7 +6330,7 @@
                     <!-- Sidebar -->
                     <div style="width: 30%; background: #2c3e50; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
                         <div style="margin-bottom: 15px; text-align: center;">
-                            ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 125px; margin-bottom: 5px; object-fit: contain;">` : ''}
+                            ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 125px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
                         </div>
                         
@@ -7176,6 +7176,7 @@
                 <div class="invoice-container">
                     <!-- Header -->
                     <div class="invoice-header">
+                        ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 80px; object-fit: contain;"></div>` : ''}
                         <h1>Invoice</h1>
                         <p>Invoice #${invoiceNumber}</p>
                         <p>Generated on ${currentDate}</p>
