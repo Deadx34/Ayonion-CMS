@@ -608,7 +608,9 @@
                 <div class="modal-body">
                     <div class="row mb-4">
                         <div class="col-md-2 text-center">
-                            <img id="clientDetailLogo" class="logo-preview" style="width: 32px; height: 32px; object-fit: contain;" src="" alt="Logo">
+                            <div id="clientDetailLogoContainer" style="width: 100px; height: 100px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                <img id="clientDetailLogo" class="logo-preview" style="max-width: 100px; max-height: 100px; object-fit: contain;" src="" alt="Logo">
+                            </div>
                         </div>
                         <div class="col-md-10">
                             <h3 id="clientDetailName" class="mb-3"></h3>
@@ -3498,16 +3500,19 @@
             const remainingBudget = totalAdBudget - totalSpent;
 
             const logoElement = document.getElementById('clientDetailLogo');
-            if (logoElement) {
+            const logoContainer = document.getElementById('clientDetailLogoContainer');
+            
+            if (logoElement && logoContainer) {
                 if (client.logoUrl) {
                     logoElement.src = client.logoUrl;
+                    logoElement.style.display = 'block';
                     logoElement.onerror = function() {
                         this.style.display = 'none';
-                        this.parentNode.innerHTML = '<i class="fas fa-building fa-3x text-muted"></i>';
+                        logoContainer.innerHTML = '<i class="fas fa-building fa-4x text-muted"></i>';
                     };
                 } else {
                     logoElement.style.display = 'none';
-                    logoElement.parentNode.innerHTML = '<i class="fas fa-building fa-3x text-muted"></i>';
+                    logoContainer.innerHTML = '<i class="fas fa-building fa-4x text-muted"></i>';
                 }
             }
             // Safely update client detail elements

@@ -1,0 +1,125 @@
+# IMMEDIATE FIX - Unknown Column Errors
+
+## Problems Found:
+
+### 1. Clients Table Missing Columns:
+- subscription_months
+- subscription_start_date  
+- subscription_end_date
+
+### 2. Campaigns Table Missing Columns:
+- evidence_image_url
+- creative_image_url
+
+### 3. Content Credits Table Missing Columns:
+- status
+- published_date
+- content_url
+- image_url (THIS IS WHY IMAGE PREVIEW NOT SAVING!)
+
+## Solution:
+
+### Step 1: Run SQL Fixes in phpMyAdmin
+
+1. **Login to cPanel**
+2. **Open phpMyAdmin**
+3. **Select database:** `ayonions_ayonion_cms`
+4. **Click "SQL" tab**
+
+### Step 2: Fix Clients Table
+
+**Paste this SQL:**
+
+```sql
+ALTER TABLE clients 
+ADD COLUMN subscription_months INT DEFAULT 12 AFTER renewal_date;
+
+ALTER TABLE clients 
+ADD COLUMN subscription_start_date DATE DEFAULT NULL AFTER subscription_months;
+
+ALTER TABLE clients 
+ADD COLUMN subscription_end_date DATE DEFAULT NULL AFTER subscription_start_date;
+```
+
+**Click "Go"** - You should see "3 rows affected"
+
+### Step 3: Fix Campaigns Table
+
+**In the same SQL tab, paste this SQL:**
+
+```sql
+ALTER TABLE campaigns 
+ADD COLUMN evidence_image_url VARCHAR(500) DEFAULT NULL AFTER evidence_files;
+
+ALTER TABLE campaigns 
+ADD COLUMN creative_image_url VARCHAR(500) DEFAULT NULL AFTER evidence_image_url;
+```
+
+**Click "Go"** - You should see "2 rows affected"
+
+### Step 4: Fix Content Credits Table (IMAGE PREVIEW FIX!)
+
+**In the same SQL tab, paste this SQL:**
+
+```sql
+ALTER TABLE content_credits 
+ADD COLUMN status VARCHAR(100) DEFAULT 'In Progress' AFTER credits;
+
+ALTER TABLE content_credits 
+ADD COLUMN published_date DATE DEFAULT NULL AFTER status;
+
+ALTER TABLE content_credits 
+ADD COLUMN content_url VARCHAR(500) DEFAULT NULL AFTER published_date;
+
+ALTER TABLE content_credits 
+ADD COLUMN image_url VARCHAR(500) DEFAULT NULL AFTER content_url;
+```
+
+**Click "Go"** - You should see "4 rows affected"
+
+6. **Click "Go"**
+7. **Should see:** "3 rows affected" or success message
+
+### Step 3: Test the Site
+
+Visit: `https://manage-sys.ayonionstudios.com`
+
+Try adding a client - should work now!
+
+---
+
+## Why This Happened:
+
+The `setup_database.sql` file was an older version that didn't include these subscription tracking columns. The application code expects them but they weren't created during initial import.
+
+---
+
+## After Running the Fix:
+
+✅ Client creation will work
+✅ No more 500 errors on handler_clients.php
+✅ Subscription tracking features will work
+
+---
+
+## If You Still Get Errors:
+
+Check for other missing tables/columns by running:
+
+```sql
+SHOW TABLES;
+```
+
+Should see:
+- campaigns
+- clients
+- content_credits
+- documents  
+- settings
+- users
+
+If any are missing, reimport `setup_database.sql`
+
+---
+
+**This should fix the 500 error immediately!**
