@@ -25,6 +25,7 @@ try {
     $renewalDate = $conn->real_escape_string($input['renewalDate'] ?? null);
     $subscriptionMonths = (int)($input['subscriptionMonths'] ?? 12);
     $packageCredits = (int)($input['packageCredits'] ?? 0);
+    $previousRemainingCredits = (int)($input['previousRemainingCredits'] ?? 0);
     $managingPlatforms = $conn->real_escape_string($input['managingPlatforms'] ?? '');
     $industry = $conn->real_escape_string($input['industry'] ?? '');
     $logoUrl = $conn->real_escape_string($input['logoUrl'] ?? '');
@@ -51,7 +52,7 @@ try {
         $subscriptionMonths, " . ($subscriptionStartDate ? "'$subscriptionStartDate'" : "NULL") . ", 
         " . ($subscriptionEndDate ? "'$subscriptionEndDate'" : "NULL") . ", $packageCredits, 
         '$managingPlatforms', '$industry', '$logoUrl', 
-        0, 0, 0, 0.00, 0.00
+        0, $previousRemainingCredits, 0, 0.00, 0.00
     )";
 
     

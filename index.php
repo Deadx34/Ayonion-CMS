@@ -960,6 +960,11 @@
                                 <label class="form-label">Package Content Credits</label>
                                 <input type="number" class="form-control" id="newClientPackageCredits" required min="0">
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="fas fa-history me-2"></i>Previous Remaining Credits (Optional)</label>
+                                <input type="number" class="form-control" id="previousRemainingCredits" min="0" value="0" placeholder="0">
+                                <small class="text-muted">Credits carried over from old system</small>
+                            </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label d-block">Managing Platforms</label>
                                 <div class="row">
@@ -3386,6 +3391,7 @@
 
             const companyName = document.getElementById('companyName').value.trim();
             const packageCreditsValue = parseInt(document.getElementById('newClientPackageCredits').value) || 0;
+            const previousCreditsValue = parseInt(document.getElementById('previousRemainingCredits').value) || 0;
             
             // Get uploaded logo URL if available
             const logoInput = document.getElementById('clientLogoUpload');
@@ -3404,6 +3410,7 @@
                 renewalDate: document.getElementById('renewalDate').value,
                 subscriptionMonths: parseInt(document.getElementById('subscriptionMonths').value) || 12,
                 packageCredits: packageCreditsValue,
+                previousRemainingCredits: previousCreditsValue,
                 managingPlatforms: managingPlatformsStr,
                 industry: document.getElementById('industry').value,
                 logoUrl: logoUrl
