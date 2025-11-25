@@ -35,7 +35,10 @@ if ($client_result) {
             'carriedForwardCredits' => (int)$row['carried_forward_credits'],
             'usedCredits' => (int)$row['used_credits'],
             'totalAdBudget' => (float)$row['total_ad_budget'],
-            'totalSpent' => (float)$row['total_spent']
+            'totalSpent' => (float)$row['total_spent'],
+            'isPaused' => (int)$row['is_paused'],
+            'pauseStartDate' => $row['pause_start_date'],
+            'pauseEndDate' => $row['pause_end_date']
         ];
     }
 }
