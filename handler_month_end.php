@@ -35,12 +35,20 @@ try {
     // Get current client data
     $client_sql = "SELECT * FROM clients WHERE id = $clientId";
     $client_result = $conn->query($client_sql);
-    
     if (!$client_result || $client_result->num_rows === 0) {
         throw new Exception("Client not found.", 404);
     }
-    
     $client = $client_result->fetch_assoc();
+
+    // Check if client is paused and current date is within pause period
+    $isPaused = (int)($client['is_paused'] ?? 0);
+    $pauseStart = $client['pause_start_date'] ?? null;
+    $pauseEnd = $client['pause_end_date'] ?? null;
+    $todayDate = date('Y-m-d');
+    if ($isPaused && $pauseStart && $pauseEnd && $todayDate >= $pauseStart && $todayDate <= $pauseEnd) {
+        throw new Exception("Client subscription is paused. No credits assigned for this period.", 200);
+    }
+
     $totalCredits = $client['package_credits'] + $client['extra_credits'] + $client['carried_forward_credits'];
     $availableCredits = $totalCredits - $client['used_credits'];
 
