@@ -3487,6 +3487,8 @@
                     ? `<button class="btn btn-sm btn-danger" onclick="deleteClient(${c.id})"><i class="fas fa-trash"></i></button>`
                     : '';
 
+                // Paused indicator for table row
+                const pausedIndicator = c.isPaused ? `<span class="badge bg-warning ms-2"><i class="fas fa-pause-circle me-1"></i>Paused</span>` : '';
                 return `
                 <tr onclick="showClientDetails(${c.id})" 
                     data-partnerid="${c.partnerId.toLowerCase()}"
@@ -3500,7 +3502,7 @@
                         ${c.logoUrl ? `<img src="${c.logoUrl}" class="logo-preview" style="width: 32px; height: 32px; object-fit: contain;" alt="Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\\'fas fa-building text-muted\\' style=\\'font-size: 32px;\\'></i>'">` : '<i class="fas fa-building text-muted" style="font-size: 32px;"></i>'}
                     </td>
                     <td style="cursor: pointer;">${c.partnerId}</td>
-                    <td>${c.companyName}</td>
+                    <td>${c.companyName} ${pausedIndicator}</td>
                     <td>${formatDate(c.renewalDate)}</td>
                     <td><span class="badge bg-${available > 0 ? 'success' : 'danger'}">${available}</span></td>
                     <td>Rs. ${remainingBudget.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
