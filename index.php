@@ -885,6 +885,17 @@
                                 <small class="text-muted">Total advertising budget for this client</small>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="editPauseSubscription">
+                                    <label class="form-check-label" for="editPauseSubscription"><i class="fas fa-pause me-2"></i>Pause Subscription</label>
+                                </div>
+                                <label class="form-label">Pause Start Date</label>
+                                <input type="date" class="form-control mb-2" id="editPauseStartDate">
+                                <label class="form-label">Pause End Date</label>
+                                <input type="date" class="form-control" id="editPauseEndDate">
+                                <small class="text-muted">No credits will be assigned during paused period</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label"><i class="fas fa-history me-2"></i>Previous Remaining Credits (Optional)</label>
                                 <input type="number" class="form-control" id="editPreviousRemainingCredits" min="0" value="0" placeholder="0">
                                 <small class="text-muted">Credits carried over from old system</small>
@@ -3683,6 +3694,9 @@
             document.getElementById('editIndustry').value = client.industry;
             document.getElementById('editTotalAdBudget').value = client.totalAdBudget || 0;
             document.getElementById('editPreviousRemainingCredits').value = client.carriedForwardCredits || 0;
+            document.getElementById('editPauseSubscription').checked = !!client.isPaused;
+            document.getElementById('editPauseStartDate').value = client.pauseStartDate || '';
+            document.getElementById('editPauseEndDate').value = client.pauseEndDate || '';
 
             // Handle logo display
             const currentLogoDiv = document.getElementById('editCurrentLogo');
@@ -3826,7 +3840,10 @@
                 industry: document.getElementById('editIndustry').value,
                 totalAdBudget: parseFloat(document.getElementById('editTotalAdBudget').value) || 0,
                 logoUrl: logoUrl,
-                previousRemainingCredits: parseInt(document.getElementById('editPreviousRemainingCredits').value) || 0
+                previousRemainingCredits: parseInt(document.getElementById('editPreviousRemainingCredits').value) || 0,
+                isPaused: document.getElementById('editPauseSubscription').checked ? 1 : 0,
+                pauseStartDate: document.getElementById('editPauseStartDate').value,
+                pauseEndDate: document.getElementById('editPauseEndDate').value
             };
 
             try {

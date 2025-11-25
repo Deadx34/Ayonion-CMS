@@ -127,6 +127,9 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
     $totalAdBudget = (float)($input['totalAdBudget'] ?? 0);
     $logoUrl = $conn->real_escape_string($input['logoUrl'] ?? '');
     $previousRemainingCredits = (int)($input['previousRemainingCredits'] ?? 0);
+    $isPaused = (int)($input['isPaused'] ?? 0);
+    $pauseStartDate = $conn->real_escape_string($input['pauseStartDate'] ?? null);
+    $pauseEndDate = $conn->real_escape_string($input['pauseEndDate'] ?? null);
 
     // Recalculate subscription end date if subscription months changed
     $subscriptionEndDate = date('Y-m-d', strtotime($renewalDate . " +{$subscriptionMonths} months"));
@@ -141,7 +144,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
         industry = '$industry',
         total_ad_budget = $totalAdBudget,
         logo_url = '$logoUrl',
-        carried_forward_credits = $previousRemainingCredits
+        carried_forward_credits = $previousRemainingCredits,
+        is_paused = $isPaused,
+        pause_start_date = " . ($pauseStartDate ? "'$pauseStartDate'" : "NULL") . ",
+        pause_end_date = " . ($pauseEndDate ? "'$pauseEndDate'" : "NULL") . "
         WHERE id = $clientId";
 
     if (query_db($conn, $sql)) {
