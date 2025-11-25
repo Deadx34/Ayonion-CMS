@@ -3540,7 +3540,22 @@
             }
             // Safely update client detail elements
             const nameEl = document.getElementById('clientDetailName');
-            if (nameEl) nameEl.textContent = client.companyName;
+            if (nameEl) {
+                nameEl.textContent = client.companyName;
+                // Show paused badge if client is paused
+                const pausedBadgeId = 'clientPausedBadge';
+                let pausedBadge = document.getElementById(pausedBadgeId);
+                if (pausedBadge) pausedBadge.remove();
+                const isPaused = !!client.isPaused;
+                const today = new Date().toISOString().slice(0, 10);
+                if (isPaused && client.pauseStartDate && client.pauseEndDate && today >= client.pauseStartDate && today <= client.pauseEndDate) {
+                    const badge = document.createElement('span');
+                    badge.id = pausedBadgeId;
+                    badge.className = 'badge bg-warning ms-2';
+                    badge.innerHTML = '<i class="fas fa-pause-circle me-1"></i>Paused';
+                    nameEl.parentNode.insertBefore(badge, nameEl.nextSibling);
+                }
+            }
             
             const partnerEl = document.getElementById('clientDetailPartnerId');
             if (partnerEl) partnerEl.textContent = client.partnerId;
