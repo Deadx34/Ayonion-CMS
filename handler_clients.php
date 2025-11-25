@@ -126,10 +126,11 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
     $industry = $conn->real_escape_string($input['industry'] ?? '');
     $totalAdBudget = (float)($input['totalAdBudget'] ?? 0);
     $logoUrl = $conn->real_escape_string($input['logoUrl'] ?? '');
-    
+    $previousRemainingCredits = (int)($input['previousRemainingCredits'] ?? 0);
+
     // Recalculate subscription end date if subscription months changed
     $subscriptionEndDate = date('Y-m-d', strtotime($renewalDate . " +{$subscriptionMonths} months"));
-    
+
     $sql = "UPDATE clients SET 
         partner_id = '$partnerId',
         company_name = '$companyName',
@@ -139,9 +140,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
         managing_platforms = '$managingPlatforms',
         industry = '$industry',
         total_ad_budget = $totalAdBudget,
-        logo_url = '$logoUrl'
+        logo_url = '$logoUrl',
+        carried_forward_credits = $previousRemainingCredits
         WHERE id = $clientId";
-    
+
     if (query_db($conn, $sql)) {
         echo json_encode([
             "success" => true, 

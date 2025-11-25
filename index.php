@@ -884,6 +884,11 @@
                                 <input type="number" class="form-control" id="editTotalAdBudget" min="0" step="0.01" placeholder="0.00">
                                 <small class="text-muted">Total advertising budget for this client</small>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label"><i class="fas fa-history me-2"></i>Previous Remaining Credits (Optional)</label>
+                                <input type="number" class="form-control" id="editPreviousRemainingCredits" min="0" value="0" placeholder="0">
+                                <small class="text-muted">Credits carried over from old system</small>
+                            </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label"><i class="fas fa-image me-2"></i>Company/Brand Logo</label>
                                 
@@ -3677,6 +3682,7 @@
             
             document.getElementById('editIndustry').value = client.industry;
             document.getElementById('editTotalAdBudget').value = client.totalAdBudget || 0;
+            document.getElementById('editPreviousRemainingCredits').value = client.carriedForwardCredits || 0;
 
             // Handle logo display
             const currentLogoDiv = document.getElementById('editCurrentLogo');
@@ -3819,7 +3825,8 @@
                 managingPlatforms: managingPlatformsStr,
                 industry: document.getElementById('editIndustry').value,
                 totalAdBudget: parseFloat(document.getElementById('editTotalAdBudget').value) || 0,
-                logoUrl: logoUrl
+                logoUrl: logoUrl,
+                previousRemainingCredits: parseInt(document.getElementById('editPreviousRemainingCredits').value) || 0
             };
 
             try {
