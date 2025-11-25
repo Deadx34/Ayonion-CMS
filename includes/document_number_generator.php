@@ -28,30 +28,26 @@ function generateDocumentNumber($conn, $docType) {
     // Get count of documents of this type created in current month
     $startOfMonth = date('Y-m-01 00:00:00');
     $endOfMonth = date('Y-m-t 23:59:59');
-    
-    $sql = "SELECT COUNT(*) as count FROM documents 
-            WHERE doc_type = ? 
-            AND date >= ? 
-            AND date <= ?";
-    
-    $stmt = $conn->prepare($sql);
-    if (!$stmt) {
-        error_log("Failed to prepare statement: " . $conn->error);
-        // Fallback to timestamp-based ID
-        return $prefix . '10P' . time();
-    }
-    
-    $stmt->bind_param('sss', $docType, $startOfMonth, $endOfMonth);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    $count = (int)$row['count'] + 1; // +1 for the new document being created
-    $stmt->close();
-    
-    // Format: [PREFIX]10P[COUNT (3 digits)][YEAR (4 digits)][MONTH (2 digits)]
-    // Example: Q10P001202511 = Quotation #1 of November 2025
-    $documentNumber = sprintf('%s10P%03d%s%s', $prefix, $count, $year, $month);
-    
+    $count = 1;
+    do {
+        $documentNumber = sprintf('%s10P%03d%s%s', $prefix, $count, $year, $month);
+        $sqlCheck = "SELECT 1 FROM documents WHERE document_number = ? LIMIT 1";
+        $stmtCheck = $conn->prepare($sqlCheck);
+        if (!$stmtCheck) {
+            error_log("Failed to prepare statement: " . $conn->error);
+            return $prefix . '10P' . time();
+        }
+        $stmtCheck->bind_param('s', $documentNumber);
+        $stmtCheck->execute();
+        $stmtCheck->store_result();
+        $exists = $stmtCheck->num_rows > 0;
+        $stmtCheck->close();
+        if ($exists) {
+            $count++;
+        } else {
+            break;
+        }
+    } while (true);
     return $documentNumber;
 }
 
