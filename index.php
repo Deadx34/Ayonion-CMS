@@ -197,7 +197,7 @@
             .modal-dialog { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
             .modal-content, .modal-body { box-shadow: none !important; border: none !important; padding: 0 !important; }
             .document-preview { box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
-            .document-preview table thead tr { background-color: #BDDFE8 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
+            .document-preview table thead tr { background-color: #2c3e50 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
         }
     </style>
 </head>
