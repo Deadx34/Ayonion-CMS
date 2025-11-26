@@ -4858,7 +4858,7 @@
                     <h4 style="margin-top: 30px; margin-bottom: 15px;">Content Item Details</h4>
                     <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
                         <thead>
-                            <tr style="background: #6366f1; color: white;">
+                            <tr style="background: #2c3e50; color: white;">
                                 <th style="padding: 10px; text-align: left; width: 30%;">Creative</th>
                                 <th style="padding: 10px; width: 20%;">Type</th>
                                 <th style="padding: 10px; width: 10%;">Credits</th>
