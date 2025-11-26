@@ -164,7 +164,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
         
         " . (!empty($client['logoUrl']) 
             ? "<div style='text-align:center; margin:15px 0;'><img src='" . $client['logoUrl'] . "' alt='Client Logo' class='client-logo'></div>" 
-            : "<div style='text-align:center; margin:15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;'><h2 style='color: #6366f1; margin: 0; font-size: 22px;'>{$client['companyName']}</h2></div>") . "
+            : "<div style='text-align:center; margin:15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;'><h2 style='color: #2c3e50; margin: 0; font-size: 22px;'>{$client['companyName']}</h2></div>") . "
 
         <div class='client-info'>
             <h3 class='client-name'>{$client['companyName']} ({$client['partnerId']})</h3>
