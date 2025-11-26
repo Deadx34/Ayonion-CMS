@@ -75,7 +75,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 object-fit: contain;
             }
             .company-name { 
-                color: #6366f1; 
+                color: #2c3e50; 
                 margin: 0; 
                 font-size: 24px; 
                 font-weight: bold;
@@ -92,7 +92,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 border-radius: 8px; 
             }
             .client-name { 
-                color: #6366f1; 
+                color: #2c3e50; 
                 margin-bottom: 15px; 
                 font-size: 18px; 
                 font-weight: bold;
@@ -117,7 +117,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 font-size: 14px;
             }
             .summary-total { 
-                border-top: 2px solid #0dcaf0; 
+                border-top: 2px solid #2c3e50; 
                 font-weight: bold;
             }
             .available-credits { 
@@ -138,7 +138,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             .content-table th { 
                 background-color: #f8f9fa; 
                 font-weight: bold; 
-                color: #6366f1;
+                color: #2c3e50;
             }
             .footer { 
                 margin-top: 40px; 
