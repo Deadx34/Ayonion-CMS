@@ -77,10 +77,10 @@ try {
             throw new Exception("Username, password, and role are required.", 400);
         }
 
-        // role validation: allow only marketer and finance (not admin)
-        $allowed_roles = ['marketer', 'finance'];
+        // role validation: allow marketer, finance, and moderator (not admin)
+        $allowed_roles = ['marketer', 'finance', 'moderator'];
         if (!in_array($role, $allowed_roles, true)) {
-            throw new Exception("Invalid role. Allowed roles: marketer, finance.", 400);
+            throw new Exception("Invalid role. Allowed roles: marketer, finance, moderator.", 400);
         }
 
         $username_esc = $conn->real_escape_string($username);

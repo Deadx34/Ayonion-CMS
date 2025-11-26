@@ -218,6 +218,7 @@
                         <option value="admin">Admin</option>
                         <option value="marketer">Digital Marketer</option>
                         <option value="finance">Finance Manager</option>
+                        <option value="moderator">Moderator</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -1878,6 +1879,7 @@
                                 <option value="">Select Role</option>
                                 <option value="marketer">Digital Marketer</option>
                                 <option value="finance">Finance Manager</option>
+                                <option value="moderator">Moderator</option>
                             </select>
                             <small class="text-muted">Admins cannot create new Admin accounts.</small>
                         </div>
@@ -2175,6 +2177,15 @@
                 canDeleteClient: false,
                 canManageContent: false,
                 canManageCampaigns: false,
+                canManageFinances: true,
+                canManageUsers: false
+            },
+            moderator: {
+                sections: ['dashboard', 'clients', 'content', 'campaigns', 'finances', 'profile'],
+                canAddClient: false,
+                canDeleteClient: false,
+                canManageContent: true,
+                canManageCampaigns: true,
                 canManageFinances: true,
                 canManageUsers: false
             }
