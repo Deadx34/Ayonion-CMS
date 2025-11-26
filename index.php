@@ -6068,18 +6068,30 @@
             const sortedDocs = [...docs].sort((a, b) => b.id - a.id);
 
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
-            tbody.innerHTML = sortedDocs.map(doc => `
-                <tr onclick="viewDocument('${type}', ${doc.id})" style="cursor: pointer;">
-                    <td><strong>${doc.documentNumber || docNum[type] + String(doc.id).slice(-6)}</strong></td>
-                    <td>${doc.clientName || doc.client_name || 'Unknown Client'}</td>
-                    <td><span class="badge bg-info">${doc.itemType || doc.item_type || 'General'}</span></td>
-                    <td>${formatDate(doc.date)}</td>
-                    <td>Rs. ${(doc.total || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+            tbody.innerHTML = sortedDocs.map(doc => {
+                const docNumber = doc.documentNumber || docNum[type] + String(doc.id).slice(-6);
+                const clientName = doc.clientName || doc.client_name || 'Unknown Client';
+                const itemType = doc.itemType || doc.item_type || 'General';
+                const date = doc.date || '';
+                const amount = doc.total || 0;
+                return `
+                <tr onclick="viewDocument('${type}', ${doc.id})" style="cursor: pointer;"
+                    data-number="${docNumber}"
+                    data-client="${clientName}"
+                    data-type="${itemType}"
+                    data-date="${date}"
+                    data-amount="${amount}">
+                    <td><strong>${docNumber}</strong></td>
+                    <td>${clientName}</td>
+                    <td><span class="badge bg-info">${itemType}</span></td>
+                    <td>${formatDate(date)}</td>
+                    <td>Rs. ${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td onclick="event.stopPropagation();">
                         <button class="btn btn-sm btn-primary" onclick="viewDocument('${type}', ${doc.id})"><i class="fas fa-eye"></i></button>
                         ${canDelete ? `<button class="btn btn-sm btn-danger" onclick="deleteDocument('${type}', ${doc.id})"><i class="fas fa-trash"></i></button>` : ''}
                     </td>
-                </tr>`).join('');
+                </tr>`;
+            }).join('');
         }
 
 
