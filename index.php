@@ -70,7 +70,7 @@
         .card { border: none; border-radius: 15px; box-shadow: 0 2px 10px rgba(5,44,71,0.08); margin-bottom: 30px; animation: fadeIn 0.5s ease; background: white; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card-header { background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; border-radius: 15px 15px 0 0 !important; padding: 20px 25px; font-weight: 600; }
-        .stat-card { background: #2c3e50 !important; color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; transition: transform 0.3s; }
+        .stat-card { background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; transition: transform 0.3s; }
         .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(247,201,53,0.25); }
         .stat-card h3 { font-size: 2rem; font-weight: 700; margin: 10px 0; }
         .stat-card p { margin: 0; opacity: 0.9; }
@@ -197,9 +197,7 @@
             .modal-dialog { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
             .modal-content, .modal-body { box-shadow: none !important; border: none !important; padding: 0 !important; }
             .document-preview { box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
-            body, html { margin: 0 !important; padding: 0 !important; }
-            .report-container, .main, main, .container, .row { margin: 0 !important; padding: 0 !important; }
-            .document-preview table thead tr { background-color: #6366f1 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
+            .document-preview table thead tr { background-color: #BDDFE8 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
         }
     </style>
 </head>
@@ -4860,7 +4858,7 @@
                     <h4 style="margin-top: 30px; margin-bottom: 15px;">Content Item Details</h4>
                     <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
                         <thead>
-                            <tr style="background: #2c3e50; color: white;">
+                            <tr style="background: #6366f1; color: white;">
                                 <th style="padding: 10px; text-align: left; width: 30%;">Creative</th>
                                 <th style="padding: 10px; width: 20%;">Type</th>
                                 <th style="padding: 10px; width: 10%;">Credits</th>
