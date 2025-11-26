@@ -70,7 +70,7 @@
         .card { border: none; border-radius: 15px; box-shadow: 0 2px 10px rgba(5,44,71,0.08); margin-bottom: 30px; animation: fadeIn 0.5s ease; background: white; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card-header { background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; border-radius: 15px 15px 0 0 !important; padding: 20px 25px; font-weight: 600; }
-        .stat-card { background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; transition: transform 0.3s; }
+        .stat-card { background: #2c3e50 !important; color: white; padding: 25px; border-radius: 15px; margin-bottom: 20px; transition: transform 0.3s; }
         .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(247,201,53,0.25); }
         .stat-card h3 { font-size: 2rem; font-weight: 700; margin: 10px 0; }
         .stat-card p { margin: 0; opacity: 0.9; }
