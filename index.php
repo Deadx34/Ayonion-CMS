@@ -1566,7 +1566,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-2"><span class="badge bg-info" id="nextDocumentNumberLabel">Next Document Number: </span></div>
+                    <div class="mb-2"><span class="badge bg-info" id="nextDocumentNumberLabel">Document Number: </span></div>
                     <form id="documentForm">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -6053,7 +6053,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && docNumberLabel) {
-                        docNumberLabel.textContent = `Next Document Number: ${data.nextDocumentNumber}`;
+                        docNumberLabel.textContent = `Document Number: ${data.nextDocumentNumber}`;
                     } else if (docNumberLabel) {
                         docNumberLabel.textContent = 'Unable to fetch document number';
                     }
