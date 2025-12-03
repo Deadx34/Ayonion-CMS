@@ -1,24 +1,6 @@
-$action = $_GET['action'] ?? '';
 
-// --- HANDLE NEXT DOCUMENT NUMBER (GET) ---
-if ($action === 'next_number') {
-    $docType = $_GET['type'] ?? '';
-    if (!$docType) {
-        echo json_encode(["success" => false, "message" => "Document type required."]);
-        exit;
-    }
-    try {
-        $documentNumber = generateDocumentNumber($conn, $docType);
-        echo json_encode(["success" => true, "documentNumber" => $documentNumber]);
-    } catch (Exception $e) {
-        echo json_encode(["success" => false, "message" => $e->getMessage()]);
-    }
-    exit;
-}
 <?php
 // AYONION-CMS/handler_finance.php - Handles financial documents
-
-// Ensure we always return JSON, even on errors
 
 // Always return JSON for API endpoints
 if (isset($_GET['action']) && $_GET['action'] === 'next_number') {
@@ -38,6 +20,22 @@ if (isset($_GET['action']) && $_GET['action'] === 'next_number') {
             exit;
         }
     });
+    try {
+        include 'includes/config.php';
+        include 'includes/document_number_generator.php';
+        $conn = connect_db();
+        $docType = $_GET['type'] ?? '';
+        if (!$docType) {
+            echo json_encode(["success" => false, "message" => "Document type required."]);
+            exit;
+        }
+        $documentNumber = generateDocumentNumber($conn, $docType);
+        echo json_encode(["success" => true, "documentNumber" => $documentNumber]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+    exit;
 }
 
 try {
