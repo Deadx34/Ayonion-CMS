@@ -6021,12 +6021,34 @@
                 showAlert('Access Denied. Finance Manager/Admin role required.', 'warning');
                 return;
             }
-			const titles = { quotation: 'Quotation', invoice: 'Invoice', receipt: 'Receipt' };
-			document.getElementById('documentModalTitle').textContent = `Create ${titles[type]}`;
-			document.getElementById('documentForm').reset();
-			document.getElementById('documentForm').dataset.docType = type;
-			populateClientSelect('docClientSelect');
-			document.getElementById('docDate').valueAsDate = new Date();
+            const titles = { quotation: 'Quotation', invoice: 'Invoice', receipt: 'Receipt' };
+            document.getElementById('documentModalTitle').textContent = `Create ${titles[type]}`;
+            document.getElementById('documentForm').reset();
+            document.getElementById('documentForm').dataset.docType = type;
+            populateClientSelect('docClientSelect');
+            document.getElementById('docDate').valueAsDate = new Date();
+
+            // Fetch/generate next document number and show it
+            fetch(`handler_finance.php?action=next_number&type=${type}`)
+                .then(res => res.json())
+                .then(data => {
+                    const docNumDiv = document.getElementById('currentDocumentNumber');
+                    if (data.success && data.documentNumber) {
+                        docNumDiv.textContent = `Next Document Number: ${data.documentNumber}`;
+                        docNumDiv.style.display = 'block';
+                    } else {
+                        docNumDiv.textContent = 'Next Document Number: (unavailable)';
+                        docNumDiv.style.display = 'block';
+                    }
+                })
+                .catch(() => {
+                    const docNumDiv = document.getElementById('currentDocumentNumber');
+                    docNumDiv.textContent = 'Next Document Number: (error)';
+                    docNumDiv.style.display = 'block';
+                });
+                                    <div class="mb-3">
+                                        <div id="currentDocumentNumber" class="alert alert-info" style="display:none;"></div>
+                                    </div>
             
             // Uncheck all item type checkboxes and clear dynamic fields
             document.querySelectorAll('#documentForm input[type="checkbox"]').forEach(cb => cb.checked = false);
