@@ -6185,8 +6185,7 @@
                 }
                 
                 if (selectedItemTypes.length === 0) {
-                    showAlert('Please select at least one item type.', 'warning');
-                    return;
+                    // Allow document generation with only Other Services
                 }
                 
                 // Validate form based on current state
