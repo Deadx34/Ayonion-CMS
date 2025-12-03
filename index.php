@@ -1566,6 +1566,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <div class="mb-2"><span class="badge bg-info" id="nextDocumentNumberLabel">Next Document Number: </span></div>
                     <form id="documentForm">
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -6045,6 +6046,21 @@
                 window.updateItemAmounts();
             }
             
+            // Fetch and show next document number
+            const docNumberLabel = document.getElementById('nextDocumentNumberLabel');
+            if (docNumberLabel) docNumberLabel.textContent = 'Loading...';
+            fetch(`handler_finance_next_number.php?action=next_document_number&docType=${type}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && docNumberLabel) {
+                        docNumberLabel.textContent = `Next Document Number: ${data.nextDocumentNumber}`;
+                    } else if (docNumberLabel) {
+                        docNumberLabel.textContent = 'Unable to fetch document number';
+                    }
+                })
+                .catch(() => {
+                    if (docNumberLabel) docNumberLabel.textContent = 'Unable to fetch document number';
+                });
             new bootstrap.Modal(document.getElementById('documentModal')).show();
         }
 
