@@ -1,42 +1,10 @@
-
 <?php
 // AYONION-CMS/handler_finance.php - Handles financial documents
 
-// Always return JSON for API endpoints
-if (isset($_GET['action']) && $_GET['action'] === 'next_number') {
-    header('Content-Type: application/json');
-    error_reporting(E_ALL);
-    ini_set('display_errors', 0); // Don't display errors in output
-    set_error_handler(function($errno, $errstr, $errfile, $errline) {
-        http_response_code(500);
-        echo json_encode(["success" => false, "message" => "PHP Error: $errstr ($errfile:$errline)"]);
-        exit;
-    });
-    register_shutdown_function(function() {
-        $error = error_get_last();
-        if ($error && ($error["type"] === E_ERROR || $error["type"] === E_PARSE)) {
-            http_response_code(500);
-            echo json_encode(["success" => false, "message" => "Fatal Error: {$error['message']} ({$error['file']}:{$error['line']})"]);
-            exit;
-        }
-    });
-    try {
-        include 'includes/config.php';
-        include 'includes/document_number_generator.php';
-        $conn = connect_db();
-        $docType = $_GET['type'] ?? '';
-        if (!$docType) {
-            echo json_encode(["success" => false, "message" => "Document type required."]);
-            exit;
-        }
-        $documentNumber = generateDocumentNumber($conn, $docType);
-        echo json_encode(["success" => true, "documentNumber" => $documentNumber]);
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(["success" => false, "message" => $e->getMessage()]);
-    }
-    exit;
-}
+// Ensure we always return JSON, even on errors
+header('Content-Type: application/json');
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors in output
 
 try {
     include 'includes/config.php';
