@@ -96,7 +96,9 @@ try {
     $date = $conn->real_escape_string($input['date'] ?? '');
 
     if ($clientId === 0 || empty($docType) || empty($date) || empty($itemTypes) || !is_array($itemTypes)) {
-        throw new Exception("Client, Document Type, Date, and Item Types are required.", 400);
+        if ($clientId === 0 || empty($docType) || empty($date)) {
+            throw new Exception("Client, Document Type, and Date are required.", 400);
+        }
     }
     
     if (empty($itemDetails) || !is_array($itemDetails)) {
