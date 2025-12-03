@@ -1,3 +1,20 @@
+$action = $_GET['action'] ?? '';
+
+// --- HANDLE NEXT DOCUMENT NUMBER (GET) ---
+if ($action === 'next_number') {
+    $docType = $_GET['type'] ?? '';
+    if (!$docType) {
+        echo json_encode(["success" => false, "message" => "Document type required."]);
+        exit;
+    }
+    try {
+        $documentNumber = generateDocumentNumber($conn, $docType);
+        echo json_encode(["success" => true, "documentNumber" => $documentNumber]);
+    } catch (Exception $e) {
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+    exit;
+}
 <?php
 // AYONION-CMS/handler_finance.php - Handles financial documents
 
