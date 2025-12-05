@@ -29,15 +29,19 @@ try {
         $impressions = (int)($input['impressions'] ?? 0);
         $qualityRanking = $conn->real_escape_string($input['qualityRanking'] ?? '');
         $conversionRanking = $conn->real_escape_string($input['conversionRanking'] ?? '');
+        $campaignStartDate = $conn->real_escape_string($input['campaignStartDate'] ?? '');
+        $campaignStartTime = $conn->real_escape_string($input['campaignStartTime'] ?? '');
+        $campaignEndDate = $conn->real_escape_string($input['campaignEndDate'] ?? '');
+        $campaignEndTime = $conn->real_escape_string($input['campaignEndTime'] ?? '');
         
         $evidenceImageUrl = $conn->real_escape_string($input['evidenceImageUrl'] ?? '');
         $creativeImageUrl = $conn->real_escape_string($input['creativeImageUrl'] ?? '');
 
         // 1. Add Campaign Record
         $sql_campaign = "INSERT INTO campaigns (
-            id, client_id, platform, ad_name, ad_id, result_type, results, cpr, reach, impressions, spend, quality_ranking, conversion_ranking, evidence_image_url, creative_image_url
+            id, client_id, platform, ad_name, ad_id, result_type, results, cpr, reach, impressions, spend, campaign_start_date, campaign_start_time, campaign_end_date, campaign_end_time, quality_ranking, conversion_ranking, evidence_image_url, creative_image_url
         ) VALUES (
-            '$id', '$clientId', '$platform', '$adName', '$adId', '$resultType', $results, $cpr, $reach, $impressions, $spend, '$qualityRanking', '$conversionRanking', '$evidenceImageUrl', '$creativeImageUrl'
+            '$id', '$clientId', '$platform', '$adName', '$adId', '$resultType', $results, $cpr, $reach, $impressions, $spend, '$campaignStartDate', '$campaignStartTime', '$campaignEndDate', '$campaignEndTime', '$qualityRanking', '$conversionRanking', '$evidenceImageUrl', '$creativeImageUrl'
         )";
 
         // 2. Update Client's Total Spent
@@ -105,6 +109,10 @@ try {
         $impressions = (int)($input['impressions'] ?? 0);
         $qualityRanking = $conn->real_escape_string($input['qualityRanking'] ?? '');
         $conversionRanking = $conn->real_escape_string($input['conversionRanking'] ?? '');
+        $campaignStartDate = $conn->real_escape_string($input['campaignStartDate'] ?? '');
+        $campaignStartTime = $conn->real_escape_string($input['campaignStartTime'] ?? '');
+        $campaignEndDate = $conn->real_escape_string($input['campaignEndDate'] ?? '');
+        $campaignEndTime = $conn->real_escape_string($input['campaignEndTime'] ?? '');
         
         $evidenceImageUrl = $conn->real_escape_string($input['evidenceImageUrl'] ?? '');
         $creativeImageUrl = $conn->real_escape_string($input['creativeImageUrl'] ?? '');
@@ -120,6 +128,10 @@ try {
             reach = $reach,
             impressions = $impressions,
             spend = $newSpend,
+            campaign_start_date = '$campaignStartDate',
+            campaign_start_time = '$campaignStartTime',
+            campaign_end_date = '$campaignEndDate',
+            campaign_end_time = '$campaignEndTime',
             quality_ranking = '$qualityRanking',
             conversion_ranking = '$conversionRanking',
             evidence_image_url = '$evidenceImageUrl',

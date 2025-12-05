@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ayonion Studios - Management System (Final)</title>
+    <link rel="icon" type="image/svg+xml" href="uploads/logos/favicon.svg">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -1362,6 +1363,22 @@
                                 <input type="number" step="0.01" class="form-control" id="spend" required min="0">
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">Campaign Start Date</label>
+                                <input type="date" class="form-control" id="campaignStartDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Campaign Start Time</label>
+                                <input type="time" class="form-control" id="campaignStartTime" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Campaign End Date</label>
+                                <input type="date" class="form-control" id="campaignEndDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Campaign End Time</label>
+                                <input type="time" class="form-control" id="campaignEndTime" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Quality Ranking</label>
                                 <select class="form-select" id="qualityRanking">
                                     <option value="Above Average">Above Average</option>
@@ -1509,6 +1526,22 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Spend (Rs.)</label>
                                 <input type="number" step="0.01" class="form-control" id="editSpend" required min="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Campaign Start Date</label>
+                                <input type="date" class="form-control" id="editCampaignStartDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Campaign Start Time</label>
+                                <input type="time" class="form-control" id="editCampaignStartTime" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Campaign End Date</label>
+                                <input type="date" class="form-control" id="editCampaignEndDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Campaign End Time</label>
+                                <input type="time" class="form-control" id="editCampaignEndTime" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Quality Ranking</label>
@@ -5209,6 +5242,10 @@
                 reach: parseInt(document.getElementById('reach').value),
                 impressions: parseInt(document.getElementById('impressions').value),
                 spend: spend,
+                campaignStartDate: document.getElementById('campaignStartDate').value,
+                campaignStartTime: document.getElementById('campaignStartTime').value,
+                campaignEndDate: document.getElementById('campaignEndDate').value,
+                campaignEndTime: document.getElementById('campaignEndTime').value,
                 qualityRanking: document.getElementById('qualityRanking').value,
                 conversionRanking: document.getElementById('conversionRanking').value,
                 evidenceImageUrl: campaignEvidenceImages.length > 0 ? JSON.stringify(campaignEvidenceImages) : null,
@@ -5340,6 +5377,10 @@
             document.getElementById('editReach').value = campaign.reach;
             document.getElementById('editImpressions').value = campaign.impressions;
             document.getElementById('editSpend').value = campaign.spend;
+            document.getElementById('editCampaignStartDate').value = campaign.campaignStartDate || '';
+            document.getElementById('editCampaignStartTime').value = campaign.campaignStartTime || '';
+            document.getElementById('editCampaignEndDate').value = campaign.campaignEndDate || '';
+            document.getElementById('editCampaignEndTime').value = campaign.campaignEndTime || '';
             document.getElementById('editQualityRanking').value = campaign.qualityRanking;
             document.getElementById('editConversionRanking').value = campaign.conversionRanking;
 
@@ -5788,6 +5829,10 @@
                 reach: parseInt(document.getElementById('editReach').value),
                 impressions: parseInt(document.getElementById('editImpressions').value),
                 spend: spend,
+                campaignStartDate: document.getElementById('editCampaignStartDate').value,
+                campaignStartTime: document.getElementById('editCampaignStartTime').value,
+                campaignEndDate: document.getElementById('editCampaignEndDate').value,
+                campaignEndTime: document.getElementById('editCampaignEndTime').value,
                 qualityRanking: document.getElementById('editQualityRanking').value,
                 conversionRanking: document.getElementById('editConversionRanking').value,
                 evidenceImageUrl: allEvidenceImages.length > 0 ? JSON.stringify(allEvidenceImages) : null,
@@ -5980,18 +6025,23 @@
                         <div class="campaigns-section">
                             <h2>Campaign Performance Details</h2>
                             <table class="campaign-table">
-                                <thead><tr><th>Platform</th><th>Campaign Name</th><th>Results</th><th>CPR</th><th>Reach</th><th>Spend</th></tr></thead>
+                                <thead><tr><th>Platform</th><th>Campaign Name</th><th>End Date & Time</th><th>Results</th><th>CPR</th><th>Reach</th><th>Spend</th></tr></thead>
                                 <tbody>
-                                    ${campaigns.length > 0 ? campaigns.map(c => `
+                                    ${campaigns.length > 0 ? campaigns.map(c => {
+                                        const endDateTime = c.campaignEndDate && c.campaignEndTime 
+                                            ? `${formatDate(c.campaignEndDate)} ${c.campaignEndTime}`
+                                            : 'N/A';
+                                        return `
                                         <tr>
                                             <td>${getPlatformBadge(c.platform)}</td>
                                             <td>${c.adName}</td>
+                                            <td>${endDateTime}</td>
                                             <td>${c.results.toLocaleString()} ${c.resultType}</td>
                                             <td>Rs. ${c.cpr.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                                             <td>${c.reach.toLocaleString()}</td>
                                             <td>Rs. ${c.spend.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                        </tr>
-                                    `).join('') : '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #999;">No campaigns found in the selected date range.</td></tr>'}
+                                        </tr>`;
+                                    }).join('') : '<tr><td colspan="7" style="padding: 30px; text-align: center; color: #999;">No campaigns found in the selected date range.</td></tr>'}
                                 </tbody>
                             </table>
                         </div>
@@ -7331,19 +7381,23 @@
                                 <tr>
                                     <th>Campaign</th>
                                     <th>Platform</th>
-                                    <th>Date</th>
+                                    <th>End Date & Time</th>
                                     <th style="text-align: right;">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${campaigns.map(c => `
+                                ${campaigns.map(c => {
+                                    const endDateTime = c.campaignEndDate && c.campaignEndTime 
+                                        ? `${formatDate(c.campaignEndDate)} ${c.campaignEndTime}`
+                                        : 'N/A';
+                                    return `
                                     <tr>
                                         <td>${c.adName}</td>
                                         <td>${getPlatformBadge(c.platform)}</td>
-                                        <td>${formatDateTime(c.dateAdded)}</td>
+                                        <td>${endDateTime}</td>
                                         <td style="text-align: right; font-weight: 600;">Rs. ${parseFloat(c.spend).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                    </tr>
-                                `).join('')}
+                                    </tr>`;
+                                }).join('')}
                             </tbody>
                         </table>
                     </div>
