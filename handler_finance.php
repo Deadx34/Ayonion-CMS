@@ -110,8 +110,13 @@ try {
         throw new Exception("Description is required when 'Other Service' is selected.", 400);
     }
     
-    // Generate document number in new format (Q10P001202511, I10P001202511, R10P001202511)
-    $documentNumber = generateDocumentNumber($conn, $docType);
+    // Use custom document number if provided, otherwise generate one
+    $customDocNumber = $input['customDocumentNumber'] ?? null;
+    if (!empty($customDocNumber) && trim($customDocNumber) !== '') {
+        $documentNumber = trim($customDocNumber);
+    } else {
+        $documentNumber = generateDocumentNumber($conn, $docType);
+    }
     $documentNumberEscaped = $conn->real_escape_string($documentNumber);
     
     // Calculate total from all item details

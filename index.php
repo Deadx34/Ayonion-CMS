@@ -1566,9 +1566,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-2"><span class="badge bg-info" id="nextDocumentNumberLabel">Document Number: </span></div>
                     <form id="documentForm">
                         <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Document Number</label>
+                                <input type="text" class="form-control" id="docNumber" placeholder="Loading..." readonly>
+                                <small class="text-muted">Auto-generated. Click to edit if needed.</small>
+                            </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Select Client</label>
                                 <select class="form-select" id="docClientSelect" required></select>
@@ -6047,19 +6051,28 @@
             }
             
             // Fetch and show next document number
-            const docNumberLabel = document.getElementById('nextDocumentNumberLabel');
-            if (docNumberLabel) docNumberLabel.textContent = 'Loading...';
+            const docNumberInput = document.getElementById('docNumber');
+            if (docNumberInput) {
+                docNumberInput.value = 'Loading...';
+                docNumberInput.readOnly = true;
+            }
             fetch(`handler_finance_next_number.php?action=next_document_number&docType=${type}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success && docNumberLabel) {
-                        docNumberLabel.textContent = `Document Number: ${data.nextDocumentNumber}`;
-                    } else if (docNumberLabel) {
-                        docNumberLabel.textContent = 'Unable to fetch document number';
+                    if (data.success && docNumberInput) {
+                        docNumberInput.value = data.nextDocumentNumber;
+                        docNumberInput.readOnly = false;
+                        docNumberInput.style.cursor = 'text';
+                    } else if (docNumberInput) {
+                        docNumberInput.value = 'Unable to fetch';
+                        docNumberInput.readOnly = false;
                     }
                 })
                 .catch(() => {
-                    if (docNumberLabel) docNumberLabel.textContent = 'Unable to fetch document number';
+                    if (docNumberInput) {
+                        docNumberInput.value = 'Unable to fetch';
+                        docNumberInput.readOnly = false;
+                    }
                 });
             new bootstrap.Modal(document.getElementById('documentModal')).show();
         }
@@ -6304,13 +6317,18 @@
                     documentDescription = otherServiceDescriptions.join('; ');
                 }
                 
+                // Get custom document number if provided
+                const docNumberInput = document.getElementById('docNumber');
+                const customDocNumber = docNumberInput && docNumberInput.value && docNumberInput.value !== 'Loading...' ? docNumberInput.value.trim() : null;
+                
                 const formData = {
 					clientId: parseInt(clientSelect.value),
 					docType: form.dataset.docType,
 					itemTypes: selectedItemTypes,
 					itemDetails: itemDetails,
 					description: documentDescription,
-					date: date.value
+					date: date.value,
+					customDocumentNumber: customDocNumber
                 };
 
                 if (!formData.clientId) {
