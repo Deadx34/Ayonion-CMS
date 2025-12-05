@@ -5959,10 +5959,10 @@
                         * { margin: 0; padding: 0; box-sizing: border-box; }
                         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding: 20px; }
                         .report-container { max-width: 1200px; margin: 0 auto; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+                        .header { background: linear-gradient(135deg, #052C47 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
                         .header h1 { font-size: 32px; margin-bottom: 10px; }
                         .header p { font-size: 16px; opacity: 0.9; }
-                        .client-info { background: #f8f9fa; padding: 30px 40px; border-left: 4px solid #667eea; }
+                        .client-info { background: #f8f9fa; padding: 30px 40px; border-left: 4px solid #052C47; }
                         .client-info h2 { color: #333; margin-bottom: 15px; font-size: 20px; }
                         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
                         .info-item { display: flex; align-items: center; }
@@ -5974,13 +5974,13 @@
                         .budget-card { background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
                         .budget-card h3 { color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
                         .budget-card .amount { font-size: 28px; font-weight: bold; color: #333; }
-                        .budget-card.total .amount { color: #667eea; }
+                        .budget-card.total .amount { color: #052C47; }
                         .budget-card.spent .amount { color: #f39c12; }
                         .budget-card.remaining .amount { color: #27ae60; }
                         .campaigns-section { padding: 40px; }
                         .campaigns-section h2 { color: #333; margin-bottom: 25px; font-size: 24px; }
                         .campaign-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-                        .campaign-table thead { background: #667eea; color: white; }
+                        .campaign-table thead { background: #052C47; color: white; }
                         .campaign-table th { padding: 15px 10px; text-align: left; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
                         .campaign-table td { padding: 15px 10px; border-bottom: 1px solid #e0e0e0; font-size: 14px; }
                         .campaign-table tbody tr:hover { background: #f8f9fa; }
@@ -5988,10 +5988,10 @@
                         .platform-meta { background: #1877f2; }
                         .platform-facebook { background: #4267B2; }
                         .platform-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
-                        .metrics-summary { background: #f8f9fa; padding: 40px; border-top: 3px solid #667eea; }
+                        .metrics-summary { background: #f8f9fa; padding: 40px; border-top: 3px solid #052C47; }
                         .metrics-summary h2 { color: #333; margin-bottom: 25px; font-size: 24px; text-align: center; }
                         .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-                        .metric-box { background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #667eea; }
+                        .metric-box { background: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #052C47; }
                         .metric-box h3 { color: #666; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
                         .metric-box .value { font-size: 24px; font-weight: bold; color: #333; }
                         .footer { background: #333; color: white; padding: 30px 40px; text-align: center; }
@@ -7200,7 +7200,7 @@
                         margin: 0 auto;
                     }
                     .invoice-header {
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        background: linear-gradient(135deg, #052C47 0%, #764ba2 100%);
                         color: white;
                         padding: 40px;
                         text-align: center;
@@ -7219,7 +7219,7 @@
                     .client-info {
                         background: #f8f9fa;
                         padding: 30px 40px;
-                        border-left: 4px solid #667eea;
+                        border-left: 4px solid #052C47;
                     }
                     .client-info h2 {
                         color: #333;
@@ -7276,7 +7276,7 @@
                     .amount-card .amount {
                         font-size: 42px;
                         font-weight: bold;
-                        color: #667eea;
+                        color: #052C47;
                         margin: 10px 0;
                     }
                     .campaigns-section {
@@ -7294,7 +7294,7 @@
                         margin-bottom: 30px;
                     }
                     .campaign-table thead {
-                        background: #667eea;
+                        background: #052C47;
                         color: white;
                     }
                     .campaign-table th {
@@ -7906,7 +7906,7 @@
             // Generate creative images gallery
             const creativeImagesHTML = reportCreativeImages.length > 0 ? `
                 <div style="margin-top: 40px;">
-                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #052C47; padding-bottom: 10px;">
                         <i class="fas fa-palette"></i> Creative Images
                     </h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
@@ -7955,8 +7955,8 @@
             const reportHTML = `
                 <div style="font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; background: white; padding: 40px;">
                     <!-- Header -->
-                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #667eea; padding-bottom: 20px;">
-                        <h1 style="color: #667eea; margin: 0; font-size: 32px;">Ad Campaign Performance Report</h1>
+                    <div style="text-align: center; margin-bottom: 40px; border-bottom: 3px solid #052C47; padding-bottom: 20px;">
+                        <h1 style="color: #052C47; margin: 0; font-size: 32px;">Ad Campaign Performance Report</h1>
                         <p style="color: #666; margin: 10px 0 5px 0; font-size: 18px;">${clientName}</p>
                         <p style="color: #999; margin: 0; font-size: 14px;">Report Period: ${formatDate(periodFrom)} - ${formatDate(periodTo)}</p>
                         <p style="color: #999; margin: 5px 0 0 0; font-size: 12px;">Generated on ${formatDate(new Date())}</p>
@@ -7964,28 +7964,28 @@
 
                     <!-- Summary Cards -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px;">
-                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; text-align: center;">
+                        <div style="background: #030b0d; color: white; padding: 25px; border-radius: 12px; text-align: center;">
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Spend</div>
                             <div style="font-size: 32px; font-weight: bold;">Rs. ${parseFloat(totalSpend).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
                         </div>
-                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 25px; border-radius: 12px; text-align: center;">
+                        <div style="background: #030b0d; color: white; padding: 25px; border-radius: 12px; text-align: center;">
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Reach</div>
                             <div style="font-size: 32px; font-weight: bold;">${parseInt(totalReach).toLocaleString()}</div>
                         </div>
-                        <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 25px; border-radius: 12px; text-align: center;">
+                        <div style="background: #030b0d; color: white; padding: 25px; border-radius: 12px; text-align: center;">
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Impressions</div>
                             <div style="font-size: 32px; font-weight: bold;">${parseInt(totalImpressions).toLocaleString()}</div>
                         </div>
                     </div>
 
                     <!-- Campaign Performance Table -->
-                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #052C47; padding-bottom: 10px;">
                         <i class="fas fa-chart-line"></i> Campaign Performance Details
                     </h3>
                     <div style="overflow-x: auto; margin-bottom: 40px;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
                             <thead>
-                                <tr style="background: #667eea; color: white;">
+                                <tr style="background: #052C47; color: white;">
                                     <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">Ad Name</th>
                                     <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: left; white-space: nowrap;">Result Type</th>
                                     <th style="padding: 8px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap;">Results</th>
@@ -8004,7 +8004,7 @@
                     </div>
 
                     <!-- Cost Efficiency Analysis -->
-                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                    <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #052C47; padding-bottom: 10px;">
                         <i class="fas fa-dollar-sign"></i> Cost Efficiency Analysis
                     </h3>
                     <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745; margin-bottom: 40px;">
@@ -8015,7 +8015,7 @@
 
                     <!-- Evidence/Notes -->
                     ${evidence ? `
-                        <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #667eea; padding-bottom: 10px;">
+                        <h3 style="color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 2px solid #052C47; padding-bottom: 10px;">
                             <i class="fas fa-clipboard-list"></i> Evidence & Additional Notes
                         </h3>
                         <div style="background: #fff3cd; padding: 20px; border-radius: 8px; border-left: 4px solid #ffc107; margin-bottom: 40px;">
