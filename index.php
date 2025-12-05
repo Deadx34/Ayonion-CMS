@@ -4873,12 +4873,12 @@
                     <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
                         ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 125px; margin-right: 20px; object-fit: contain;">` : ''}
                         <div>
-                            <h1 style="color: #6366f1; margin: 0; font-size: 2rem;">${COMPANY_INFO.name}</h1>
+                            <h1 style="color: #052C47; margin: 0; font-size: 2rem;">${COMPANY_INFO.name}</h1>
                             <p style="color: #666; margin: 5px 0;">Content Credit Usage Report</p>
                         </div>
                     </div>
                     <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                        <h3 style="color: #6366f1; margin-bottom: 15px;">${client.companyName} (${client.partnerId})</h3>
+                        <h3 style="color: #052C47; margin-bottom: 15px;">${client.companyName} (${client.partnerId})</h3>
                         <p><strong>Reporting Cycle:</strong> Ends on ${formatDate(client.renewalDate)}</p>
                         <p><strong>Generated:</strong> ${formatDate(new Date())}</p>
                     </div>
@@ -4896,7 +4896,7 @@
                     <h4 style="margin-top: 30px; margin-bottom: 15px;">Content Item Details</h4>
                     <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
                         <thead>
-                            <tr style="background: #6366f1; color: white;">
+                            <tr style="background: #052C47; color: white;">
                                 <th style="padding: 10px; text-align: left; width: 30%;">Creative</th>
                                 <th style="padding: 10px; width: 20%;">Type</th>
                                 <th style="padding: 10px; width: 10%;">Credits</th>
@@ -5920,7 +5920,7 @@
             }
 
             let evidenceSection = '<div style="page-break-before:always; padding-top: 30px;">';
-            evidenceSection += '<h4 style="margin-bottom: 20px; color: #6366f1;">Campaign Evidence (In Range)</h4>';
+            evidenceSection += '<h4 style="margin-bottom: 20px; color: #052C47;">Campaign Evidence (In Range)</h4>';
 
             if (campaigns.length === 0) {
                 evidenceSection += '<p class="text-muted">No campaign data found in the selected range for evidence reporting.</p>';
@@ -5929,7 +5929,7 @@
                       let mediaHtml = '';
 
                       mediaHtml += (c.evidenceUrls || []).map(url => `
-                          <a href="${url}" target="_blank" style="display: inline-block; margin-right: 10px; font-size: 12px; color: #6366f1;">${url}</a>
+                          <a href="${url}" target="_blank" style="display: inline-block; margin-right: 10px; font-size: 12px; color: #052C47;">${url}</a>
                       `).join('<br>');
 
                       mediaHtml += (c.evidenceFiles || []).map(dataUrl => `
@@ -6684,7 +6684,7 @@
                             border: 1px solid #ddd;
                         }
                         th {
-                            background-color: #6366f1 !important;
+                            background-color: #052C47 !important;
                             color: white !important;
                             -webkit-print-color-adjust: exact;
                             print-color-adjust: exact;
