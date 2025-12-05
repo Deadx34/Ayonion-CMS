@@ -7968,11 +7968,11 @@
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Spend</div>
                             <div style="font-size: 32px; font-weight: bold;">Rs. ${parseFloat(totalSpend).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
                         </div>
-                        <div style="background: #030b0d; color: white; padding: 25px; border-radius: 12px; text-align: center;">
+                        <div style="background: #052C47; color: white; padding: 25px; border-radius: 12px; text-align: center;">
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Reach</div>
                             <div style="font-size: 32px; font-weight: bold;">${parseInt(totalReach).toLocaleString()}</div>
                         </div>
-                        <div style="background: #030b0d; color: white; padding: 25px; border-radius: 12px; text-align: center;">
+                        <div style="background: #1A364A; color: white; padding: 25px; border-radius: 12px; text-align: center;">
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">Total Impressions</div>
                             <div style="font-size: 32px; font-weight: bold;">${parseInt(totalImpressions).toLocaleString()}</div>
                         </div>
