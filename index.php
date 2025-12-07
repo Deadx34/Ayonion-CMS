@@ -5317,7 +5317,9 @@
                     const evidenceImages = JSON.parse(campaign.evidenceImageUrl);
                     console.log('Parsed evidence images:', evidenceImages);
                     if (Array.isArray(evidenceImages) && evidenceImages.length > 0) {
-                        evidenceImageContainer.innerHTML = evidenceImages.map(url => {
+                        evidenceImageContainer.innerHTML = evidenceImages.map(img => {
+                            // Handle both string URLs and objects with url property
+                            const url = typeof img === 'string' ? img : (img.url || img);
                             console.log('Evidence image URL:', url);
                             return `
                             <img src="${url}" alt="Evidence" 
@@ -5350,7 +5352,9 @@
                     const creativeImages = JSON.parse(campaign.creativeImageUrl);
                     console.log('Parsed creative images:', creativeImages);
                     if (Array.isArray(creativeImages) && creativeImages.length > 0) {
-                        creativeImageContainer.innerHTML = creativeImages.map(url => {
+                        creativeImageContainer.innerHTML = creativeImages.map(img => {
+                            // Handle both string URLs and objects with url property
+                            const url = typeof img === 'string' ? img : (img.url || img);
                             console.log('Creative image URL:', url);
                             return `
                             <img src="${url}" alt="Creative" 
