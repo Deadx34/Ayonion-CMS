@@ -384,6 +384,12 @@
                                 <select class="form-select" id="contentClientSelect" onchange="loadContentCredits()"></select>
                             </div>
                             <div class="col-md-8 text-end">
+                                <button class="btn btn-success me-2 mt-2" onclick="generateContentReport()">
+                                    <i class="fas fa-file-pdf me-2"></i>Generate Report (All)
+                                </button>
+                                <button class="btn btn-primary me-2 mt-2" id="generateSelectedReportBtn" onclick="generateSelectedContentReport()" style="display: none;">
+                                    <i class="fas fa-file-pdf me-2"></i>Generate Report (<span id="selectedCount">0</span> Selected)
+                                </button>
                                 <button class="btn btn-primary mt-2" onclick="showAddContentModal()">
                                     <i class="fas fa-plus me-2"></i>Add Content
                                 </button>
@@ -416,14 +422,6 @@
                                 </thead>
                                 <tbody id="contentTableBody"></tbody>
                             </table>
-                        </div>
-                        <div class="mt-3">
-                            <button class="btn btn-success me-2" onclick="generateContentReport()">
-                                <i class="fas fa-file-pdf me-2"></i>Generate Report (All)
-                            </button>
-                            <button class="btn btn-primary" id="generateSelectedReportBtn" onclick="generateSelectedContentReport()" style="display: none;">
-                                <i class="fas fa-file-pdf me-2"></i>Generate Report (<span id="selectedCount">0</span> Selected)
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -4869,46 +4867,61 @@
             
             // Fallback to browser print
             const reportHtml = `
-                <div style="font-family: Arial; padding: 20px;">
-                    <div style="display: flex; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px;">
-                        ${COMPANY_INFO.logoUrl ? `<img src="${COMPANY_INFO.logoUrl}" alt="Logo" style="height: 125px; margin-right: 20px; object-fit: contain;">` : ''}
-                        <div>
-                            <h1 style="color: #052C47; margin: 0; font-size: 2rem;">${COMPANY_INFO.name}</h1>
-                            <p style="color: #666; margin: 5px 0;">Content Credit Usage Report</p>
+                <div style="font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; background: white;">
+                    <!-- Company Header -->
+                    <div style="background: #0d0e10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center;">
+                            <img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logo || 'uploads/logos/favicon.svg'}" alt="Company Logo" style="height: 60px; width: auto; object-fit: contain;">
+                        </div>
+                        <div style="text-align: right; color: white;">
+                            <p style="margin: 0; font-size: 12px; line-height: 1.6;">${COMPANY_INFO.website || 'www.ayonionstudios.com'}</p>
+                            <p style="margin: 0; font-size: 12px; line-height: 1.6;">${COMPANY_INFO.email || 'info@ayonionstudios.com'}</p>
+                            <p style="margin: 0; font-size: 11px; line-height: 1.6; opacity: 0.8;">© ${COMPANY_INFO.name || 'Ayonion Studios'}</p>
                         </div>
                     </div>
-                    <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                        <h3 style="color: #052C47; margin-bottom: 15px;">${client.companyName} (${client.partnerId})</h3>
-                        <p><strong>Reporting Cycle:</strong> Ends on ${formatDate(client.renewalDate)}</p>
-                        <p><strong>Generated:</strong> ${formatDate(new Date())}</p>
-                    </div>
-                    <div style="margin: 20px 0; padding: 15px; background: #cff4fc; border-radius: 8px;">
-                        <h4 style="margin-bottom: 10px;">Credit Summary</h4>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <tr><td style="padding: 5px;"><strong>Package Credits:</strong></td><td>${client.packageCredits}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Extra Credits:</strong></td><td>${client.extraCredits}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Carried Credits:</strong></td><td>${client.carriedForwardCredits}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>TOTAL Credits:</strong></td><td>${totalCredits}</td></tr>
-                            <tr style="border-top: 2px solid #0dcaf0;"><td style="padding: 5px;"><strong>Used Credits:</strong></td><td>${client.usedCredits}</td></tr>
-                            <tr><td style="padding: 5px;"><strong>Available Credits:</strong></td><td style="color: #10b981; font-weight: bold;">${available}</td></tr>
+
+                    <div style="padding: 40px;">
+                        <!-- Report Title -->
+                        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px;">
+                            <h1 style="color: #052C47; margin: 0; font-size: 32px;">Content Credit Usage Report</h1>
+                            <p style="color: #666; margin: 10px 0 5px 0; font-size: 18px;">${client.companyName} (${client.partnerId})</p>
+                            <p style="color: #999; margin: 0; font-size: 14px;">Reporting Cycle Ends: ${formatDate(client.renewalDate)}</p>
+                            <p style="color: #999; margin: 5px 0 0 0; font-size: 12px;">Generated on ${formatDate(new Date())}</p>
+                        </div>
+
+                        <!-- Credit Summary -->
+                        <div style="margin: 20px 0; padding: 20px; background: #cff4fc; border-radius: 8px;">
+                            <h4 style="margin-bottom: 10px;">Credit Summary</h4>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr><td style="padding: 5px;"><strong>Package Credits:</strong></td><td>${client.packageCredits}</td></tr>
+                                <tr><td style="padding: 5px;"><strong>Extra Credits:</strong></td><td>${client.extraCredits}</td></tr>
+                                <tr><td style="padding: 5px;"><strong>Carried Credits:</strong></td><td>${client.carriedForwardCredits}</td></tr>
+                                <tr><td style="padding: 5px;"><strong>TOTAL Credits:</strong></td><td>${totalCredits}</td></tr>
+                                <tr style="border-top: 2px solid #0dcaf0;"><td style="padding: 5px;"><strong>Used Credits:</strong></td><td>${client.usedCredits}</td></tr>
+                                <tr><td style="padding: 5px;"><strong>Available Credits:</strong></td><td style="color: #10b981; font-weight: bold;">${available}</td></tr>
+                            </table>
+                        </div>
+
+                        <!-- Content Item Details -->
+                        <h4 style="margin-top: 30px; margin-bottom: 15px;">Content Item Details</h4>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
+                            <thead>
+                                <tr style="background: #052C47; color: white;">
+                                    <th style="padding: 10px; text-align: left; width: 30%;">Creative</th>
+                                    <th style="padding: 10px; width: 20%;">Type</th>
+                                    <th style="padding: 10px; width: 10%;">Credits</th>
+                                    <th style="padding: 10px; width: 20%;">Published Date</th>
+                                    <th style="padding: 10px; width: 20%;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>${tableRows}</tbody>
                         </table>
-                    </div>
-                    <h4 style="margin-top: 30px; margin-bottom: 15px;">Content Item Details</h4>
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
-                        <thead>
-                            <tr style="background: #052C47; color: white;">
-                                <th style="padding: 10px; text-align: left; width: 30%;">Creative</th>
-                                <th style="padding: 10px; width: 20%;">Type</th>
-                                <th style="padding: 10px; width: 10%;">Credits</th>
-                                <th style="padding: 10px; width: 20%;">Published Date</th>
-                                <th style="padding: 10px; width: 20%;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>${tableRows}</tbody>
-                    </table>
-                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 14px;">
-                        <p>${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}</p>
-                        <p style="margin: 5px 0;">Generated on ${formatDate(new Date())}</p>
+
+                        <!-- Footer -->
+                        <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 14px;">
+                            <p>${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}</p>
+                            <p style="margin: 5px 0;">Generated on ${formatDate(new Date())}</p>
+                        </div>
                     </div>
                 </div>
             `;
