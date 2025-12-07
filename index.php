@@ -5294,6 +5294,10 @@
             const campaign = appData.campaigns.find(c => c.id === id);
             if (!campaign) return;
 
+            console.log('Campaign data:', campaign);
+            console.log('Evidence URL:', campaign.evidenceImageUrl);
+            console.log('Creative URL:', campaign.creativeImageUrl);
+
             document.getElementById('detailPlatform').textContent = campaign.platform;
             document.getElementById('detailAdId').textContent = campaign.adId;
             document.getElementById('detailAdName').textContent = campaign.adName;
@@ -5311,17 +5315,22 @@
             if (campaign.evidenceImageUrl) {
                 try {
                     const evidenceImages = JSON.parse(campaign.evidenceImageUrl);
+                    console.log('Parsed evidence images:', evidenceImages);
                     if (Array.isArray(evidenceImages) && evidenceImages.length > 0) {
-                        evidenceImageContainer.innerHTML = evidenceImages.map(url => `
+                        evidenceImageContainer.innerHTML = evidenceImages.map(url => {
+                            console.log('Evidence image URL:', url);
+                            return `
                             <img src="${url}" alt="Evidence" 
                                  style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; margin-bottom: 10px;" 
                                  onclick="window.open('${url}', '_blank')" 
                                  title="Click to view full size">
-                        `).join('');
+                        `;
+                        }).join('');
                     } else {
                         evidenceImageContainer.innerHTML = '<p class="text-muted">No evidence image uploaded</p>';
                     }
                 } catch (e) {
+                    console.log('Error parsing evidence images:', e);
                     // Fallback for single URL (old format)
                     evidenceImageContainer.innerHTML = `
                         <img src="${campaign.evidenceImageUrl}" alt="Evidence" 
@@ -5339,17 +5348,22 @@
             if (campaign.creativeImageUrl) {
                 try {
                     const creativeImages = JSON.parse(campaign.creativeImageUrl);
+                    console.log('Parsed creative images:', creativeImages);
                     if (Array.isArray(creativeImages) && creativeImages.length > 0) {
-                        creativeImageContainer.innerHTML = creativeImages.map(url => `
+                        creativeImageContainer.innerHTML = creativeImages.map(url => {
+                            console.log('Creative image URL:', url);
+                            return `
                             <img src="${url}" alt="Creative" 
                                  style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; margin-bottom: 10px;" 
                                  onclick="window.open('${url}', '_blank')" 
                                  title="Click to view full size">
-                        `).join('');
+                        `;
+                        }).join('');
                     } else {
                         creativeImageContainer.innerHTML = '<p class="text-muted">No creative image uploaded</p>';
                     }
                 } catch (e) {
+                    console.log('Error parsing creative images:', e);
                     // Fallback for single URL (old format)
                     creativeImageContainer.innerHTML = `
                         <img src="${campaign.creativeImageUrl}" alt="Creative" 
