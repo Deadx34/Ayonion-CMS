@@ -5261,8 +5261,8 @@
                 campaignEndTime: document.getElementById('campaignEndTime').value,
                 qualityRanking: document.getElementById('qualityRanking').value,
                 conversionRanking: document.getElementById('conversionRanking').value,
-                evidenceImageUrl: campaignEvidenceImages.length > 0 ? JSON.stringify(campaignEvidenceImages) : null,
-                creativeImageUrl: campaignCreativeImages.length > 0 ? JSON.stringify(campaignCreativeImages) : null
+                evidenceImageUrl: campaignEvidenceImages.length > 0 ? JSON.stringify(campaignEvidenceImages.map(img => img.url || img)) : null,
+                creativeImageUrl: campaignCreativeImages.length > 0 ? JSON.stringify(campaignCreativeImages.map(img => img.url || img)) : null
             };
 
             try {
@@ -5441,14 +5441,17 @@
                     const evidenceImages = JSON.parse(campaign.evidenceImageUrl);
                     if (Array.isArray(evidenceImages)) {
                         evidenceImages.forEach((img, idx) => {
-                            editCampaignCurrentEvidenceImages.push(img);
+                            // Handle both string URLs and objects with url property
+                            const imageUrl = typeof img === 'string' ? img : img.url;
+                            const imageName = typeof img === 'object' ? (img.name || 'Current Evidence') : 'Current Evidence';
+                            editCampaignCurrentEvidenceImages.push({ url: imageUrl, name: imageName });
                             const col = document.createElement('div');
                             col.className = 'col-md-6 mb-2';
                             col.innerHTML = `
                                 <div class="card">
-                                    <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                    <img src="${imageUrl}" class="card-img-top" style="height: 120px; object-fit: cover;">
                                     <div class="card-body p-2">
-                                        <small class="text-muted d-block text-truncate">${img.name || 'Current Evidence'}</small>
+                                        <small class="text-muted d-block text-truncate">${imageName}</small>
                                         <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditCurrentEvidenceImage(${idx})">
                                             <i class="fas fa-trash me-1"></i>Remove
                                         </button>
@@ -5486,14 +5489,17 @@
                     const creativeImages = JSON.parse(campaign.creativeImageUrl);
                     if (Array.isArray(creativeImages)) {
                         creativeImages.forEach((img, idx) => {
-                            editCampaignCurrentCreativeImages.push(img);
+                            // Handle both string URLs and objects with url property
+                            const imageUrl = typeof img === 'string' ? img : img.url;
+                            const imageName = typeof img === 'object' ? (img.name || 'Current Creative') : 'Current Creative';
+                            editCampaignCurrentCreativeImages.push({ url: imageUrl, name: imageName });
                             const col = document.createElement('div');
                             col.className = 'col-md-6 mb-2';
                             col.innerHTML = `
                                 <div class="card">
-                                    <img src="${img.url}" class="card-img-top" style="height: 120px; object-fit: cover;">
+                                    <img src="${imageUrl}" class="card-img-top" style="height: 120px; object-fit: cover;">
                                     <div class="card-body p-2">
-                                        <small class="text-muted d-block text-truncate">${img.name || 'Current Creative'}</small>
+                                        <small class="text-muted d-block text-truncate">${imageName}</small>
                                         <button type="button" class="btn btn-sm btn-danger w-100 mt-1" onclick="removeEditCurrentCreativeImage(${idx})">
                                             <i class="fas fa-trash me-1"></i>Remove
                                         </button>
@@ -5878,8 +5884,8 @@
                 campaignEndTime: document.getElementById('editCampaignEndTime').value,
                 qualityRanking: document.getElementById('editQualityRanking').value,
                 conversionRanking: document.getElementById('editConversionRanking').value,
-                evidenceImageUrl: allEvidenceImages.length > 0 ? JSON.stringify(allEvidenceImages) : null,
-                creativeImageUrl: allCreativeImages.length > 0 ? JSON.stringify(allCreativeImages) : null
+                evidenceImageUrl: allEvidenceImages.length > 0 ? JSON.stringify(allEvidenceImages.map(img => img.url || img)) : null,
+                creativeImageUrl: allCreativeImages.length > 0 ? JSON.stringify(allCreativeImages.map(img => img.url || img)) : null
             };
 
             try {
