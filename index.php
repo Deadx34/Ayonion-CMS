@@ -5362,7 +5362,12 @@
                 creativeImageContainer.innerHTML = '<p class="text-muted">No creative image uploaded</p>';
             }
 
-            new bootstrap.Modal(document.getElementById('campaignDetailsModal')).show();
+            const modalEl = document.getElementById('campaignDetailsModal');
+            let modal = bootstrap.Modal.getInstance(modalEl);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalEl);
+            }
+            modal.show();
         }
         
         // ✅ FIXED: Implemented fetch call for campaign deletion with system confirmation
