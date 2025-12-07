@@ -154,23 +154,27 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
         </style>
     </head>
     <body>
-        <div class='header'>
-            " . ($companyInfo['logoUrl'] ? "<img src='{$companyInfo['logoUrl']}' alt='Logo' class='logo'>" : '') . "
-            <div>
-                <h1 class='company-name'>{$companyInfo['name']}</h1>
-                <p class='report-title'>Content Credit Usage Report</p>
+        <div style='font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; background: white;'>
+            <!-- Company Header -->
+            <div style='background: #0d0e10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;'>
+                <div style='display: flex; align-items: center;'>
+                    <img src='" . ($companyInfo['logoDark'] ?? $companyInfo['logo'] ?? 'uploads/logos/favicon.svg') . "' alt='Company Logo' style='height: 60px; width: auto; object-fit: contain;'>
+                </div>
+                <div style='text-align: right; color: white;'>
+                    <p style='margin: 0; font-size: 12px; line-height: 1.6;'>" . ($companyInfo['website'] ?? 'www.ayonionstudios.com') . "</p>
+                    <p style='margin: 0; font-size: 12px; line-height: 1.6;'>" . ($companyInfo['email'] ?? 'info@ayonionstudios.com') . "</p>
+                    <p style='margin: 0; font-size: 11px; line-height: 1.6; opacity: 0.8;'>© " . ($companyInfo['name'] ?? 'Ayonion Studios') . "</p>
+                </div>
             </div>
-        </div>
-        
-        " . (!empty($client['logoUrl']) 
-            ? "<div style='text-align:center; margin:15px 0;'><img src='" . $client['logoUrl'] . "' alt='Client Logo' class='client-logo'></div>" 
-            : "<div style='text-align:center; margin:15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;'><h2 style='color: #2c3e50; margin: 0; font-size: 22px;'>{$client['companyName']}</h2></div>") . "
 
-        <div class='client-info'>
-            <h3 class='client-name'>{$client['companyName']} ({$client['partnerId']})</h3>
-            <p><strong>Reporting Cycle:</strong> Ends on " . date('F j, Y', strtotime($client['renewalDate'])) . "</p>
-            <p><strong>Generated:</strong> " . date('F j, Y') . "</p>
-        </div>
+            <div style='padding: 40px;'>
+                <!-- Report Title -->
+                <div style='text-align: center; margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px;'>
+                    <h1 style='color: #052C47; margin: 0; font-size: 32px;'>Content Credit Usage Report</h1>
+                    <p style='color: #666; margin: 10px 0 5px 0; font-size: 18px;'>{$client['companyName']} ({$client['partnerId']})</p>
+                    <p style='color: #999; margin: 0; font-size: 14px;'>Reporting Cycle Ends: " . date('F j, Y', strtotime($client['renewalDate'])) . "</p>
+                    <p style='color: #999; margin: 5px 0 0 0; font-size: 12px;'>Generated on " . date('F j, Y') . "</p>
+                </div>
         
         {$selectedReportInfo}
         
@@ -205,6 +209,8 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             <p><strong>Thank you for using AYONION CMS!</strong></p>
             <p>Generated on " . date('F j, Y \a\t g:i A') . "</p>
             <p>This report was generated automatically by AYONION CMS</p>
+        </div>
+            </div>
         </div>
     </body>
     </html>";
