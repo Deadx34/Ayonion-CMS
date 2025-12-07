@@ -7615,9 +7615,11 @@
                             const evidenceImages = JSON.parse(campaign.evidenceImageUrl);
                             if (Array.isArray(evidenceImages)) {
                                 evidenceImages.forEach(img => {
+                                    // Handle both string URLs and objects with url property
+                                    const imageUrl = typeof img === 'string' ? img : img.url;
                                     reportEvidenceImages.push({
                                         name: `Evidence - ${campaign.adName}`,
-                                        data: img.url
+                                        data: imageUrl
                                     });
                                 });
                             }
@@ -7635,9 +7637,11 @@
                             const creativeImages = JSON.parse(campaign.creativeImageUrl);
                             if (Array.isArray(creativeImages)) {
                                 creativeImages.forEach(img => {
+                                    // Handle both string URLs and objects with url property
+                                    const imageUrl = typeof img === 'string' ? img : img.url;
                                     reportCreativeImages.push({
                                         name: `Creative - ${campaign.adName}`,
-                                        data: img.url
+                                        data: imageUrl
                                     });
                                 });
                             }
