@@ -70,7 +70,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             }
             .client-logo {
                 display: block;
-                margin: 0 auto 15px;
+                margin: 0 0 15px 0;
                 max-height: 80px;
                 object-fit: contain;
             }
@@ -169,11 +169,11 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
 
             <div style='padding: 40px;'>
                 <!-- Report Title -->
-                <div style='text-align: center; margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px;'>
-                    <h1 style='color: #052C47; margin: 0; font-size: 32px;'>Content Credit Usage Report</h1>
-                    <p style='color: #666; margin: 10px 0 5px 0; font-size: 18px;'>{$client['companyName']} ({$client['partnerId']})</p>
-                    <p style='color: #999; margin: 0; font-size: 14px;'>Reporting Cycle Ends: " . date('F j, Y', strtotime($client['renewalDate'])) . "</p>
-                    <p style='color: #999; margin: 5px 0 0 0; font-size: 12px;'>Generated on " . date('F j, Y') . "</p>
+                <div style='margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px;'>
+                    <h1 style='color: #052C47; margin: 0; font-size: 32px; text-align: center;'>Content Credit Usage Report</h1>
+                    <p style='color: #666; margin: 10px 0 5px 0; font-size: 18px; text-align: center;'>{$client['companyName']} ({$client['partnerId']})</p>
+                    <p style='color: #999; margin: 0; font-size: 14px; text-align: center;'>Reporting Cycle Ends: " . date('F j, Y', strtotime($client['renewalDate'])) . "</p>
+                    <p style='color: #999; margin: 5px 0 0 0; font-size: 12px; text-align: center;'>Generated on " . date('F j, Y') . "</p>
                 </div>
         
         {$selectedReportInfo}
