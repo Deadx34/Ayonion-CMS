@@ -6835,6 +6835,18 @@
                     </style>
                 </head>
                 <body>
+                    <!-- Document Header -->
+                    <div style="background: #0d0e10; padding: 20px 30px; margin: -30px -30px 30px -30px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 0 0 auto;">
+                            <img src="uploads/logos/favicon.svg" alt="Company Logo" style="height: 50px; width: auto;">
+                        </div>
+                        <div style="text-align: right; color: white;">
+                            <p style="margin: 0; font-size: 14px;">${COMPANY_INFO.website || 'www.ayonionstudios.com'}</p>
+                            <p style="margin: 5px 0; font-size: 14px;">${COMPANY_INFO.email}</p>
+                            <p style="margin: 5px 0; font-size: 12px;">© ${COMPANY_INFO.name}</p>
+                        </div>
+                    </div>
+                    
                     <div class="header">
                         <div style="display: flex; justify-content: space-between; align-items: start;">
                             <div>
