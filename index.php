@@ -7957,7 +7957,7 @@
                     <!-- Company Header -->
                     <div style="background: #0d0e10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center;">
-                            <img src="${COMPANY_INFO.logo || 'uploads/logos/favicon.svg'}" alt="Company Logo" style="height: 60px; width: auto; object-fit: contain;">
+                            <img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logo || 'uploads/logos/favicon.svg'}" alt="Company Logo" style="height: 60px; width: auto; object-fit: contain;">
                         </div>
                         <div style="text-align: right; color: white;">
                             <p style="margin: 0; font-size: 12px; line-height: 1.6;">${COMPANY_INFO.website || 'www.ayonionstudios.com'}</p>
