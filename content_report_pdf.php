@@ -5,17 +5,8 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
     $totalCredits = $client['packageCredits'] + $client['extraCredits'] + $client['carriedForwardCredits'];
     $available = $totalCredits - $client['usedCredits'];
     
-    // Add selected report info header if applicable
+    // Selected report info removed as per user request
     $selectedReportInfo = '';
-    if ($isSelectedReport && $selectedCount > 0) {
-        $selectedReportInfo = "
-            <div style='background: #fef3c7; padding: 12px; border-left: 4px solid #f59e0b; border-radius: 4px; margin-bottom: 20px;'>
-                <p style='margin: 0; color: #92400e; font-size: 13px;'>
-                    <strong>📋 Selected Items Report:</strong> This report includes <strong>{$selectedCount}</strong> selected content items with a total of <strong>{$totalSelectedCredits} credits</strong>.
-                </p>
-            </div>
-        ";
-    }
     
     $tableRows = '';
     if (count($contents) > 0) {

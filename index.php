@@ -5323,7 +5323,7 @@
                             console.log('Evidence image URL:', url);
                             return `
                             <img src="${url}" alt="Evidence" 
-                                 style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; margin-bottom: 10px;" 
+                                 style="width: 100%; height: 200px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; margin-bottom: 10px; background: #f8f9fa;" 
                                  onclick="window.open('${url}', '_blank')" 
                                  title="Click to view full size">
                         `;
@@ -5336,7 +5336,7 @@
                     // Fallback for single URL (old format)
                     evidenceImageContainer.innerHTML = `
                         <img src="${campaign.evidenceImageUrl}" alt="Evidence" 
-                             style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" 
+                             style="width: 100%; height: 200px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: #f8f9fa;" 
                              onclick="window.open('${campaign.evidenceImageUrl}', '_blank')" 
                              title="Click to view full size">
                     `;
@@ -5358,7 +5358,7 @@
                             console.log('Creative image URL:', url);
                             return `
                             <img src="${url}" alt="Creative" 
-                                 style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; margin-bottom: 10px;" 
+                                 style="width: 100%; height: 200px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; margin-bottom: 10px; background: #f8f9fa;" 
                                  onclick="window.open('${url}', '_blank')" 
                                  title="Click to view full size">
                         `;
@@ -5371,7 +5371,7 @@
                     // Fallback for single URL (old format)
                     creativeImageContainer.innerHTML = `
                         <img src="${campaign.creativeImageUrl}" alt="Creative" 
-                             style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" 
+                             style="width: 100%; height: 200px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; background: #f8f9fa;" 
                              onclick="window.open('${campaign.creativeImageUrl}', '_blank')" 
                              title="Click to view full size">
                     `;
