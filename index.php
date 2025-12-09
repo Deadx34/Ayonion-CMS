@@ -6553,7 +6553,7 @@
             const html = `
                 <div style="display: flex; min-height: 100vh; font-family: Arial, sans-serif;">
                     <!-- Sidebar -->
-                    <div style="width: 30%; background: #2c3e50; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
+                    <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
                         <div style="margin-bottom: 15px; text-align: center;">
                             ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 125px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
