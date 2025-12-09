@@ -4907,7 +4907,7 @@
                         <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
                         <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
                             <thead>
-                                <tr style="background: #052C47; color: white;">
+                                <tr style="background: #030b0d; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
                                     <th style="padding: 10px; text-align: left; width: 35%;">Creative</th>
                                     <th style="padding: 10px; width: 25%;">Type</th>
                                     <th style="padding: 10px; width: 15%;">Credits</th>

@@ -38,11 +38,14 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
         <link href='https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap' rel='stylesheet'>
         <title>Content Credit Report - {$client['companyName']}</title>
         <style>
-            @page { margin: 0.75in; }
+            @page { 
+                margin: 0.75in; 
+                size: A4;
+            }
             body { 
                 font-family: 'Lato', 'Arial', sans-serif; 
                 margin: 0; 
-                padding: 0; 
+                padding: 20px; 
                 color: #333; 
                 line-height: 1.4;
             }
@@ -126,9 +129,9 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 border-bottom: 1px solid #ddd; 
             }
             .content-table th { 
-                background-color: #f8f9fa; 
+                background-color: #030b0d; 
                 font-weight: bold; 
-                color: #2c3e50;
+                color: white;
             }
             .footer { 
                 margin-top: 40px; 
