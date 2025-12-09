@@ -4882,6 +4882,7 @@
                     <div style="padding: 40px;">
                         <!-- Report Title -->
                         <div style="margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px;">
+                            <img src="${client.logoUrl || 'uploads/logos/favicon.svg'}" alt="Client Logo" style="display: block; margin: 0 0 15px 0; max-height: 80px; object-fit: contain;">
                             <h1 style="color: #052C47; margin: 0; font-size: 32px; text-align: center;">Content Credit Usage Report</h1>
                             <p style="color: #666; margin: 10px 0 5px 0; font-size: 18px; text-align: center;">${client.companyName} (${client.partnerId})</p>
                             <p style="color: #999; margin: 0; font-size: 14px; text-align: center;">Reporting Cycle Ends: ${formatDate(client.renewalDate)}</p>
