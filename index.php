@@ -4869,12 +4869,26 @@
             const reportHtml = `
                 <style>
                     @media print {
+                        @page {
+                            margin-top: 0;
+                        }
                         .report-header {
-                            position: relative;
-                            page-break-after: avoid;
+                            position: static !important;
+                            display: block !important;
+                            page-break-inside: avoid !important;
+                            page-break-after: avoid !important;
+                            break-inside: avoid !important;
+                            break-after: avoid !important;
                         }
                         .report-content {
-                            page-break-before: avoid;
+                            page-break-before: avoid !important;
+                            break-before: avoid !important;
+                        }
+                        thead {
+                            display: table-header-group !important;
+                        }
+                        tfoot {
+                            display: table-footer-group !important;
                         }
                     }
                 </style>
