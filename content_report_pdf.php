@@ -24,11 +24,10 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                     <td style='padding: 10px; font-size: 12px;'>{$c['contentType']}</td>
                     <td style='padding: 10px; text-align: center; font-size: 12px;'>{$c['credits']}</td>
                     <td style='padding: 10px; font-size: 12px;'>" . ($c['publishedDate'] ? date('M j, Y', strtotime($c['publishedDate'])) : '-') . "</td>
-                    <td style='padding: 10px; font-size: 12px; color: #10b981;'>{$c['status']}</td>
                 </tr>";
         }
     } else {
-        $tableRows = '<tr><td colspan="5" style="padding: 20px; text-align: center; font-size: 12px;">No content records found.</td></tr>';
+        $tableRows = '<tr><td colspan="4" style="padding: 20px; text-align: center; font-size: 12px;">No content records found.</td></tr>';
     }
     
     $html = "
@@ -182,20 +181,19 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
         </div>
         
         <table class='content-table'>
+        <table class='content-table'>
             <thead>
                 <tr>
-                    <th style='width: 30%;'>Creative</th>
-                    <th style='width: 20%;'>Content Type</th>
-                    <th style='width: 10%; text-align: center;'>Credits</th>
-                    <th style='width: 20%;'>Published Date</th>
-                    <th style='width: 20%;'>Status</th>
+                    <th style='width: 35%;'>Creative</th>
+                    <th style='width: 25%;'>Content Type</th>
+                    <th style='width: 15%; text-align: center;'>Credits</th>
+                    <th style='width: 25%;'>Published Date</th>
                 </tr>
             </thead>
             <tbody>
                 {$tableRows}
             </tbody>
         </table>
-        
         <div class='footer'>
             <p><strong>Thank you for using AYONION CMS!</strong></p>
             <p>Generated on " . date('F j, Y \a\t g:i A') . "</p>

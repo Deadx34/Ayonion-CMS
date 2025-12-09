@@ -4821,12 +4821,11 @@
                     <td style="padding: 10px;">${c.contentType}</td>
                     <td style="padding: 10px; text-align: center;">${c.credits}</td>
                     <td style="padding: 10px;">${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
-                    <td style="padding: 10px;"><span style="color: ${getStatusColor(c.status) === 'success' ? '#10b981' : '#f59e0b'};">${c.status}</span></td>
                 </tr>
             `).join('');
 
             if (contents.length === 0) {
-                tableRows = '<tr><td colspan="5" style="padding: 20px; text-align: center;">No content records found.</td></tr>';
+                tableRows = '<tr><td colspan="4" style="padding: 20px; text-align: center;">No content records found.</td></tr>';
             }
 
             // Generate PDF using server-side generation
@@ -4905,18 +4904,17 @@
                         <!-- Content Item Details -->
                         <h4 style="margin-top: 30px; margin-bottom: 15px;">Content Item Details</h4>
                         <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
                             <thead>
                                 <tr style="background: #052C47; color: white;">
-                                    <th style="padding: 10px; text-align: left; width: 30%;">Creative</th>
-                                    <th style="padding: 10px; width: 20%;">Type</th>
-                                    <th style="padding: 10px; width: 10%;">Credits</th>
-                                    <th style="padding: 10px; width: 20%;">Published Date</th>
-                                    <th style="padding: 10px; width: 20%;">Status</th>
+                                    <th style="padding: 10px; text-align: left; width: 35%;">Creative</th>
+                                    <th style="padding: 10px; width: 25%;">Type</th>
+                                    <th style="padding: 10px; width: 15%;">Credits</th>
+                                    <th style="padding: 10px; width: 25%;">Published Date</th>
                                 </tr>
                             </thead>
                             <tbody>${tableRows}</tbody>
                         </table>
-
                         <!-- Footer -->
                         <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #666; font-size: 14px;">
                             <p>${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}</p>
