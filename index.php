@@ -6612,11 +6612,11 @@
                         
                         <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;">
                             <thead>
-                                <tr style="background: #f8f9fa; border-bottom: 2px solid #ecf0f1;">
-                                    <th style="padding: 8px 6px; text-align: left; font-weight: bold; color: #2c3e50;">Description</th>
-                                    <th style="padding: 8px 6px; text-align: center; font-weight: bold; color: #2c3e50;">Quantity</th>
-                                    <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: #2c3e50;">Unit Price</th>
-                                    <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: #2c3e50;">Amount (Rs.)</th>
+                                <tr style="background: #030b0d; border-bottom: 2px solid #ecf0f1; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <th style="padding: 8px 6px; text-align: left; font-weight: bold; color: white;">Description</th>
+                                    <th style="padding: 8px 6px; text-align: center; font-weight: bold; color: white;">Quantity</th>
+                                    <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: white;">Unit Price</th>
+                                    <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: white;">Amount (Rs.)</th>
                                 </tr>
                             </thead>
                             <tbody>
