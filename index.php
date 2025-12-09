@@ -7252,14 +7252,19 @@
             const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             
-            // Get platform badges with appropriate styling
+            // Get platform badges with appropriate styling (text-based for print compatibility)
             const getPlatformBadge = (platform) => {
                 const badges = {
-                    'Meta Ads': '<span class="badge" style="background: linear-gradient(135deg, #0062E6 0%, #19AFFF 100%); color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">Meta Ads</span>',
-                    'Facebook': '<span class="badge" style="background: #4267B2; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">Facebook</span>',
-                    'Instagram': '<span class="badge" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">Instagram</span>'
+                    'Meta Ads': '<span class="badge" style="background: linear-gradient(135deg, #0062E6 0%, #19AFFF 100%); color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● Meta Ads</span>',
+                    'Facebook': '<span class="badge" style="background: #4267B2; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● Facebook</span>',
+                    'Instagram': '<span class="badge" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● Instagram</span>',
+                    'Twitter': '<span class="badge" style="background: #1DA1F2; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● Twitter</span>',
+                    'LinkedIn': '<span class="badge" style="background: #0077B5; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● LinkedIn</span>',
+                    'YouTube': '<span class="badge" style="background: #FF0000; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● YouTube</span>',
+                    'TikTok': '<span class="badge" style="background: #000000; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● TikTok</span>',
+                    'Google Ads': '<span class="badge" style="background: #4285F4; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● Google Ads</span>'
                 };
-                return badges[platform] || `<span class="badge bg-primary" style="padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600;">${platform}</span>`;
+                return badges[platform] || `<span class="badge" style="background: #6c757d; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact;">● ${platform}</span>`;
             };
             
             const invoiceHTML = `
