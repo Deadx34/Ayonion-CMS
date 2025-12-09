@@ -7290,7 +7290,8 @@
                     .client-info {
                         background: #f8f9fa;
                         padding: 30px 40px;
-                        border-left: 4px solid #052C47;
+                        border-left: 4px solid #030b0d;
+                        margin: 0;
                     }
                     .client-info h2 {
                         color: #333;
