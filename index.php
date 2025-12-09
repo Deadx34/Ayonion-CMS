@@ -4866,9 +4866,20 @@
             
             // Fallback to browser print
             const reportHtml = `
+                <style>
+                    @media print {
+                        .report-header {
+                            position: relative;
+                            page-break-after: avoid;
+                        }
+                        .report-content {
+                            page-break-before: avoid;
+                        }
+                    }
+                </style>
                 <div style="font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; background: white;">
                     <!-- Company Header -->
-                    <div style="background: #0d0e10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;">
+                    <div class="report-header" style="background: #0d0e10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center;">
                             <img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logo || 'uploads/logos/favicon.svg'}" alt="Company Logo" style="height: 60px; width: auto; object-fit: contain;">
                         </div>
@@ -4879,7 +4890,7 @@
                         </div>
                     </div>
 
-                    <div style="padding: 40px;">
+                    <div class="report-content" style="padding: 40px;">
                         <!-- Report Title -->
                         <div style="margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px;">
                             <img src="${client.logoUrl || 'uploads/logos/favicon.svg'}" alt="Client Logo" style="display: block; margin: 0 0 15px 0; max-height: 80px; object-fit: contain;">

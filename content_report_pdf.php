@@ -150,13 +150,20 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                     background-color: #030b0d !important;
                     color: white !important;
                 }
+                .report-header {
+                    position: relative;
+                    page-break-after: avoid;
+                }
+                .report-content {
+                    page-break-before: avoid;
+                }
             }
         </style>
     </head>
     <body>
         <div style='font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; background: white;'>
             <!-- Company Header -->
-            <div style='background: #0d0e10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;'>
+            <div class='report-header' style='background: #0d0e10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;'>
                 <div style='display: flex; align-items: center;'>
                     <img src='" . ($companyInfo['logoDark'] ?? $companyInfo['logo'] ?? 'uploads/logos/favicon.svg') . "' alt='Company Logo' style='height: 60px; width: auto; object-fit: contain;'>
                 </div>
@@ -167,7 +174,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 </div>
             </div>
 
-            <div style='padding: 40px;'>
+            <div class='report-content' style='padding: 40px;'>
                 <!-- Report Title -->
                 <div style='margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px;'>
                     <img class='client-logo' src='" . ($client['logoUrl'] ?? 'uploads/logos/favicon.svg') . "' alt='Client Logo'>
