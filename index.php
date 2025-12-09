@@ -7402,6 +7402,31 @@
                         opacity: 0.8;
                         margin: 5px 0;
                     }
+                    
+                    /* Force colors to print */
+                    @media print {
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                        }
+                        .invoice-header {
+                            background: linear-gradient(135deg, #052C47 0%, #764ba2 100%) !important;
+                        }
+                        .amount-summary {
+                            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important;
+                        }
+                        .campaign-table thead {
+                            background: #052C47 !important;
+                        }
+                        .footer-section {
+                            background: #333 !important;
+                        }
+                        .badge {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                    }
                 </style>
                 
                 <div class="invoice-container">
