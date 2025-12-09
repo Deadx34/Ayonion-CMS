@@ -129,6 +129,8 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 background-color: #030b0d; 
                 font-weight: bold; 
                 color: white;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
             .footer { 
                 margin-top: 40px; 
@@ -140,6 +142,14 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             }
             @media print { 
                 body { margin: 0; }
+                * {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                .content-table th {
+                    background-color: #030b0d !important;
+                    color: white !important;
+                }
             }
         </style>
     </head>
