@@ -165,11 +165,16 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                     page-break-before: avoid !important;
                     break-before: avoid !important;
                 }
-                thead {
-                    display: table-header-group !important;
+                /* Prevent table headers from repeating on every page */
+                .content-table thead {
+                    display: table-row-group !important;
                 }
-                tfoot {
-                    display: table-footer-group !important;
+                .content-table {
+                    page-break-inside: auto !important;
+                }
+                .content-table tr {
+                    page-break-inside: avoid !important;
+                    page-break-after: auto !important;
                 }
             }
         </style>

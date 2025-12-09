@@ -4884,11 +4884,16 @@
                             page-break-before: avoid !important;
                             break-before: avoid !important;
                         }
-                        thead {
-                            display: table-header-group !important;
+                        /* Prevent table headers from repeating on every page */
+                        table thead {
+                            display: table-row-group !important;
                         }
-                        tfoot {
-                            display: table-footer-group !important;
+                        table {
+                            page-break-inside: auto !important;
+                        }
+                        table tr {
+                            page-break-inside: avoid !important;
+                            page-break-after: auto !important;
                         }
                     }
                 </style>
