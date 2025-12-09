@@ -6583,11 +6583,11 @@
                                 <div style="font-size: 11px; color: #bdc3c7; margin-bottom: 5px;">Find us on social media:</div>
                                 <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">ayonionstudios</div>
                                 <div style="display: flex; gap: 6px;">
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white;"><i class="fab fa-youtube"></i></div>
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #e4405f; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white;"><i class="fab fa-instagram"></i></div>
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #3b5998; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white;"><i class="fab fa-facebook-f"></i></div>
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #1da1f2; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white;"><i class="fab fa-twitter"></i></div>
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #0077b5; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white;"><i class="fab fa-linkedin-in"></i></div>
+                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">▶</div>
+                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #e4405f; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">📷</div>
+                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #3b5998; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">f</div>
+                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #1da1f2; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">𝕏</div>
+                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #0077b5; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">in</div>
                                 </div>
                             </div>
                         </div>
