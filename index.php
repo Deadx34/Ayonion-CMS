@@ -4478,19 +4478,20 @@
             const totalCredits = client.packageCredits + client.extraCredits + client.carriedForwardCredits;
             const available = totalCredits - client.usedCredits;
 
+            // Allow minus credits - removed validation
             // For edit mode, add back the original credits before checking
-            let availableForEdit = available;
-            if (mode === 'edit' && editId) {
-                const originalContent = appData.contentCredits.find(c => c.id === parseInt(editId));
-                if (originalContent) {
-                    availableForEdit = available + originalContent.credits;
-                }
-            }
+            // let availableForEdit = available;
+            // if (mode === 'edit' && editId) {
+            //     const originalContent = appData.contentCredits.find(c => c.id === parseInt(editId));
+            //     if (originalContent) {
+            //         availableForEdit = available + originalContent.credits;
+            //     }
+            // }
 
-            if (credits > availableForEdit) {
-                showAlert(`Insufficient credits! Only ${availableForEdit} credits available`, 'danger');
-                return;
-            }
+            // if (credits > availableForEdit) {
+            //     showAlert(`Insufficient credits! Only ${availableForEdit} credits available`, 'danger');
+            //     return;
+            // }
 
             const contentData = {
                 clientId: clientId,
