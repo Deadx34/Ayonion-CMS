@@ -153,6 +153,15 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 @page {
                     margin-top: 0;
                 }
+                @page :first {
+                    margin-top: 0;
+                }
+                @page :not(:first) {
+                    margin-top: 20mm;
+                    margin-bottom: 20mm;
+                    margin-left: 15mm;
+                    margin-right: 15mm;
+                }
                 .report-header {
                     position: static !important;
                     display: block !important;

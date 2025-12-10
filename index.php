@@ -105,11 +105,11 @@
         .action-btn:hover { transform: translateY(-2px); }
         .document-preview { 
             background: white; 
-            padding: 40px; 
-            border-radius: 10px; 
-            max-width: 800px; 
-            margin: 20px auto; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 0; 
+            border-radius: 0; 
+            max-width: 100%; 
+            margin: 0; 
+            box-shadow: none;
             font-family: 'Times New Roman', serif;
             line-height: 1.6;
             color: #333;
@@ -161,7 +161,7 @@
             .top-bar { padding: 12px 16px; border-radius: 12px; gap: 10px; }
             .page-title { font-size: 1.3rem; max-width: 70vw; }
             .stat-card { padding: 18px; }
-            .document-preview { padding: 20px; }
+            .document-preview { padding: 0; }
             .logo-preview { width: 32px; height: 32px; }
             .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         }
@@ -4871,6 +4871,15 @@
                     @media print {
                         @page {
                             margin-top: 0;
+                        }
+                        @page :first {
+                            margin-top: 0;
+                        }
+                        @page :not(:first) {
+                            margin-top: 20mm;
+                            margin-bottom: 20mm;
+                            margin-left: 15mm;
+                            margin-right: 15mm;
                         }
                         .report-header {
                             position: static !important;
