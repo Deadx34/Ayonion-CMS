@@ -4814,14 +4814,14 @@
             const available = totalCredits - client.usedCredits;
 
             let tableRows = contents.map(c => `
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 10px;">
-                        ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.creative}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 5px;">` : ''}
+                <tr style="border-bottom: 1px solid #ddd; border-left: none; border-right: none;">
+                    <td style="padding: 10px; border-left: none; border-right: none;">
+                        ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.creative}" style="width: 80px; height: 80px; object-fit: cover; display: block; margin-bottom: 5px;">` : ''}
                         <div style="font-weight: bold;">${c.creative}</div>
                     </td>
-                    <td style="padding: 10px;">${c.contentType}</td>
-                    <td style="padding: 10px; text-align: center;">${c.credits}</td>
-                    <td style="padding: 10px;">${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
+                    <td style="padding: 10px; border-left: none; border-right: none;">${c.contentType}</td>
+                    <td style="padding: 10px; text-align: center; border-left: none; border-right: none;">${c.credits}</td>
+                    <td style="padding: 10px; border-left: none; border-right: none;">${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
                 </tr>
             `).join('');
 
@@ -4930,15 +4930,15 @@
                         </div>
 
                         <!-- Credit Summary -->
-                        <div style="margin: 20px 0; padding: 20px; background: #cff4fc; border-radius: 8px;">
+                        <div style="margin: 20px 0; padding: 20px; background: #cff4fc; border: none;">
                             <h4 style="margin-bottom: 10px;">Credit Summary</h4>
                             <table style="width: 100%; border-collapse: collapse;">
-                                <tr><td style="padding: 5px;"><strong>Package Credits:</strong></td><td>${client.packageCredits}</td></tr>
-                                <tr><td style="padding: 5px;"><strong>Extra Credits:</strong></td><td>${client.extraCredits}</td></tr>
-                                <tr><td style="padding: 5px;"><strong>Carried Credits:</strong></td><td>${client.carriedForwardCredits}</td></tr>
-                                <tr><td style="padding: 5px;"><strong>TOTAL Credits:</strong></td><td>${totalCredits}</td></tr>
-                                <tr style="border-top: 2px solid #0dcaf0;"><td style="padding: 5px;"><strong>Used Credits:</strong></td><td>${client.usedCredits}</td></tr>
-                                <tr><td style="padding: 5px;"><strong>Available Credits:</strong></td><td style="color: #10b981; font-weight: bold;">${available}</td></tr>
+                                <tr><td style="padding: 5px; border: none;"><strong>Package Credits:</strong></td><td style="border: none;">${client.packageCredits}</td></tr>
+                                <tr><td style="padding: 5px; border: none;"><strong>Extra Credits:</strong></td><td style="border: none;">${client.extraCredits}</td></tr>
+                                <tr><td style="padding: 5px; border: none;"><strong>Carried Credits:</strong></td><td style="border: none;">${client.carriedForwardCredits}</td></tr>
+                                <tr><td style="padding: 5px; border: none;"><strong>TOTAL Credits:</strong></td><td style="border: none;">${totalCredits}</td></tr>
+                                <tr style="border-top: 2px solid #0dcaf0; border-left: none; border-right: none;"><td style="padding: 5px; border-left: none; border-right: none;"><strong>Used Credits:</strong></td><td style="border-left: none; border-right: none;">${client.usedCredits}</td></tr>
+                                <tr><td style="padding: 5px; border: none;"><strong>Available Credits:</strong></td><td style="color: #10b981; font-weight: bold; border: none;">${available}</td></tr>
                             </table>
                         </div>
 
@@ -4948,10 +4948,10 @@
                         <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px;">
                             <thead>
                                 <tr style="background: #030b0d; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                                    <th style="padding: 10px; text-align: left; width: 35%;">Creative</th>
-                                    <th style="padding: 10px; width: 25%;">Type</th>
-                                    <th style="padding: 10px; width: 15%;">Credits</th>
-                                    <th style="padding: 10px; width: 25%;">Published Date</th>
+                                    <th style="padding: 10px; text-align: left; width: 35%; border-bottom: 1px solid #ddd; border-left: none; border-right: none;">Creative</th>
+                                    <th style="padding: 10px; width: 25%; border-bottom: 1px solid #ddd; border-left: none; border-right: none;">Type</th>
+                                    <th style="padding: 10px; width: 15%; border-bottom: 1px solid #ddd; border-left: none; border-right: none;">Credits</th>
+                                    <th style="padding: 10px; width: 25%; border-bottom: 1px solid #ddd; border-left: none; border-right: none;">Published Date</th>
                                 </tr>
                             </thead>
                             <tbody>${tableRows}</tbody>

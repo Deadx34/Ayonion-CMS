@@ -13,7 +13,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
         foreach ($contents as $c) {
             $imageHtml = '';
             if (!empty($c['imageUrl'])) {
-                $imageHtml = "<img src='{$c['imageUrl']}' alt='{$c['creative']}' style='width: 80px; height: 80px; object-fit: cover; border-radius: 4px; display: block; margin-bottom: 5px;'>";
+                $imageHtml = "<img src='{$c['imageUrl']}' alt='{$c['creative']}' style='width: 80px; height: 80px; object-fit: cover; display: block; margin-bottom: 5px;'>";
             }
             $tableRows .= "
                 <tr style='border-bottom: 1px solid #ddd;'>
@@ -89,9 +89,9 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             }
             .credit-summary { 
                 margin: 20px 0; 
-                padding: 15px; 
+                padding: 20px; 
                 background: #cff4fc; 
-                border-radius: 8px; 
+                border: none;
             }
             .summary-title { 
                 margin-bottom: 10px; 
@@ -104,10 +104,13 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             }
             .summary-table td { 
                 padding: 5px; 
-                font-size: 14px;
+                font-size: 12px;
+                border: none;
             }
             .summary-total { 
-                border-top: 2px solid #2c3e50; 
+                border-top: 2px solid #2c3e50;
+                border-left: none;
+                border-right: none;
                 font-weight: bold;
             }
             .available-credits { 
@@ -123,7 +126,9 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             .content-table th, .content-table td { 
                 padding: 8px; 
                 text-align: left; 
-                border-bottom: 1px solid #ddd; 
+                border-bottom: 1px solid #ddd;
+                border-left: none;
+                border-right: none; 
             }
             .content-table th { 
                 background-color: #030b0d; 
