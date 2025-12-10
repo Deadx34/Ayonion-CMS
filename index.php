@@ -4921,12 +4921,16 @@
 
                     <div class="report-content" style="padding: 40px;">
                         <!-- Report Title -->
-                        <div style="margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px;">
-                            <img src="${client.logoUrl || 'uploads/logos/favicon.svg'}" alt="Client Logo" style="display: block; margin: 0 0 15px 0; max-height: 80px; object-fit: contain;">
-                            <h1 style="color: #052C47; margin: 0; font-size: 32px; text-align: center;">Content Credit Usage Report</h1>
-                            <p style="color: #666; margin: 10px 0 5px 0; font-size: 18px; text-align: center;">${client.companyName} (${client.partnerId})</p>
-                            <p style="color: #999; margin: 0; font-size: 14px; text-align: center;">Reporting Cycle Ends: ${formatDate(client.renewalDate)}</p>
-                            <p style="color: #999; margin: 5px 0 0 0; font-size: 12px; text-align: center;">Generated on ${formatDate(new Date())}</p>
+                        <div style="margin-bottom: 30px; border-bottom: 3px solid #052C47; padding-bottom: 20px; display: flex; align-items: center; gap: 30px;">
+                            <div style="flex: 0 0 auto;">
+                                <img src="${client.logoUrl || 'uploads/logos/favicon.svg'}" alt="Client Logo" style="display: block; max-height: 100px; max-width: 200px; object-fit: contain;">
+                            </div>
+                            <div style="flex: 1;">
+                                <h1 style="color: #052C47; margin: 0 0 10px 0; font-size: 32px;">Content Credit Usage Report</h1>
+                                <p style="color: #666; margin: 5px 0; font-size: 18px;">${client.companyName} (${client.partnerId})</p>
+                                <p style="color: #999; margin: 5px 0; font-size: 14px;">Reporting Cycle Ends: ${formatDate(client.renewalDate)}</p>
+                                <p style="color: #999; margin: 5px 0 0 0; font-size: 12px;">Generated on ${formatDate(new Date())}</p>
+                            </div>
                         </div>
 
                         <!-- Credit Summary -->
