@@ -162,7 +162,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                     margin-top: 0;
                 }
                 @page :not(:first) {
-                    margin-top: 20mm;
+                    margin-top: 35mm;
                     margin-bottom: 20mm;
                     margin-left: 15mm;
                     margin-right: 15mm;
