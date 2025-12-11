@@ -6631,11 +6631,11 @@
                                 <div style="font-size: 11px; color: #bdc3c7; margin-bottom: 5px;">Find us on social media:</div>
                                 <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">ayonionstudios</div>
                                 <div style="display: flex; gap: 8px;">
-                                    <img src="uploads/social-icons/youtube.png" alt="YouTube" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                                    <img src="uploads/social-icons/instagram.png" alt="Instagram" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                                    <img src="uploads/social-icons/facebook.png" alt="Facebook" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                                    <img src="uploads/social-icons/twitter.png" alt="Twitter" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                                    <img src="uploads/social-icons/linkedin.png" alt="LinkedIn" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/youtube.png" alt="YouTube" style="width: 22px; height: 22px; filter: brightness(0) invert(1); -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/instagram.png" alt="Instagram" style="width: 22px; height: 22px; filter: brightness(0) invert(1); -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/facebook.png" alt="Facebook" style="width: 22px; height: 22px; filter: brightness(0) invert(1); -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/twitter.png" alt="Twitter" style="width: 22px; height: 22px; filter: brightness(0) invert(1); -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/linkedin.png" alt="LinkedIn" style="width: 22px; height: 22px; filter: brightness(0) invert(1); -webkit-print-color-adjust: exact; print-color-adjust: exact;">
                                 </div>
                             </div>
                         </div>
