@@ -60,8 +60,8 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
             }
             .client-logo {
                 display: block;
-                margin: 0 0 15px 0;
-                max-height: 80px;
+                max-height: 100px;
+                max-width: 200px;
                 object-fit: contain;
             }
             .company-name { 
