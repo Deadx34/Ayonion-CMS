@@ -6601,7 +6601,7 @@
             const html = `
                 <div style="display: flex; min-height: 100vh; font-family: Arial, sans-serif;">
                     <!-- Sidebar -->
-                    <div style="width: 30%; background: #052c47; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
+                    <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
                         <div style="margin-bottom: 15px; text-align: center;">
                             ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 150px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
@@ -6660,7 +6660,7 @@
                         
                         <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;">
                             <thead>
-                                <tr style="background: #052c47; border-bottom: 2px solid #ecf0f1; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                <tr style="background: #030b0d; border-bottom: 2px solid #ecf0f1; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
                                     <th style="padding: 8px 6px; text-align: left; font-weight: bold; color: white;">Description</th>
                                     <th style="padding: 8px 6px; text-align: center; font-weight: bold; color: white;">Quantity</th>
                                     <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: white;">Unit Price</th>
