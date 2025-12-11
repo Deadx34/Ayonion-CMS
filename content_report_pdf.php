@@ -200,7 +200,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 <table style='width: 100%; border-collapse: collapse;'>
                     <tr>
                         <td style='width: 50%; vertical-align: middle; border: none;'>
-                            <img src='" . ($companyInfo['logoDark'] ?? $companyInfo['logo'] ?? 'uploads/logos/favicon.svg') . "' alt='Company Logo' style='height: 60px; width: auto; object-fit: contain; display: block;'>
+                            <img src='" . ($companyInfo['logoDark'] ?? $companyInfo['logo'] ?? 'uploads/logos/favicon.svg') . "' alt='Company Logo' style='height: 80px; width: auto; object-fit: contain; display: block;'>
                         </td>
                         <td style='width: 50%; vertical-align: middle; text-align: right; color: white; border: none;'>
                             <p style='margin: 0; font-size: 12px; line-height: 1.6;'>" . ($companyInfo['website'] ?? 'www.ayonionstudios.com') . "</p>
