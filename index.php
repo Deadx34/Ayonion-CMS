@@ -6630,12 +6630,12 @@
                             <div>
                                 <div style="font-size: 11px; color: #bdc3c7; margin-bottom: 5px;">Find us on social media:</div>
                                 <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">ayonionstudios</div>
-                                <div style="display: flex; gap: 6px;">
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #ff0000; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">▶</div>
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #e4405f; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">📷</div>
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #3b5998; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">f</div>
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #1da1f2; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">𝕏</div>
-                                    <div style="width: 18px; height: 18px; border-radius: 50%; background: #0077b5; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact;">in</div>
+                                <div style="display: flex; gap: 8px;">
+                                    <img src="uploads/social-icons/youtube.png" alt="YouTube" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/instagram.png" alt="Instagram" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/facebook.png" alt="Facebook" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/twitter.png" alt="Twitter" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                    <img src="uploads/social-icons/linkedin.png" alt="LinkedIn" style="width: 22px; height: 22px; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
                                 </div>
                             </div>
                         </div>
