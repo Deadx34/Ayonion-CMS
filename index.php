@@ -4912,7 +4912,7 @@
                         <table style="width: 100%; border-collapse: collapse;">
                             <tr>
                                 <td style="width: 50%; vertical-align: middle; border: none;">
-                                    <img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logo || 'uploads/logos/favicon.svg'}" alt="Company Logo" style="height: 100px; width: auto; object-fit: contain; display: block;">
+                                    <img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logo || 'uploads/logos/favicon.svg'}" alt="Company Logo" style="height: 200px; width: auto; object-fit: contain; display: block;">
                                 </td>
                                 <td style="width: 50%; vertical-align: middle; text-align: right; color: white; border: none;">
                                     <p style="margin: 0; font-size: 12px; line-height: 1.6;">${COMPANY_INFO.website || 'www.ayonionstudios.com'}</p>
@@ -6603,7 +6603,7 @@
                     <!-- Sidebar -->
                     <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
                         <div style="margin-bottom: 15px; text-align: center;">
-                            ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 150px; margin-bottom: 5px; object-fit: contain;">` : ''}
+                            ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 158px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
                         </div>
                         
