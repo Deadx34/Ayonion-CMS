@@ -196,15 +196,19 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
     <body>
         <div style='font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; background: white;'>
             <!-- Company Header -->
-            <div class='report-header' style='background: #0d0e10; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;'>
-                <div style='display: flex; align-items: center;'>
-                    <img src='" . ($companyInfo['logoDark'] ?? $companyInfo['logo'] ?? 'uploads/logos/favicon.svg') . "' alt='Company Logo' style='height: 60px; width: auto; object-fit: contain;'>
-                </div>
-                <div style='text-align: right; color: white;'>
-                    <p style='margin: 0; font-size: 12px; line-height: 1.6;'>" . ($companyInfo['website'] ?? 'www.ayonionstudios.com') . "</p>
-                    <p style='margin: 0; font-size: 12px; line-height: 1.6;'>" . ($companyInfo['email'] ?? 'info@ayonionstudios.com') . "</p>
-                    <p style='margin: 0; font-size: 11px; line-height: 1.6; opacity: 0.8;'>© " . ($companyInfo['name'] ?? 'Ayonion Studios') . "</p>
-                </div>
+            <div class='report-header' style='background: #0d0e10; padding: 20px 40px;'>
+                <table style='width: 100%; border-collapse: collapse;'>
+                    <tr>
+                        <td style='width: 50%; vertical-align: middle; border: none;'>
+                            <img src='" . ($companyInfo['logoDark'] ?? $companyInfo['logo'] ?? 'uploads/logos/favicon.svg') . "' alt='Company Logo' style='height: 60px; width: auto; object-fit: contain; display: block;'>
+                        </td>
+                        <td style='width: 50%; vertical-align: middle; text-align: right; color: white; border: none;'>
+                            <p style='margin: 0; font-size: 12px; line-height: 1.6;'>" . ($companyInfo['website'] ?? 'www.ayonionstudios.com') . "</p>
+                            <p style='margin: 0; font-size: 12px; line-height: 1.6;'>" . ($companyInfo['email'] ?? 'info@ayonionstudios.com') . "</p>
+                            <p style='margin: 0; font-size: 11px; line-height: 1.6; opacity: 0.8;'>© " . ($companyInfo['name'] ?? 'Ayonion Studios') . "</p>
+                        </td>
+                    </tr>
+                </table>
             </div>
 
             <div class='report-content' style='padding: 40px;'>
