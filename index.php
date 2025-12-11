@@ -6660,7 +6660,7 @@
                         
                         <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;">
                             <thead>
-                                <tr style="background: #030b0d; border-bottom: 2px solid #ecf0f1; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                <tr style="background: #052c47; border-bottom: 2px solid #ecf0f1; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
                                     <th style="padding: 8px 6px; text-align: left; font-weight: bold; color: white;">Description</th>
                                     <th style="padding: 8px 6px; text-align: center; font-weight: bold; color: white;">Quantity</th>
                                     <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: white;">Unit Price</th>
