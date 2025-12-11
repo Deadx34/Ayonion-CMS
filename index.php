@@ -6603,7 +6603,7 @@
                     <!-- Sidebar -->
                     <div style="width: 30%; background: #052c47; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
                         <div style="margin-bottom: 15px; text-align: center;">
-                            ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 125px; margin-bottom: 5px; object-fit: contain;">` : ''}
+                            ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 150px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
                         </div>
                         
