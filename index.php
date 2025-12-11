@@ -6558,7 +6558,7 @@
                 return;
             }
 
-            const colors = { quotation: '#618698', invoice: '#052C47', receipt: '#F7C935' };
+            const colors = { quotation: '#618698', invoice: '#030b0d', receipt: '#F7C935' };
             const titles = { quotation: 'QUOTATION', invoice: 'INVOICE', receipt: 'RECEIPT' };
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
 
@@ -6803,7 +6803,7 @@
                             border: 1px solid #ddd;
                         }
                         th {
-                            background-color: #052C47 !important;
+                            background-color: #030b0d !important;
                             color: white !important;
                             -webkit-print-color-adjust: exact;
                             print-color-adjust: exact;
@@ -6915,7 +6915,7 @@
         
         // ✅ Generate print content for documents
         function generatePrintContent(doc, docType) {
-            const colors = { quotation: '#618698', invoice: '#052C47', receipt: '#F7C935' };
+            const colors = { quotation: '#618698', invoice: '#030b0d', receipt: '#F7C935' };
             const titles = { quotation: 'QUOTATION', invoice: 'INVOICE', receipt: 'RECEIPT' };
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
             
