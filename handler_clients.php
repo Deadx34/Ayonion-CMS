@@ -28,6 +28,7 @@ try {
     $previousRemainingCredits = (int)($input['previousRemainingCredits'] ?? 0);
     $managingPlatforms = $conn->real_escape_string($input['managingPlatforms'] ?? '');
     $industry = $conn->real_escape_string($input['industry'] ?? '');
+    $totalAdBudget = (float)($input['totalAdBudget'] ?? 0);
     $logoUrl = $conn->real_escape_string($input['logoUrl'] ?? '');
 
     // If no logo URL provided, leave it empty (will show icon in frontend)
@@ -52,7 +53,7 @@ try {
         $subscriptionMonths, " . ($subscriptionStartDate ? "'$subscriptionStartDate'" : "NULL") . ", 
         " . ($subscriptionEndDate ? "'$subscriptionEndDate'" : "NULL") . ", $packageCredits, 
         '$managingPlatforms', '$industry', '$logoUrl', 
-        0, $previousRemainingCredits, 0, 0.00, 0.00
+        0, $previousRemainingCredits, 0, $totalAdBudget, 0.00
     )";
 
     

@@ -1078,6 +1078,11 @@
                                     <option value="Real Estate">Real Estate</option>
                                 </select>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Total Ad Budget</label>
+                                <input type="number" class="form-control" id="totalAdBudget" min="0" step="0.01" placeholder="0.00">
+                                <small class="text-muted">Total advertising budget for this client</small>
+                            </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label"><i class="fas fa-image me-2"></i>Company/Brand Logo (Optional)</label>
                                 <input type="file" class="form-control" id="clientLogoUpload" accept="image/*" onchange="handleClientLogoUpload(this)">
@@ -3476,6 +3481,7 @@
                 previousRemainingCredits: previousCreditsValue,
                 managingPlatforms: managingPlatformsStr,
                 industry: document.getElementById('industry').value,
+                totalAdBudget: parseFloat(document.getElementById('totalAdBudget').value) || 0,
                 logoUrl: logoUrl
             };
             
