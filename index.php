@@ -2250,6 +2250,9 @@
         let selectedClientContentId = null;
         let selectedClientCampaignId = null;
         let campaignImageFiles = [];
+        const DEVELOPER_PAYMENT_REMINDER_MESSAGE = 'Friendly reminder: please settle the pending developer payment. Thank you for supporting continued maintenance and updates.';
+        const DEVELOPER_PAYMENT_REMINDER_INTERVAL_MS = 30 * 60 * 1000;
+        let developerPaymentReminderTimer = null;
 
         // Default company info (fallback)
         const DEFAULT_COMPANY_INFO = {
@@ -2468,6 +2471,19 @@
             }
         }
 
+        function showDeveloperPaymentReminder() {
+            showAlert(DEVELOPER_PAYMENT_REMINDER_MESSAGE, 'info', 9000);
+        }
+
+        function startDeveloperPaymentReminder() {
+            if (developerPaymentReminderTimer) {
+                clearInterval(developerPaymentReminderTimer);
+            }
+
+            showDeveloperPaymentReminder();
+            developerPaymentReminderTimer = setInterval(showDeveloperPaymentReminder, DEVELOPER_PAYMENT_REMINDER_INTERVAL_MS);
+        }
+
 
         async function logout() {
             const confirmed = await showConfirm('Are you sure you want to logout?', 'Logout Confirmation', 'warning');
@@ -2477,6 +2493,10 @@
                 await fetch('logout.php', { method: 'POST' });
             } catch (_) {}
             currentUser = { username: '', role: '', isTempPassword: false };
+            if (developerPaymentReminderTimer) {
+                clearInterval(developerPaymentReminderTimer);
+                developerPaymentReminderTimer = null;
+            }
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
             document.getElementById('loginForm').reset();
@@ -2528,6 +2548,7 @@
             await loadAllDataFromPHP();
             buildNavigation();
             applyRoleBasedUI();
+            startDeveloperPaymentReminder();
             navigateToSection('dashboard');
             checkRenewalDates();
             document.getElementById('currentUser').textContent = currentUser.username ? (currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1)) : '';
