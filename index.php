@@ -579,6 +579,48 @@
             <div id="profile" class="section">
                 <div class="card">
                     <div class="card-header">
+                        <span><i class="fas fa-palette me-2"></i>Theme Settings</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Select Theme</label>
+                                <div class="row g-3">
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('ocean')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-ocean">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #BDDFE8, #618698); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Ocean (Default)</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Cool blue theme with modern gradients</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('purpleDark')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-purpleDark">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Purple Dark</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Dark purple theme for low-light environments</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('lightMinimal')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-lightMinimal">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #2563eb, #2563eb); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Light Minimal</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Clean light theme with minimal design</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
                         <span><i class="fas fa-key me-2"></i>Change Password</span>
                     </div>
                     <div class="card-body">
@@ -2272,6 +2314,29 @@
         function initializeTheme() {
             const savedTheme = getTheme();
             setTheme(savedTheme);
+            updateThemeCardSelection();
+        }
+
+        function switchTheme(themeName) {
+            setTheme(themeName);
+            updateThemeCardSelection();
+        }
+
+        function updateThemeCardSelection() {
+            const currentTheme = getTheme();
+            // Remove active state from all theme cards
+            document.querySelectorAll('.theme-card').forEach(card => {
+                card.style.borderColor = 'var(--border)';
+                card.style.boxShadow = 'none';
+                card.style.backgroundColor = 'var(--card)';
+            });
+            // Add active state to current theme card
+            const activeCard = document.getElementById(`themeCard-${currentTheme}`);
+            if (activeCard) {
+                activeCard.style.borderColor = 'var(--primary-solid)';
+                activeCard.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.3)';
+                activeCard.style.backgroundColor = 'var(--hover)';
+            }
         }
 
         // Apply theme on page load (before other scripts execute)
@@ -3308,6 +3373,11 @@
 
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
+
+            // Update theme card selection when navigating to profile
+            if (sectionId === 'profile') {
+                setTimeout(() => updateThemeCardSelection(), 100);
+            }
 
             const titles = {
                 dashboard: 'Dashboard',
