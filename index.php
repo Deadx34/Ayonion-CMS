@@ -2250,9 +2250,6 @@
         let selectedClientContentId = null;
         let selectedClientCampaignId = null;
         let campaignImageFiles = [];
-        const DEVELOPER_PAYMENT_REMINDER_MESSAGE = 'Friendly reminder: please settle the pending developer payment. Thank you for supporting continued maintenance and updates.';
-        const DEVELOPER_PAYMENT_REMINDER_INTERVAL_MS = 30 * 60 * 1000;
-        let developerPaymentReminderTimer = null;
 
         // Default company info (fallback)
         const DEFAULT_COMPANY_INFO = {
@@ -2471,68 +2468,6 @@
             }
         }
 
-        function showDeveloperPaymentReminder() {
-            let overlay = document.getElementById('developerPaymentReminderOverlay');
-
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'developerPaymentReminderOverlay';
-                overlay.style.cssText = `
-                    position: fixed;
-                    inset: 0;
-                    display: none;
-                    align-items: center;
-                    justify-content: center;
-                    background: rgba(3, 11, 13, 0.45);
-                    z-index: 2000;
-                    padding: 20px;
-                `;
-
-                const reminderBox = document.createElement('div');
-                reminderBox.style.cssText = `
-                    width: min(560px, 92vw);
-                    background: #ffffff;
-                    border-radius: 14px;
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-                    border-left: 6px solid #618698;
-                    padding: 24px 20px 18px 20px;
-                    position: relative;
-                `;
-
-                reminderBox.innerHTML = `
-                    <button type="button" aria-label="Close" onclick="closeDeveloperPaymentReminder()" style="position:absolute; top:8px; right:10px; border:none; background:transparent; color:#9ca3af; opacity:0.18; font-size:10px; line-height:1; padding:2px 4px; cursor:pointer;">✕</button>
-                    <div style="display:flex; align-items:flex-start; gap:10px;">
-                        <i class="fas fa-hand-holding-dollar" style="color:#618698; font-size:20px; margin-top:1px;"></i>
-                        <div>
-                            <div style="font-weight:700; color:#030B0D; margin-bottom:6px;">Payment Notice</div>
-                            <div style="color:#1f2937; font-size:15px; line-height:1.5;">${DEVELOPER_PAYMENT_REMINDER_MESSAGE}</div>
-                        </div>
-                    </div>
-                `;
-
-                overlay.appendChild(reminderBox);
-                document.body.appendChild(overlay);
-            }
-
-            overlay.style.display = 'flex';
-        }
-
-        function closeDeveloperPaymentReminder() {
-            const overlay = document.getElementById('developerPaymentReminderOverlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
-        }
-
-        function startDeveloperPaymentReminder() {
-            if (developerPaymentReminderTimer) {
-                clearInterval(developerPaymentReminderTimer);
-            }
-
-            showDeveloperPaymentReminder();
-            developerPaymentReminderTimer = setInterval(showDeveloperPaymentReminder, DEVELOPER_PAYMENT_REMINDER_INTERVAL_MS);
-        }
-
 
         async function logout() {
             const confirmed = await showConfirm('Are you sure you want to logout?', 'Logout Confirmation', 'warning');
@@ -2542,10 +2477,6 @@
                 await fetch('logout.php', { method: 'POST' });
             } catch (_) {}
             currentUser = { username: '', role: '', isTempPassword: false };
-            if (developerPaymentReminderTimer) {
-                clearInterval(developerPaymentReminderTimer);
-                developerPaymentReminderTimer = null;
-            }
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('mainApp').style.display = 'none';
             document.getElementById('loginForm').reset();
@@ -2597,7 +2528,6 @@
             await loadAllDataFromPHP();
             buildNavigation();
             applyRoleBasedUI();
-            startDeveloperPaymentReminder();
             navigateToSection('dashboard');
             checkRenewalDates();
             document.getElementById('currentUser').textContent = currentUser.username ? (currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1)) : '';
