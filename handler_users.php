@@ -86,8 +86,9 @@ try {
         $username_esc = $conn->real_escape_string($username);
         $role_esc = $conn->real_escape_string($role);
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $hashed_password_esc = $conn->real_escape_string($hashed_password);
 
-        $sql = "INSERT INTO users (username, password, role, is_temp_password) VALUES ('{$username_esc}', '{$hashed_password}', '{$role_esc}', 1)";
+        $sql = "INSERT INTO users (username, password, role, is_temp_password) VALUES ('{$username_esc}', '{$hashed_password_esc}', '{$role_esc}', 1)";
 
         if (query_db($conn, $sql)) {
             echo json_encode(["success" => true, "message" => "User created successfully."]);
@@ -242,7 +243,8 @@ try {
         
         // Update to new password (always hash it)
         $hashed_password = password_hash($newPassword, PASSWORD_DEFAULT);
-        $sql = "UPDATE users SET password = '{$hashed_password}', is_temp_password = 0 WHERE id = {$userId}";
+        $hashed_password_esc = $conn->real_escape_string($hashed_password);
+        $sql = "UPDATE users SET password = '{$hashed_password_esc}', is_temp_password = 0 WHERE id = {$userId}";
         
         if (query_db($conn, $sql)) {
             echo json_encode(["success" => true, "message" => "Password changed successfully."]);

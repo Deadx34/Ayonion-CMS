@@ -58,3 +58,12 @@ function connect_db(): mysqli {
     $conn->set_charset('utf8mb4');
     return $conn;
 }
+/**
+ * Execute a query and return success status.
+ */
+function query_db(mysqli $conn, string $sql): bool {
+    if (!$conn->query($sql)) {
+        return false;
+    }
+    return true;
+}
