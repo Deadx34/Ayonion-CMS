@@ -53,9 +53,10 @@ if ($result && $result->num_rows === 1) {
     $stored = $user['password'];
     $isValid = false;
 
-    // Verify password (supports bcrypt and legacy plaintext)
-    if (preg_match('/^\$2y\$\d{2}\$/', $stored)) {
-        $isValid = verify_password($password, $stored);
+    // Verify hashed passwords first (supports bcrypt variants like $2y$, $2a$, $2b$),
+    // then fall back to plaintext compare for legacy records.
+    if (verify_password($password, $stored)) {
+        $isValid = true;
     } else {
         // Legacy plaintext - log security warning
         $isValid = hash_equals($stored, $password);

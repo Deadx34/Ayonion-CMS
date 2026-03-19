@@ -18,11 +18,12 @@ ON DUPLICATE KEY UPDATE
 
 -- Default admin for first login
 -- IMPORTANT: change this password immediately after first login.
--- Temporary plain password is supported by existing login handler.
+-- Plain password for this hash is: admin123
 INSERT INTO users (id, username, password, role, is_temp_password, full_name, email)
-VALUES (1, 'admin', 'admin123', 'admin', 1, 'System Admin', '')
+VALUES (1, 'admin', '$2y$12$Om6mSr3CP.GAi2Qs4k4eR.MCz691OzARO.koD1qtvFEkPmEwJDxrK', 'admin', 1, 'System Admin', '')
 ON DUPLICATE KEY UPDATE
     username = VALUES(username),
+    password = VALUES(password),
     role = VALUES(role),
     is_temp_password = VALUES(is_temp_password),
     full_name = VALUES(full_name),
