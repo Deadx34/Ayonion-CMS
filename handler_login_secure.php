@@ -35,7 +35,7 @@ rate_limit($client_ip . '_login', 5, 900);
 
 // Use prepared statement to prevent SQL injection
 $sql = "SELECT id, username, password, role, is_temp_password FROM users WHERE username = ? AND role = ? LIMIT 1";
-$stmt = execute_prepared($conn, $sql, 'ss', [$username, $role]);
+$stmt = prepare_and_execute($conn, $sql, 'ss', [$username, $role]);
 
 if (!$stmt) {
     http_response_code(500);
