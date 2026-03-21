@@ -71,6 +71,132 @@
             --warning: #F7C935;
             --info: #0dcaf0;
         }
+
+        /* Palette 16 */
+        html[data-theme="palette16"] {
+            --primary: linear-gradient(135deg, #CCABD8, #089790);
+            --primary-solid: #089790;
+            --secondary: #8474A1;
+            --background: #f4f7f8;
+            --card: #ffffff;
+            --dark: #055B5C;
+            --dark-secondary: #0a6f71;
+            --dark-tertiary: #e8eff1;
+            --light: #CCABD8;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #d7e2e5;
+            --hover: rgba(8, 151, 144, 0.14);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #F7C935;
+            --info: #0dcaf0;
+        }
+
+        /* Palette 17 */
+        html[data-theme="palette17"] {
+            --primary: linear-gradient(135deg, #86D5CE, #CCABD8);
+            --primary-solid: #86D5CE;
+            --secondary: #D0E6A5;
+            --background: #fbfdf9;
+            --card: #ffffff;
+            --dark: #6d7b67;
+            --dark-secondary: #95a48a;
+            --dark-tertiary: #f0f5ec;
+            --light: #D0E6A5;
+            --text-primary: #334155;
+            --text-secondary: #7b8794;
+            --border: #e3edd9;
+            --hover: rgba(208, 230, 165, 0.22);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #F1D094;
+            --info: #0dcaf0;
+        }
+
+        /* Palette 19 */
+        html[data-theme="palette19"] {
+            --primary: linear-gradient(135deg, #54C0CC, #7EA00E);
+            --primary-solid: #54C0CC;
+            --secondary: #1F4F59;
+            --background: #f7faf7;
+            --card: #ffffff;
+            --dark: #213502;
+            --dark-secondary: #355b0f;
+            --dark-tertiary: #edf3e7;
+            --light: #DCD964;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #dce8d0;
+            --hover: rgba(126, 160, 14, 0.14);
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #DCD964;
+            --info: #54C0CC;
+        }
+
+        /* Palette 20 */
+        html[data-theme="palette20"] {
+            --primary: linear-gradient(135deg, #E25845, #F78357);
+            --primary-solid: #E25845;
+            --secondary: #FAC172;
+            --background: #fff9f5;
+            --card: #ffffff;
+            --dark: #6b2d1f;
+            --dark-secondary: #8f4c35;
+            --dark-tertiary: #fbe9da;
+            --light: #89D5C9;
+            --text-primary: #3f2a1f;
+            --text-secondary: #7c675c;
+            --border: #f1ddcb;
+            --hover: rgba(247, 131, 87, 0.17);
+            --success: #ADC865;
+            --danger: #ef4444;
+            --warning: #FAC172;
+            --info: #89D5C9;
+        }
+
+        /* Palette 21 */
+        html[data-theme="palette21"] {
+            --primary: linear-gradient(135deg, #F5CEC7, #E79796);
+            --primary-solid: #E79796;
+            --secondary: #F1C98B;
+            --background: #fefcfb;
+            --card: #ffffff;
+            --dark: #8a6f63;
+            --dark-secondary: #a18a7f;
+            --dark-tertiary: #f8ede3;
+            --light: #F8B284;
+            --text-primary: #4b3a32;
+            --text-secondary: #7d6b61;
+            --border: #efdfd4;
+            --hover: rgba(231, 151, 150, 0.18);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #F1C98B;
+            --info: #F8B284;
+        }
+
+        /* Palette 15 */
+        html[data-theme="palette15"] {
+            --primary: linear-gradient(135deg, #001B4B, #018ABE);
+            --primary-solid: #018ABE;
+            --secondary: #02457A;
+            --background: #f3f8fb;
+            --card: #ffffff;
+            --dark: #001B4B;
+            --dark-secondary: #02457A;
+            --dark-tertiary: #dcebf2;
+            --light: #97CADB;
+            --text-primary: #0f172a;
+            --text-secondary: #5b6875;
+            --border: #cddfe8;
+            --hover: rgba(1, 138, 190, 0.16);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #F7C935;
+            --info: #97CADB;
+        }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Lato', 'Segoe UI', sans-serif; background: var(--background); color: var(--text-primary); transition: background 0.3s, color 0.3s; }
@@ -611,6 +737,60 @@
                                                 <strong>Light Minimal</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Clean light theme with minimal design</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('palette16')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette16">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #CCABD8, #089790); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Palette 16</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Lavender and teal professional blend</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('palette19')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette19">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #54C0CC, #7EA00E); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Palette 19</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Teal and lime with high contrast</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('palette17')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette17">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #86D5CE, #CCABD8); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Palette 17</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Soft pastel layout for light UI</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('palette15')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette15">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #001B4B, #018ABE); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Palette 15</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Navy and cyan corporate style</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('palette20')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette20">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #E25845, #F78357); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Palette 20</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Warm orange gradient with fresh accents</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="theme-card" onclick="switchTheme('palette21')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette21">
+                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #F5CEC7, #E79796); border-radius: 50%; margin-right: 10px;"></div>
+                                                <strong>Palette 21</strong>
+                                            </div>
+                                            <small style="color: var(--text-secondary);">Peach neutral theme for gentle contrast</small>
                                         </div>
                                     </div>
                                 </div>
@@ -2295,6 +2475,30 @@
             lightMinimal: {
                 name: 'Light Minimal',
                 description: 'Clean light theme with minimal design'
+            },
+            palette16: {
+                name: 'Palette 16',
+                description: 'Lavender and teal professional blend'
+            },
+            palette19: {
+                name: 'Palette 19',
+                description: 'Teal and lime with high contrast'
+            },
+            palette17: {
+                name: 'Palette 17',
+                description: 'Soft pastel layout for light UI'
+            },
+            palette15: {
+                name: 'Palette 15',
+                description: 'Navy and cyan corporate style'
+            },
+            palette20: {
+                name: 'Palette 20',
+                description: 'Warm orange gradient with fresh accents'
+            },
+            palette21: {
+                name: 'Palette 21',
+                description: 'Peach neutral theme for gentle contrast'
             }
         };
 
