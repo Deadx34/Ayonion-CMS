@@ -68,6 +68,13 @@ CREATE TABLE settings (
     phone VARCHAR(50) NULL,
     address TEXT NULL,
     website VARCHAR(255) NULL,
+    bank_name VARCHAR(255) NULL,
+    bank_branch VARCHAR(255) NULL,
+    bank_account_name VARCHAR(255) NULL,
+    bank_account_number VARCHAR(100) NULL,
+    doc_thank_you_text TEXT NULL,
+    doc_payment_instructions TEXT NULL,
+    doc_bank_intro TEXT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)

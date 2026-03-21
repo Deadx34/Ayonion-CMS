@@ -637,6 +637,37 @@
                                 <label class="form-label">Address</label>
                                 <textarea class="form-control" id="settingsAddress" rows="3"></textarea>
                             </div>
+                            <div class="col-12 mt-3">
+                                <h6 class="mb-2"><i class="fas fa-file-invoice me-2"></i>Financial Document Settings</h6>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bank Name</label>
+                                <input type="text" class="form-control" id="settingsBankName" placeholder="NDB Bank">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bank Branch</label>
+                                <input type="text" class="form-control" id="settingsBankBranch" placeholder="Kadawatha Branch">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Account Name</label>
+                                <input type="text" class="form-control" id="settingsBankAccountName" placeholder="Ayonion Studios (pvt) Ltd">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Account Number</label>
+                                <input type="text" class="form-control" id="settingsBankAccountNumber" placeholder="101001037178">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Thank You Message (Quotation/Invoice)</label>
+                                <textarea class="form-control" id="settingsDocThankYouText" rows="4" placeholder="Thank you for reaching out..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Payment Instructions</label>
+                                <textarea class="form-control" id="settingsDocPaymentInstructions" rows="6" placeholder="• All cheques should be crossed...&#10;• ..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Bank Instruction Heading</label>
+                                <input type="text" class="form-control" id="settingsDocBankIntro" placeholder="Please deposit the advance payment to the below account">
+                            </div>
                             <div class="col-12 mt-2">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save Settings</button>
                             </div>
@@ -2789,8 +2820,12 @@
             address: 'No.59/1/C, Kaluwala road, Kossinna, Ganemulla.',
             website: 'www.ayonionstudios.com',
             bank: 'NDB Bank',
+            bankBranch: 'Kadawatha Branch',
             account: '101001037178',
-            accountName: 'Ayonion Studios (pvt) Ltd'
+            accountName: 'Ayonion Studios (pvt) Ltd',
+            docThankYouText: 'Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.',
+            docPaymentInstructions: '• All cheques should be crossed and made payable to Ayonion Studios (pvt) Ltd.\n• A 50% of advance payment is required. (Excluding package payments)\n• The quotation is valid for two weeks from the day issued.\n• This is a computer generated quotation, No signature required.',
+            docBankIntro: 'Please deposit the advance payment to the below account'
         };
 
         // Dynamic company info (loaded from settings)
@@ -3091,6 +3126,13 @@
                         phone: settings.phone || DEFAULT_COMPANY_INFO.tel,
                         website: settings.website || DEFAULT_COMPANY_INFO.website,
                         address: settings.address || DEFAULT_COMPANY_INFO.address,
+                        bank: settings.bank_name || DEFAULT_COMPANY_INFO.bank,
+                        bankBranch: settings.bank_branch || DEFAULT_COMPANY_INFO.bankBranch,
+                        accountName: settings.bank_account_name || DEFAULT_COMPANY_INFO.accountName,
+                        account: settings.bank_account_number || DEFAULT_COMPANY_INFO.account,
+                        docThankYouText: settings.doc_thank_you_text || DEFAULT_COMPANY_INFO.docThankYouText,
+                        docPaymentInstructions: settings.doc_payment_instructions || DEFAULT_COMPANY_INFO.docPaymentInstructions,
+                        docBankIntro: settings.doc_bank_intro || DEFAULT_COMPANY_INFO.docBankIntro,
                         logoUrl: settings.logo_light || settings.logo_url || '', // Use light logo for documents
                         logoLight: settings.logo_light || settings.logo_url || '',
                         logoDark: settings.logo_dark || settings.logo_url || ''
@@ -3236,6 +3278,13 @@
                     document.getElementById('settingsPhone').value = s.phone || '';
                     document.getElementById('settingsWebsite').value = s.website || '';
                     document.getElementById('settingsAddress').value = s.address || '';
+                    document.getElementById('settingsBankName').value = s.bank_name || '';
+                    document.getElementById('settingsBankBranch').value = s.bank_branch || '';
+                    document.getElementById('settingsBankAccountName').value = s.bank_account_name || '';
+                    document.getElementById('settingsBankAccountNumber').value = s.bank_account_number || '';
+                    document.getElementById('settingsDocThankYouText').value = s.doc_thank_you_text || '';
+                    document.getElementById('settingsDocPaymentInstructions').value = s.doc_payment_instructions || '';
+                    document.getElementById('settingsDocBankIntro').value = s.doc_bank_intro || '';
                     
                     // Show existing light logo if available
                     if (s.logo_light) {
@@ -3270,7 +3319,14 @@
                 email: document.getElementById('settingsEmail').value.trim(),
                 phone: document.getElementById('settingsPhone').value.trim(),
                 website: document.getElementById('settingsWebsite').value.trim(),
-                address: document.getElementById('settingsAddress').value.trim()
+                address: document.getElementById('settingsAddress').value.trim(),
+                bankName: document.getElementById('settingsBankName').value.trim(),
+                bankBranch: document.getElementById('settingsBankBranch').value.trim(),
+                bankAccountName: document.getElementById('settingsBankAccountName').value.trim(),
+                bankAccountNumber: document.getElementById('settingsBankAccountNumber').value.trim(),
+                docThankYouText: document.getElementById('settingsDocThankYouText').value.trim(),
+                docPaymentInstructions: document.getElementById('settingsDocPaymentInstructions').value.trim(),
+                docBankIntro: document.getElementById('settingsDocBankIntro').value.trim()
             };
             try {
                 const res = await fetch('handler_settings.php?action=update', {
@@ -7137,6 +7193,10 @@
                 </tr>
             `).join('');
 
+            const thankYouTextHtml = formatMultilineTextForHtml(COMPANY_INFO.docThankYouText || DEFAULT_COMPANY_INFO.docThankYouText);
+            const paymentInstructionsHtml = formatMultilineTextForHtml(COMPANY_INFO.docPaymentInstructions || DEFAULT_COMPANY_INFO.docPaymentInstructions);
+            const bankIntroHtml = formatMultilineTextForHtml(COMPANY_INFO.docBankIntro || DEFAULT_COMPANY_INFO.docBankIntro);
+
             const html = `
                 <div style="display: flex; min-height: 100vh; font-family: Arial, sans-serif;">
                     <!-- Sidebar -->
@@ -7227,24 +7287,21 @@
                         <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px;">
                             <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you</div>
                             <div style="font-size: 12px; line-height: 1.4; color: #555;">
-                                Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.<br><br>
+                                ${thankYouTextHtml}<br><br>
                                 <strong>Payment Instructions:</strong><br>
-                                • All cheques should be crossed and made payable to Ayonion Studios (pvt) Ltd.<br>
-                                • A 50% of advance payment is required. (Excluding package payments)<br>
-                                • The quotation is valid for two weeks from the day issued.<br>
-                                • This is a computer generated quotation, No signature required.<br><br>
+                                ${paymentInstructionsHtml}<br><br>
                                 <div style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 4px; border-left: 3px solid #3498db;">
-                                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">Please deposit the advance payment to the below account</div>
-                                    <div><strong>Ayonion Studios (pvt) Ltd</strong></div>
-                                    <div><strong>101001037178</strong></div>
-                                    <div><strong>NDB Bank, Kadawatha Branch</strong></div>
+                                    <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">${bankIntroHtml}</div>
+                                    <div><strong>${COMPANY_INFO.accountName || DEFAULT_COMPANY_INFO.accountName}</strong></div>
+                                    <div><strong>${COMPANY_INFO.account || DEFAULT_COMPANY_INFO.account}</strong></div>
+                                    <div><strong>${COMPANY_INFO.bank || DEFAULT_COMPANY_INFO.bank}${(COMPANY_INFO.bankBranch || DEFAULT_COMPANY_INFO.bankBranch) ? ', ' + (COMPANY_INFO.bankBranch || DEFAULT_COMPANY_INFO.bankBranch) : ''}</strong></div>
                                 </div>
                             </div>
                         </div>
                         `}
                         
                         <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; font-size: 12px;">
-                            Thank you and have a good day! Team Ayonion Studios.
+                            Thank you and have a good day! Team ${COMPANY_INFO.name || DEFAULT_COMPANY_INFO.name}.
                         </div>
                     </div>
                 </div>
@@ -7691,6 +7748,16 @@
         function getStatusColor(status) {
             const colors = { 'Pending': 'warning', 'In Progress': 'info', 'Published': 'success' };
             return colors[status] || 'secondary';
+        }
+
+        function formatMultilineTextForHtml(text) {
+            const safeText = String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+            return safeText.replace(/\n/g, '<br>');
         }
 
         // ✅ Enhanced User-Friendly Notification System

@@ -36,12 +36,21 @@ try {
         throw new Exception("Authentication required.", 401);
     }
 
+    // Auto-migrate settings table for new financial document fields
+    @$conn->query("ALTER TABLE settings ADD COLUMN bank_name VARCHAR(255) NULL");
+    @$conn->query("ALTER TABLE settings ADD COLUMN bank_branch VARCHAR(255) NULL");
+    @$conn->query("ALTER TABLE settings ADD COLUMN bank_account_name VARCHAR(255) NULL");
+    @$conn->query("ALTER TABLE settings ADD COLUMN bank_account_number VARCHAR(100) NULL");
+    @$conn->query("ALTER TABLE settings ADD COLUMN doc_thank_you_text TEXT NULL");
+    @$conn->query("ALTER TABLE settings ADD COLUMN doc_payment_instructions TEXT NULL");
+    @$conn->query("ALTER TABLE settings ADD COLUMN doc_bank_intro TEXT NULL");
+
     // Ensure a row exists (id=1 acts as singleton)
-    $conn->query("INSERT INTO settings (id, company_name, logo_url, logo_light, logo_dark, email, phone, address, website) 
-                  SELECT 1, 'Ayonion Studios', '', '', '', '', '', '', '' WHERE NOT EXISTS (SELECT 1 FROM settings WHERE id=1)");
+    $conn->query("INSERT INTO settings (id, company_name, logo_url, logo_light, logo_dark, email, phone, address, website, bank_name, bank_branch, bank_account_name, bank_account_number, doc_thank_you_text, doc_payment_instructions, doc_bank_intro) 
+                  SELECT 1, 'Ayonion Studios', '', '', '', '', '', '', '', 'NDB Bank', 'Kadawatha Branch', 'Ayonion Studios (pvt) Ltd', '101001037178', 'Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.', '• All cheques should be crossed and made payable to Ayonion Studios (pvt) Ltd.\n• A 50% of advance payment is required. (Excluding package payments)\n• The quotation is valid for two weeks from the day issued.\n• This is a computer generated quotation, No signature required.', 'Please deposit the advance payment to the below account' WHERE NOT EXISTS (SELECT 1 FROM settings WHERE id=1)");
 
     if ($action === 'get') {
-        $sql = "SELECT company_name, logo_url, logo_light, logo_dark, email, phone, address, website FROM settings WHERE id = 1";
+        $sql = "SELECT company_name, logo_url, logo_light, logo_dark, email, phone, address, website, bank_name, bank_branch, bank_account_name, bank_account_number, doc_thank_you_text, doc_payment_instructions, doc_bank_intro FROM settings WHERE id = 1";
         $result = $conn->query($sql);
         if ($result && $row = $result->fetch_assoc()) {
             echo json_encode([ 'success' => true, 'settings' => $row ]);
@@ -58,6 +67,13 @@ try {
         $phone = $conn->real_escape_string(trim($input['phone'] ?? ''));
         $website = $conn->real_escape_string(trim($input['website'] ?? ''));
         $address = $conn->real_escape_string(trim($input['address'] ?? ''));
+        $bankName = $conn->real_escape_string(trim($input['bankName'] ?? ''));
+        $bankBranch = $conn->real_escape_string(trim($input['bankBranch'] ?? ''));
+        $bankAccountName = $conn->real_escape_string(trim($input['bankAccountName'] ?? ''));
+        $bankAccountNumber = $conn->real_escape_string(trim($input['bankAccountNumber'] ?? ''));
+        $docThankYouText = $conn->real_escape_string(trim($input['docThankYouText'] ?? ''));
+        $docPaymentInstructions = $conn->real_escape_string(trim($input['docPaymentInstructions'] ?? ''));
+        $docBankIntro = $conn->real_escape_string(trim($input['docBankIntro'] ?? 'Please deposit the advance payment to the below account'));
 
         if ($companyName === '') {
             http_response_code(400);
@@ -65,7 +81,7 @@ try {
             exit;
         }
 
-        $sql = "UPDATE settings SET company_name='$companyName', logo_url='$logoUrl', logo_light='$logoLight', logo_dark='$logoDark', email='$email', phone='$phone', website='$website', address='$address' WHERE id = 1";
+        $sql = "UPDATE settings SET company_name='$companyName', logo_url='$logoUrl', logo_light='$logoLight', logo_dark='$logoDark', email='$email', phone='$phone', website='$website', address='$address', bank_name='$bankName', bank_branch='$bankBranch', bank_account_name='$bankAccountName', bank_account_number='$bankAccountNumber', doc_thank_you_text='$docThankYouText', doc_payment_instructions='$docPaymentInstructions', doc_bank_intro='$docBankIntro' WHERE id = 1";
         if ($conn->query($sql)) {
             echo json_encode([ 'success' => true, 'message' => 'Settings updated' ]);
         } else {
