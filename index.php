@@ -462,6 +462,80 @@
                             <p>Content Credits Used</p>
                         </div>
                     </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #0f766e 0%, #0f766e 100%)">
+                            <i class="fas fa-bullhorn fa-2x mb-2"></i>
+                            <h3 id="totalCampaigns">0</h3>
+                            <p>Active Campaigns</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%)">
+                            <i class="fas fa-coins fa-2x mb-2"></i>
+                            <h3 id="creditsUtilization">0%</h3>
+                            <p>Credits Utilization</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #b45309 0%, #92400e 100%)">
+                            <i class="fas fa-wallet fa-2x mb-2"></i>
+                            <h3 id="budgetUtilization">0%</h3>
+                            <p>Budget Utilization</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #166534 0%, #14532d 100%)">
+                            <i class="fas fa-file-invoice-dollar fa-2x mb-2"></i>
+                            <h3 id="invoiceValueThisMonth">Rs. 0.00</h3>
+                            <p>Invoice Value (This Month)</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #0369a1 0%, #1e3a8a 100%)">
+                            <i class="fas fa-upload fa-2x mb-2"></i>
+                            <h3 id="publishedRate">0%</h3>
+                            <p>Content Published Rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8 mb-4">
+                        <div class="card">
+                            <div class="card-header"><span><i class="fas fa-chart-pie me-2"></i>Platform Performance</span></div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Platform</th>
+                                                <th>Total Spend</th>
+                                                <th>Total Results</th>
+                                                <th>Avg CPR</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dashboardPlatformTableBody">
+                                            <tr><td colspan="4" class="text-center text-muted py-4">No campaign data available</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <div class="card">
+                            <div class="card-header"><span><i class="fas fa-lightbulb me-2"></i>Quick Insights</span></div>
+                            <div class="card-body">
+                                <ul class="mb-0 ps-3" id="dashboardInsightsList">
+                                    <li class="mb-2">Top spending platform: -</li>
+                                    <li class="mb-2">Best performing client: -</li>
+                                    <li class="mb-2">Published contents: 0/0</li>
+                                    <li class="mb-2">Total campaign spend: Rs. 0.00</li>
+                                    <li class="mb-0">Invoices this month: 0</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -7403,8 +7477,110 @@
         // DASHBOARD
         // ============================================
         function loadDashboard() {
-            document.getElementById('totalClients').textContent = appData.clients.length;
-            document.getElementById('totalContentUsed').textContent = appData.clients.reduce((sum, c) => sum + c.usedCredits, 0).toLocaleString();
+            const clients = appData.clients || [];
+            const campaigns = appData.campaigns || [];
+            const contentCredits = appData.contentCredits || [];
+            const invoices = (appData.documents && appData.documents.invoices) ? appData.documents.invoices : [];
+
+            const totalClients = clients.length;
+            const totalContentUsed = clients.reduce((sum, c) => sum + (parseInt(c.usedCredits) || 0), 0);
+            const totalCampaigns = campaigns.length;
+
+            const totalAllocatedCredits = clients.reduce((sum, c) => {
+                const allocated = (parseInt(c.packageCredits) || 0) + (parseInt(c.extraCredits) || 0) + (parseInt(c.carriedForwardCredits) || 0);
+                return sum + allocated;
+            }, 0);
+            const creditsUtilization = totalAllocatedCredits > 0 ? (totalContentUsed / totalAllocatedCredits) * 100 : 0;
+
+            const totalAdBudget = clients.reduce((sum, c) => sum + (parseFloat(c.totalAdBudget) || 0), 0);
+            const totalSpent = clients.reduce((sum, c) => sum + (parseFloat(c.totalSpent) || 0), 0);
+            const budgetUtilization = totalAdBudget > 0 ? (totalSpent / totalAdBudget) * 100 : 0;
+
+            const publishedCount = contentCredits.filter(item => String(item.status || '').toLowerCase() === 'published').length;
+            const publishedRate = contentCredits.length > 0 ? (publishedCount / contentCredits.length) * 100 : 0;
+
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            const invoiceDocsThisMonth = invoices.filter(doc => {
+                const docDate = new Date(doc.date || '');
+                return !isNaN(docDate.getTime()) && docDate.getMonth() === currentMonth && docDate.getFullYear() === currentYear;
+            });
+            const invoiceValueThisMonth = invoiceDocsThisMonth.reduce((sum, doc) => sum + (parseFloat(doc.total) || 0), 0);
+
+            document.getElementById('totalClients').textContent = totalClients.toLocaleString();
+            document.getElementById('totalContentUsed').textContent = totalContentUsed.toLocaleString();
+            document.getElementById('totalCampaigns').textContent = totalCampaigns.toLocaleString();
+            document.getElementById('creditsUtilization').textContent = `${creditsUtilization.toFixed(1)}%`;
+            document.getElementById('budgetUtilization').textContent = `${budgetUtilization.toFixed(1)}%`;
+            document.getElementById('publishedRate').textContent = `${publishedRate.toFixed(1)}%`;
+            document.getElementById('invoiceValueThisMonth').textContent = `Rs. ${invoiceValueThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            const platformMap = {};
+            campaigns.forEach(campaign => {
+                const platform = campaign.platform || 'Unknown';
+                const spend = parseFloat(campaign.spend) || 0;
+                const results = parseInt(campaign.results) || 0;
+
+                if (!platformMap[platform]) {
+                    platformMap[platform] = { spend: 0, results: 0, cprSum: 0, count: 0 };
+                }
+                platformMap[platform].spend += spend;
+                platformMap[platform].results += results;
+                platformMap[platform].cprSum += (parseFloat(campaign.cpr) || 0);
+                platformMap[platform].count += 1;
+            });
+
+            const platformRows = Object.entries(platformMap)
+                .map(([platform, values]) => ({
+                    platform,
+                    spend: values.spend,
+                    results: values.results,
+                    avgCpr: values.count > 0 ? values.cprSum / values.count : 0
+                }))
+                .sort((a, b) => b.spend - a.spend);
+
+            const platformTableBody = document.getElementById('dashboardPlatformTableBody');
+            if (platformRows.length === 0) {
+                platformTableBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No campaign data available</td></tr>';
+            } else {
+                platformTableBody.innerHTML = platformRows.map(row => `
+                    <tr>
+                        <td>${row.platform}</td>
+                        <td>Rs. ${row.spend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td>${row.results.toLocaleString()}</td>
+                        <td>Rs. ${row.avgCpr.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>
+                `).join('');
+            }
+
+            const clientSpendMap = {};
+            campaigns.forEach(campaign => {
+                const clientId = parseInt(campaign.clientId);
+                const spend = parseFloat(campaign.spend) || 0;
+                clientSpendMap[clientId] = (clientSpendMap[clientId] || 0) + spend;
+            });
+
+            let bestClientName = '-';
+            let bestClientSpend = 0;
+            Object.entries(clientSpendMap).forEach(([clientId, spend]) => {
+                if (spend > bestClientSpend) {
+                    bestClientSpend = spend;
+                    const client = clients.find(item => parseInt(item.id) === parseInt(clientId));
+                    bestClientName = client ? client.companyName : `Client #${clientId}`;
+                }
+            });
+
+            const topPlatform = platformRows.length > 0 ? platformRows[0].platform : '-';
+
+            const insightsList = document.getElementById('dashboardInsightsList');
+            insightsList.innerHTML = `
+                <li class="mb-2">Top spending platform: <strong>${topPlatform}</strong></li>
+                <li class="mb-2">Best performing client: <strong>${bestClientName}</strong></li>
+                <li class="mb-2">Published contents: <strong>${publishedCount}/${contentCredits.length}</strong></li>
+                <li class="mb-2">Total campaign spend: <strong>Rs. ${campaigns.reduce((sum, c) => sum + (parseFloat(c.spend) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></li>
+                <li class="mb-0">Invoices this month: <strong>${invoiceDocsThisMonth.length}</strong></li>
+            `;
         }
 
 
