@@ -790,7 +790,7 @@
                                         <div class="theme-card" onclick="switchTheme('ocean')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-ocean">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #BDDFE8, #618698); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Ocean (Default)</strong>
+                                                <strong>Color Palette Theme 1</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Cool blue theme with modern gradients</small>
                                         </div>
@@ -799,7 +799,7 @@
                                         <div class="theme-card" onclick="switchTheme('purpleDark')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-purpleDark">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Purple Dark</strong>
+                                                <strong>Color Palette Theme 2</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Dark purple theme for low-light environments</small>
                                         </div>
@@ -808,7 +808,7 @@
                                         <div class="theme-card" onclick="switchTheme('lightMinimal')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-lightMinimal">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #2563eb, #2563eb); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Light Minimal</strong>
+                                                <strong>Color Palette Theme 3</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Clean light theme with minimal design</small>
                                         </div>
@@ -817,7 +817,7 @@
                                         <div class="theme-card" onclick="switchTheme('palette16')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette16">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #CCABD8, #089790); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Palette 16</strong>
+                                                <strong>Color Palette Theme 4</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Lavender and teal professional blend</small>
                                         </div>
@@ -826,7 +826,7 @@
                                         <div class="theme-card" onclick="switchTheme('palette19')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette19">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #54C0CC, #7EA00E); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Palette 19</strong>
+                                                <strong>Color Palette Theme 5</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Teal and lime with high contrast</small>
                                         </div>
@@ -835,7 +835,7 @@
                                         <div class="theme-card" onclick="switchTheme('palette17')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette17">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #86D5CE, #CCABD8); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Palette 17</strong>
+                                                <strong>Color Palette Theme 6</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Soft pastel layout for light UI</small>
                                         </div>
@@ -844,7 +844,7 @@
                                         <div class="theme-card" onclick="switchTheme('palette15')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette15">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #001B4B, #018ABE); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Palette 15</strong>
+                                                <strong>Color Palette Theme 7</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Navy and cyan corporate style</small>
                                         </div>
@@ -853,7 +853,7 @@
                                         <div class="theme-card" onclick="switchTheme('palette20')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette20">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #E25845, #F78357); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Palette 20</strong>
+                                                <strong>Color Palette Theme 8</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Warm orange gradient with fresh accents</small>
                                         </div>
@@ -862,7 +862,7 @@
                                         <div class="theme-card" onclick="switchTheme('palette21')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette21">
                                             <div style="display: flex; align-items: center; margin-bottom: 10px;">
                                                 <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #F5CEC7, #E79796); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Palette 21</strong>
+                                                <strong>Color Palette Theme 9</strong>
                                             </div>
                                             <small style="color: var(--text-secondary);">Peach neutral theme for gentle contrast</small>
                                         </div>
@@ -2539,39 +2539,39 @@
         // ============================================
         const AVAILABLE_THEMES = {
             ocean: {
-                name: 'Ocean (Default)',
+                name: 'Color Palette Theme 1',
                 description: 'Cool blue theme with modern gradients'
             },
             purpleDark: {
-                name: 'Purple Dark',
+                name: 'Color Palette Theme 2',
                 description: 'Dark purple theme for low-light environments'
             },
             lightMinimal: {
-                name: 'Light Minimal',
+                name: 'Color Palette Theme 3',
                 description: 'Clean light theme with minimal design'
             },
             palette16: {
-                name: 'Palette 16',
+                name: 'Color Palette Theme 4',
                 description: 'Lavender and teal professional blend'
             },
             palette19: {
-                name: 'Palette 19',
+                name: 'Color Palette Theme 5',
                 description: 'Teal and lime with high contrast'
             },
             palette17: {
-                name: 'Palette 17',
+                name: 'Color Palette Theme 6',
                 description: 'Soft pastel layout for light UI'
             },
             palette15: {
-                name: 'Palette 15',
+                name: 'Color Palette Theme 7',
                 description: 'Navy and cyan corporate style'
             },
             palette20: {
-                name: 'Palette 20',
+                name: 'Color Palette Theme 8',
                 description: 'Warm orange gradient with fresh accents'
             },
             palette21: {
-                name: 'Palette 21',
+                name: 'Color Palette Theme 9',
                 description: 'Peach neutral theme for gentle contrast'
             }
         };
