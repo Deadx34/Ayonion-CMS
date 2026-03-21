@@ -238,11 +238,30 @@
         .sidebar-header { padding: 30px 20px; background: linear-gradient(135deg, var(--dark), var(--dark-secondary)); color: var(--text-on-dark); text-align: center; }
         .sidebar-header h3 { font-size: 1.4rem; font-weight: 700; margin: 0; }
         .sidebar-header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 0.85rem; }
-        .nav-item { margin: 5px 15px; }
-        .nav-link { color: var(--nav-text); padding: 12px 20px; border-radius: 10px; transition: all 0.3s; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
-        .nav-link:hover { background: var(--hover); color: var(--text-on-hover); transform: translateX(5px); }
-        .nav-link.active { background: var(--primary); color: var(--text-on-primary); font-weight: 600; }
-        .nav-link i { width: 20px; text-align: center; }
+        .sidebar .nav-item { margin: 5px 15px; }
+        .sidebar .nav-link { color: var(--nav-text); padding: 12px 20px; border-radius: 10px; transition: all 0.3s; display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
+        .sidebar .nav-link:hover { background: var(--hover); color: var(--text-on-hover); transform: translateX(5px); }
+        .sidebar .nav-link.active { background: var(--primary); color: var(--text-on-primary); font-weight: 600; }
+        .sidebar .nav-link i { width: 20px; text-align: center; }
+        .nav-tabs .nav-link {
+            color: var(--text-secondary);
+            background: var(--card);
+            border-color: var(--border);
+            transform: none;
+        }
+        .nav-tabs .nav-link:hover {
+            color: var(--text-primary);
+            border-color: var(--primary-solid);
+            background: var(--hover);
+            transform: none;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--text-primary);
+            background: var(--card);
+            border-color: var(--border) var(--border) transparent;
+            font-weight: 600;
+            transform: none;
+        }
         .content-area { margin-left: 260px; padding: 30px; min-height: 100vh; transition: margin-left 0.3s ease; }
         /* Adjust content area when warning banner is shown */
         body:has(#tempPasswordWarning[style*="display: block"]) .content-area { padding-top: 60px; }
@@ -282,6 +301,32 @@
         .form-check-input:checked { background-color: var(--primary-solid); border-color: var(--primary-solid); }
         .form-check-input:focus { border-color: var(--primary-solid); box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25); }
         .form-check-label { font-weight: 500; color: var(--text-primary); }
+        .theme-radio-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+        .theme-option input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; }
+        .theme-radio-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 52px;
+            margin: 0;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: var(--card);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .theme-radio-label:hover { border-color: var(--primary-solid); background: var(--hover); }
+        .theme-option input[type="radio"]:checked + .theme-radio-label {
+            border-color: var(--primary-solid);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.22);
+            background: var(--hover);
+        }
+        .theme-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; }
+        .theme-radio-text { font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+        @media (max-width: 991.98px) { .theme-radio-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 575.98px) { .theme-radio-grid { grid-template-columns: 1fr; } }
         .section { display: none; }
         .section.active { display: block; }
         .action-btn { margin: 0 3px; padding: 6px 12px; border-radius: 6px; border: none; cursor: pointer; transition: all 0.3s; }
@@ -791,87 +836,69 @@
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="form-label">Select Theme</label>
-                                <div class="row g-3">
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('ocean')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-ocean">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #BDDFE8, #618698); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 1</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Cool blue theme with modern gradients</small>
-                                        </div>
+                                <div class="theme-radio-grid" role="radiogroup" aria-label="Theme Selection">
+                                    <div class="theme-option" title="Cool blue theme with modern gradients">
+                                        <input type="radio" id="themeRadio-ocean" name="themeSelection" value="ocean" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-ocean">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #BDDFE8, #618698);"></span>
+                                            <span class="theme-radio-text">Theme 1</span>
+                                        </label>
                                     </div>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('purpleDark')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-purpleDark">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 2</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Dark purple theme for low-light environments</small>
-                                        </div>
+                                    <div class="theme-option" title="Dark purple theme for low-light environments">
+                                        <input type="radio" id="themeRadio-purpleDark" name="themeSelection" value="purpleDark" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-purpleDark">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #667eea, #764ba2);"></span>
+                                            <span class="theme-radio-text">Theme 2</span>
+                                        </label>
                                     </div>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('lightMinimal')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-lightMinimal">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #2563eb, #2563eb); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 3</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Clean light theme with minimal design</small>
-                                        </div>
+                                    <div class="theme-option" title="Clean light theme with minimal design">
+                                        <input type="radio" id="themeRadio-lightMinimal" name="themeSelection" value="lightMinimal" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-lightMinimal">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #2563eb, #2563eb);"></span>
+                                            <span class="theme-radio-text">Theme 3</span>
+                                        </label>
                                     </div>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('palette16')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette16">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #CCABD8, #089790); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 4</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Lavender and teal professional blend</small>
-                                        </div>
+                                    <div class="theme-option" title="Lavender and teal professional blend">
+                                        <input type="radio" id="themeRadio-palette16" name="themeSelection" value="palette16" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-palette16">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #CCABD8, #089790);"></span>
+                                            <span class="theme-radio-text">Theme 4</span>
+                                        </label>
                                     </div>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('palette19')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette19">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #54C0CC, #7EA00E); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 5</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Teal and lime with high contrast</small>
-                                        </div>
+                                    <div class="theme-option" title="Teal and lime with high contrast">
+                                        <input type="radio" id="themeRadio-palette19" name="themeSelection" value="palette19" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-palette19">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #54C0CC, #7EA00E);"></span>
+                                            <span class="theme-radio-text">Theme 5</span>
+                                        </label>
                                     </div>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('palette17')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette17">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #86D5CE, #CCABD8); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 6</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Soft pastel layout for light UI</small>
-                                        </div>
+                                    <div class="theme-option" title="Soft pastel layout for light UI">
+                                        <input type="radio" id="themeRadio-palette17" name="themeSelection" value="palette17" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-palette17">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #86D5CE, #CCABD8);"></span>
+                                            <span class="theme-radio-text">Theme 6</span>
+                                        </label>
                                     </div>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('palette15')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette15">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #001B4B, #018ABE); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 7</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Navy and cyan corporate style</small>
-                                        </div>
+                                    <div class="theme-option" title="Navy and cyan corporate style">
+                                        <input type="radio" id="themeRadio-palette15" name="themeSelection" value="palette15" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-palette15">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #001B4B, #018ABE);"></span>
+                                            <span class="theme-radio-text">Theme 7</span>
+                                        </label>
                                     </div>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('palette20')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette20">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #E25845, #F78357); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 8</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Warm orange gradient with fresh accents</small>
-                                        </div>
+                                    <div class="theme-option" title="Warm orange gradient with fresh accents">
+                                        <input type="radio" id="themeRadio-palette20" name="themeSelection" value="palette20" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-palette20">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #E25845, #F78357);"></span>
+                                            <span class="theme-radio-text">Theme 8</span>
+                                        </label>
                                     </div>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="theme-card" onclick="switchTheme('palette21')" style="cursor: pointer; padding: 20px; border-radius: 10px; border: 3px solid var(--border); transition: all 0.3s; background: var(--card);" id="themeCard-palette21">
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                                                <div style="width: 20px; height: 20px; background: linear-gradient(135deg, #F5CEC7, #E79796); border-radius: 50%; margin-right: 10px;"></div>
-                                                <strong>Theme 9</strong>
-                                            </div>
-                                            <small style="color: var(--text-secondary);">Peach neutral theme for gentle contrast</small>
-                                        </div>
+                                    <div class="theme-option" title="Peach neutral theme for gentle contrast">
+                                        <input type="radio" id="themeRadio-palette21" name="themeSelection" value="palette21" onchange="switchTheme(this.value)">
+                                        <label class="theme-radio-label" for="themeRadio-palette21">
+                                            <span class="theme-dot" style="background: linear-gradient(135deg, #F5CEC7, #E79796);"></span>
+                                            <span class="theme-radio-text">Theme 9</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -2679,18 +2706,9 @@
 
         function updateThemeCardSelection() {
             const currentTheme = getTheme();
-            // Remove active state from all theme cards
-            document.querySelectorAll('.theme-card').forEach(card => {
-                card.style.borderColor = 'var(--border)';
-                card.style.boxShadow = 'none';
-                card.style.backgroundColor = 'var(--card)';
-            });
-            // Add active state to current theme card
-            const activeCard = document.getElementById(`themeCard-${currentTheme}`);
-            if (activeCard) {
-                activeCard.style.borderColor = 'var(--primary-solid)';
-                activeCard.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.3)';
-                activeCard.style.backgroundColor = 'var(--hover)';
+            const activeRadio = document.getElementById(`themeRadio-${currentTheme}`);
+            if (activeRadio) {
+                activeRadio.checked = true;
             }
         }
 
