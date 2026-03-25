@@ -6303,13 +6303,8 @@
                 const docNumber = doc.documentNumber || docNum[type] + String(doc.id).slice(-6);
                 const clientName = doc.clientName || doc.client_name || 'Unknown Client';
                 const itemType = doc.itemType || doc.item_type || 'General';
-                const itemSubTexts = (doc.itemDetails && Array.isArray(doc.itemDetails))
-                    ? doc.itemDetails
-                        .map(item => (item.subText || '').trim())
-                        .filter(text => text !== '')
-                    : [];
                 const date = doc.date || '';
-                        subText: '',
+                const amount = doc.total || 0;
                 return `
                 <tr onclick="viewDocument('${type}', ${doc.id})" style="cursor: pointer;"
                     data-number="${docNumber}"
@@ -6319,10 +6314,7 @@
                     data-amount="${amount}">
                     <td><strong>${docNumber}</strong></td>
                     <td>${clientName}</td>
-                    <td>
-                        <span class="badge bg-info">${itemType}</span>
-                        ${itemSubTexts.length > 0 ? itemSubTexts.map(text => `<div class="text-muted small mt-1">${text}</div>`).join('') : ''}
-                    </td>
+                    <td><span class="badge bg-info">${itemType}</span></td>
                     <td>${formatDate(date)}</td>
                     <td>Rs. ${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td onclick="event.stopPropagation();">
