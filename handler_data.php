@@ -123,6 +123,7 @@ if ($document_result) {
             'itemType' => $item_type ?: 'General',
             'itemDetails' => $item_details, // Include detailed item information
             'description' => $row['description'] ?: '',
+            'subText' => $row['sub_text'] ?? '',
             'quantity' => (int)$row['quantity'],
             'unitPrice' => (float)$row['unit_price'],
             'total' => (float)$row['total'],

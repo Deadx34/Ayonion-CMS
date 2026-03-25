@@ -1618,6 +1618,10 @@
                                 <input type="date" class="form-control" id="docDate" required>
                             </div>
                             <div class="col-md-12 mb-3">
+                                <label class="form-label">Sub Text (Optional)</label>
+                                <input type="text" class="form-control" id="docSubText" placeholder="Enter optional sub text to show under this record">
+                            </div>
+                            <div class="col-md-12 mb-3">
                                 <label class="form-label">Select Item Types for This Document</label>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -6287,6 +6291,7 @@
                 const docNumber = doc.documentNumber || docNum[type] + String(doc.id).slice(-6);
                 const clientName = doc.clientName || doc.client_name || 'Unknown Client';
                 const itemType = doc.itemType || doc.item_type || 'General';
+                const subText = doc.subText || doc.sub_text || '';
                 const date = doc.date || '';
                 const amount = doc.total || 0;
                 return `
@@ -6296,7 +6301,10 @@
                     data-type="${itemType}"
                     data-date="${date}"
                     data-amount="${amount}">
-                    <td><strong>${docNumber}</strong></td>
+                    <td>
+                        <strong>${docNumber}</strong>
+                        ${subText ? `<div class="text-muted small mt-1">${subText}</div>` : ''}
+                    </td>
                     <td>${clientName}</td>
                     <td><span class="badge bg-info">${itemType}</span></td>
                     <td>${formatDate(date)}</td>
@@ -6502,6 +6510,7 @@
 					itemTypes: selectedItemTypes,
 					itemDetails: itemDetails,
 					description: documentDescription,
+                    subText: (form.querySelector('#docSubText')?.value || '').trim(),
 					date: date.value,
 					customDocumentNumber: customDocNumber
                 };
@@ -6570,6 +6579,7 @@
 
             // Handle multiple line items or single item
             const clientName = doc.clientName || doc.client_name || 'Unknown Client';
+            const subText = doc.subText || doc.sub_text || '';
             const total = parseFloat(doc.total || 0);
             
             // Check if we have detailed item information (new format)
@@ -6653,6 +6663,7 @@
                             <div style="flex: 1;">
                                 <div style="font-size: 12px; color: #7f8c8d; margin-bottom: 3px;">Customer</div>
                                 <div style="font-size: 16px; font-weight: bold; color: #2c3e50;">${clientName}</div>
+                                ${subText ? `<div style="font-size: 12px; color: #7f8c8d; margin-top: 6px;">${subText}</div>` : ''}
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 28px; font-weight: bold; color: #2c3e50; margin-bottom: 10px;">${titles[type]}</div>
@@ -6935,6 +6946,7 @@
             const unitPrice = doc.unitPrice || doc.unit_price || 0;
             const total = doc.total || 0;
             const description = doc.description || '';
+            const subText = doc.subText || doc.sub_text || '';
             
             return `
                 <!DOCTYPE html>
@@ -6981,6 +6993,7 @@
                         <div class="document-details">
                             <p><strong>Date:</strong> ${date}</p>
                             <p><strong>Item Type:</strong> ${itemType}</p>
+                            ${subText ? `<p><strong>Sub Text:</strong> ${subText}</p>` : ''}
                         </div>
                     </div>
                     
