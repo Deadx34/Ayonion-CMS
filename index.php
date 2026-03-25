@@ -6309,7 +6309,7 @@
                         .filter(text => text !== '')
                     : [];
                 const date = doc.date || '';
-                const amount = doc.total || 0;
+                        subText: '',
                 return `
                 <tr onclick="viewDocument('${type}', ${doc.id})" style="cursor: pointer;"
                     data-number="${docNumber}"
@@ -6980,7 +6980,7 @@
                 }))
                 : [{
                     description: description,
-                    subText: doc.subText || doc.sub_text || '',
+                    subText: '',
                     quantity: quantity,
                     unitPrice: unitPrice,
                     total: total
