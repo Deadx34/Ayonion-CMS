@@ -1618,10 +1618,6 @@
                                 <input type="date" class="form-control" id="docDate" required>
                             </div>
                             <div class="col-md-12 mb-3">
-                                <label class="form-label">Sub Text (Optional)</label>
-                                <input type="text" class="form-control" id="docSubText" placeholder="Enter optional sub text to show under this record">
-                            </div>
-                            <div class="col-md-12 mb-3">
                                 <label class="form-label">Select Item Types for This Document</label>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -1699,6 +1695,12 @@
                                                                placeholder="Enter service description" 
                                                                required>
                                                     </div>
+                                                    <div class="col-12 mb-2">
+                                                        <label class="form-label">Sub Text</label>
+                                                        <input type="text" class="form-control other-service-sub-text" 
+                                                               data-service-id="${otherServiceCounter}"
+                                                               placeholder="Enter sub text for this item type">
+                                                    </div>
                                                     <div class="col-md-6 mb-2">
                                                         <label class="form-label">Quantity</label>
                                                         <input type="number" class="form-control other-service-quantity" 
@@ -1759,7 +1761,7 @@
                                         
                                         // Save existing values before rebuilding
                                         const existingValues = {};
-                                        itemAmountsContainer.querySelectorAll('.item-quantity, .item-unit-price, .item-description').forEach(input => {
+                                        itemAmountsContainer.querySelectorAll('.item-quantity, .item-unit-price, .item-description, .item-sub-text').forEach(input => {
                                             const itemType = input.dataset.itemType;
                                             if (!existingValues[itemType]) {
                                                 existingValues[itemType] = {};
@@ -1770,6 +1772,8 @@
                                                 existingValues[itemType].unitPrice = input.value;
                                             } else if (input.classList.contains('item-description')) {
                                                 existingValues[itemType].description = input.value;
+                                            } else if (input.classList.contains('item-sub-text')) {
+                                                existingValues[itemType].subText = input.value;
                                             }
                                         });
                                         
@@ -1801,6 +1805,7 @@
                                                 const savedQuantity = savedValues.quantity || '1';
                                                 const savedUnitPrice = savedValues.unitPrice || '';
                                                 const savedDescription = savedValues.description || '';
+                                                const savedSubText = savedValues.subText || '';
                                                 
                                                 itemDiv.innerHTML = `
                                                     <div class="col-12">
@@ -1830,6 +1835,13 @@
                                                                value="${savedUnitPrice}"
                                                                required min="0" 
                                                                placeholder="Enter unit price">
+                                                    </div>
+                                                    <div class="col-12 mt-2">
+                                                        <label class="form-label">Sub Text</label>
+                                                        <input type="text" class="form-control item-sub-text" 
+                                                               data-item-type="${checkbox.value}" 
+                                                               value="${savedSubText}"
+                                                               placeholder="Enter sub text for this item type">
                                                     </div>
                                                 `;
                                                 itemAmountsContainer.appendChild(itemDiv);
@@ -6291,7 +6303,11 @@
                 const docNumber = doc.documentNumber || docNum[type] + String(doc.id).slice(-6);
                 const clientName = doc.clientName || doc.client_name || 'Unknown Client';
                 const itemType = doc.itemType || doc.item_type || 'General';
-                const subText = doc.subText || doc.sub_text || '';
+                const itemSubTexts = (doc.itemDetails && Array.isArray(doc.itemDetails))
+                    ? doc.itemDetails
+                        .map(item => (item.subText || '').trim())
+                        .filter(text => text !== '')
+                    : [];
                 const date = doc.date || '';
                 const amount = doc.total || 0;
                 return `
@@ -6301,12 +6317,12 @@
                     data-type="${itemType}"
                     data-date="${date}"
                     data-amount="${amount}">
-                    <td>
-                        <strong>${docNumber}</strong>
-                        ${subText ? `<div class="text-muted small mt-1">${subText}</div>` : ''}
-                    </td>
+                    <td><strong>${docNumber}</strong></td>
                     <td>${clientName}</td>
-                    <td><span class="badge bg-info">${itemType}</span></td>
+                    <td>
+                        <span class="badge bg-info">${itemType}</span>
+                        ${itemSubTexts.length > 0 ? itemSubTexts.map(text => `<div class="text-muted small mt-1">${text}</div>`).join('') : ''}
+                    </td>
                     <td>${formatDate(date)}</td>
                     <td>Rs. ${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td onclick="event.stopPropagation();">
@@ -6426,17 +6442,20 @@
                 for (const itemType of selectedItemTypes) {
                     const quantityInput = form.querySelector(`input[data-item-type="${itemType}"].item-quantity`);
                     const unitPriceInput = form.querySelector(`input[data-item-type="${itemType}"].item-unit-price`);
+                    const subTextInput = form.querySelector(`input[data-item-type="${itemType}"].item-sub-text`);
                     
                     if (quantityInput && unitPriceInput) {
                         const qty = parseInt(quantityInput.value) || 0;
                         const price = parseFloat(unitPriceInput.value) || 0;
+                        const itemSubText = subTextInput ? subTextInput.value.trim() : '';
                         
                         if (qty > 0 && price > 0) {
                             const itemDetail = {
                                 itemType: itemType,
                                 quantity: qty,
                                 unitPrice: price,
-                                total: qty * price
+                                total: qty * price,
+                                subText: itemSubText
                             };
                             
                             itemDetails.push(itemDetail);
@@ -6449,11 +6468,13 @@
                 otherServiceItems.forEach(serviceItem => {
                     const serviceId = serviceItem.dataset.serviceId;
                     const descriptionInput = serviceItem.querySelector(`.other-service-description[data-service-id="${serviceId}"]`);
+                    const subTextInput = serviceItem.querySelector(`.other-service-sub-text[data-service-id="${serviceId}"]`);
                     const quantityInput = serviceItem.querySelector(`.other-service-quantity[data-service-id="${serviceId}"]`);
                     const unitPriceInput = serviceItem.querySelector(`.other-service-unit-price[data-service-id="${serviceId}"]`);
                     
                     if (descriptionInput && quantityInput && unitPriceInput) {
                         const description = descriptionInput.value.trim();
+                        const itemSubText = subTextInput ? subTextInput.value.trim() : '';
                         const qty = parseInt(quantityInput.value) || 0;
                         const price = parseFloat(unitPriceInput.value) || 0;
                         
@@ -6471,7 +6492,8 @@
                                 description: description,
                                 quantity: qty,
                                 unitPrice: price,
-                                total: qty * price
+                                total: qty * price,
+                                subText: itemSubText
                             };
                             
                             itemDetails.push(itemDetail);
@@ -6510,7 +6532,6 @@
 					itemTypes: selectedItemTypes,
 					itemDetails: itemDetails,
 					description: documentDescription,
-                    subText: (form.querySelector('#docSubText')?.value || '').trim(),
 					date: date.value,
 					customDocumentNumber: customDocNumber
                 };
@@ -6579,7 +6600,6 @@
 
             // Handle multiple line items or single item
             const clientName = doc.clientName || doc.client_name || 'Unknown Client';
-            const subText = doc.subText || doc.sub_text || '';
             const total = parseFloat(doc.total || 0);
             
             // Check if we have detailed item information (new format)
@@ -6588,6 +6608,7 @@
                 // New format with detailed item information
                 lineItems = doc.itemDetails.map(item => ({
                     description: item.description || item.itemType || 'Service',
+                    subText: item.subText || '',
                     quantity: parseFloat(item.quantity || 0),
                     unitPrice: parseFloat(item.unitPrice || 0),
                     total: parseFloat(item.total || 0)
@@ -6598,6 +6619,7 @@
                 const unit = parseFloat(doc.unitPrice || doc.unit_price || 0);
                 lineItems = [{
                     description: doc.description || 'Service',
+                    subText: doc.subText || doc.sub_text || '',
                     quantity: qty,
                     unitPrice: unit,
                     total: total
@@ -6607,7 +6629,10 @@
             // Generate table rows for all line items
             const tableRows = lineItems.map(item => `
                 <tr style="border-bottom: 1px solid #e5e7eb;">
-                    <td style="padding: 8px 6px;">${item.description}</td>
+                    <td style="padding: 8px 6px;">
+                        <div>${item.description}</div>
+                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px;">${item.subText}</div>` : ''}
+                    </td>
                     <td style="padding: 8px 6px; text-align: center;">${item.quantity.toLocaleString()}</td>
                     <td style="padding: 8px 6px; text-align: right;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td style="padding: 8px 6px; text-align: right; font-weight: bold;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
@@ -6663,7 +6688,6 @@
                             <div style="flex: 1;">
                                 <div style="font-size: 12px; color: #7f8c8d; margin-bottom: 3px;">Customer</div>
                                 <div style="font-size: 16px; font-weight: bold; color: #2c3e50;">${clientName}</div>
-                                ${subText ? `<div style="font-size: 12px; color: #7f8c8d; margin-top: 6px;">${subText}</div>` : ''}
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 28px; font-weight: bold; color: #2c3e50; margin-bottom: 10px;">${titles[type]}</div>
@@ -6946,7 +6970,21 @@
             const unitPrice = doc.unitPrice || doc.unit_price || 0;
             const total = doc.total || 0;
             const description = doc.description || '';
-            const subText = doc.subText || doc.sub_text || '';
+            const lineItems = (doc.itemDetails && Array.isArray(doc.itemDetails) && doc.itemDetails.length > 0)
+                ? doc.itemDetails.map(item => ({
+                    description: item.description || item.itemType || 'Service',
+                    subText: item.subText || '',
+                    quantity: parseFloat(item.quantity || 0),
+                    unitPrice: parseFloat(item.unitPrice || 0),
+                    total: parseFloat(item.total || 0)
+                }))
+                : [{
+                    description: description,
+                    subText: doc.subText || doc.sub_text || '',
+                    quantity: quantity,
+                    unitPrice: unitPrice,
+                    total: total
+                }];
             
             return `
                 <!DOCTYPE html>
@@ -6993,7 +7031,6 @@
                         <div class="document-details">
                             <p><strong>Date:</strong> ${date}</p>
                             <p><strong>Item Type:</strong> ${itemType}</p>
-                            ${subText ? `<p><strong>Sub Text:</strong> ${subText}</p>` : ''}
                         </div>
                     </div>
                     
@@ -7007,12 +7044,17 @@
                             </tr>
                         </thead>
                         <tbody>
+                            ${lineItems.map(item => `
                             <tr>
-                                <td>${description}</td>
-                                <td>${quantity}</td>
-                                <td>Rs. ${unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                <td>Rs. ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                <td>
+                                    <div>${item.description}</div>
+                                    ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px;">${item.subText}</div>` : ''}
+                                </td>
+                                <td>${item.quantity}</td>
+                                <td>Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                <td>Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                             </tr>
+                            `).join('')}
                         </tbody>
                     </table>
                     
