@@ -93,7 +93,6 @@ try {
     $itemTypes = $input['itemTypes'] ?? [];
     $itemDetails = $input['itemDetails'] ?? [];
     $description = $conn->real_escape_string($input['description'] ?? '');
-    $subText = $conn->real_escape_string(trim($input['subText'] ?? ''));
     $date = $conn->real_escape_string($input['date'] ?? '');
 
     if ($clientId === 0 || empty($docType) || empty($date) || empty($itemTypes) || !is_array($itemTypes)) {
@@ -146,9 +145,9 @@ try {
     $avgUnitPrice = array_sum(array_column($itemDetails, 'unitPrice')) / count($itemDetails);
     
     $sql_insert_doc = "INSERT INTO documents 
-        (id, document_number, client_id, client_name, doc_type, item_type, description, sub_text, quantity, unit_price, total, date) 
+        (id, document_number, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
         VALUES 
-        ('$id', '$documentNumberEscaped', $clientId, '$clientName', '$docType', '$itemDetailsJson', '$description', '$subText', $avgQuantity, $avgUnitPrice, $total, '$date')";
+        ('$id', '$documentNumberEscaped', $clientId, '$clientName', '$docType', '$itemDetailsJson', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
 
     if (!query_db($conn, $sql_insert_doc)) {
         throw new Exception("Failed to save document to the database.");
