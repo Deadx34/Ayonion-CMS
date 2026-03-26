@@ -97,18 +97,31 @@ if ($document_result) {
         // Format document data for frontend consistency
         $item_type = $row['item_type'];
         $item_details = null;
-        
-        // Handle JSON-encoded item details (from multiple item selection)
-        if (is_string($item_type) && (strpos($item_type, '[') === 0 || strpos($item_type, '{') === 0)) {
-            $decoded_items = json_decode($item_type, true);
+
+        // Handle JSON-encoded item details (robustly supports array/object/double-encoded JSON)
+        if (is_string($item_type)) {
+            $raw_item_type = trim($item_type);
+            $decoded_items = json_decode($raw_item_type, true);
+
+            // Handle double-encoded JSON strings
+            if (is_string($decoded_items)) {
+                $decoded_items = json_decode($decoded_items, true);
+            }
+
             if (is_array($decoded_items)) {
-                // Check if it's the new format with item details
-                if (isset($decoded_items[0]['itemType'])) {
-                    // New format with detailed item information
+                // If a single object is provided, normalize to array
+                if (isset($decoded_items['itemType'])) {
+                    $decoded_items = [$decoded_items];
+                }
+
+                // New format with detailed item objects
+                if (isset($decoded_items[0]) && is_array($decoded_items[0]) && isset($decoded_items[0]['itemType'])) {
                     $item_details = $decoded_items;
-                    $item_type = implode(', ', array_column($decoded_items, 'itemType'));
-                } else {
-                    // Old format with just item types
+                    $item_names = array_filter(array_column($decoded_items, 'itemType'));
+                    $item_type = !empty($item_names) ? implode(', ', $item_names) : 'General';
+                }
+                // Old format with just item type strings
+                elseif (isset($decoded_items[0]) && is_string($decoded_items[0])) {
                     $item_type = implode(', ', $decoded_items);
                 }
             }
