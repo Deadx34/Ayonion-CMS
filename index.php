@@ -1697,9 +1697,10 @@
                                                     </div>
                                                     <div class="col-12 mb-2">
                                                         <label class="form-label">Sub Text</label>
-                                                        <input type="text" class="form-control other-service-sub-text" 
-                                                               data-service-id="${otherServiceCounter}"
-                                                               placeholder="Enter sub text for this item type">
+                                                        <textarea class="form-control other-service-sub-text" 
+                                                                  data-service-id="${otherServiceCounter}"
+                                                                  rows="2"
+                                                                  placeholder="Enter sub text for this item type"></textarea>
                                                     </div>
                                                     <div class="col-md-6 mb-2">
                                                         <label class="form-label">Quantity</label>
@@ -1838,10 +1839,10 @@
                                                     </div>
                                                     <div class="col-12 mt-2">
                                                         <label class="form-label">Sub Text</label>
-                                                        <input type="text" class="form-control item-sub-text" 
-                                                               data-item-type="${checkbox.value}" 
-                                                               value="${savedSubText}"
-                                                               placeholder="Enter sub text for this item type">
+                                                        <textarea class="form-control item-sub-text" 
+                                                                  data-item-type="${checkbox.value}" 
+                                                                  rows="2"
+                                                                  placeholder="Enter sub text for this item type">${savedSubText}</textarea>
                                                     </div>
                                                 `;
                                                 itemAmountsContainer.appendChild(itemDiv);
@@ -6434,7 +6435,7 @@
                 for (const itemType of selectedItemTypes) {
                     const quantityInput = form.querySelector(`input[data-item-type="${itemType}"].item-quantity`);
                     const unitPriceInput = form.querySelector(`input[data-item-type="${itemType}"].item-unit-price`);
-                    const subTextInput = form.querySelector(`input[data-item-type="${itemType}"].item-sub-text`);
+                    const subTextInput = form.querySelector(`[data-item-type="${itemType}"].item-sub-text`);
                     
                     if (quantityInput && unitPriceInput) {
                         const qty = parseInt(quantityInput.value) || 0;
@@ -6623,7 +6624,7 @@
                 <tr style="border-bottom: 1px solid #e5e7eb;">
                     <td style="padding: 8px 6px;">
                         <div>${item.description}</div>
-                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px;">${item.subText}</div>` : ''}
+                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
                     </td>
                     <td style="padding: 8px 6px; text-align: center;">${item.quantity.toLocaleString()}</td>
                     <td style="padding: 8px 6px; text-align: right;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
@@ -7040,7 +7041,7 @@
                             <tr>
                                 <td>
                                     <div>${item.description}</div>
-                                    ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px;">${item.subText}</div>` : ''}
+                                    ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
                                 </td>
                                 <td>${item.quantity}</td>
                                 <td>Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
