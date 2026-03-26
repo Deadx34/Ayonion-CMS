@@ -6655,7 +6655,8 @@
             if (doc.itemDetails && Array.isArray(doc.itemDetails)) {
                 // New format with detailed item information
                 lineItems = doc.itemDetails.map(item => ({
-                    description: item.description || item.itemType || 'Service',
+                    serviceType: item.itemType || 'Service',
+                    description: item.description || '',
                     subText: item.subText || '',
                     quantity: parseFloat(item.quantity || 0),
                     unitPrice: parseFloat(item.unitPrice || 0),
@@ -6666,7 +6667,8 @@
                 const qty = parseFloat(doc.quantity || 0);
                 const unit = parseFloat(doc.unitPrice || doc.unit_price || 0);
                 lineItems = [{
-                    description: doc.description || 'Service',
+                    serviceType: normalizeItemTypeLabel(doc.itemType || doc.item_type || 'Service', doc.itemDetails),
+                    description: doc.description || '',
                     subText: doc.subText || doc.sub_text || '',
                     quantity: qty,
                     unitPrice: unit,
@@ -6678,8 +6680,9 @@
             const tableRows = lineItems.map(item => `
                 <tr style="border-bottom: 1px solid #e5e7eb;">
                     <td style="padding: 8px 6px;">
-                        <div>${item.description}</div>
+                        <div style="font-weight: 600;">${item.serviceType}</div>
                         ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
+                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px;">${item.description}</div>` : ''}
                     </td>
                     <td style="padding: 8px 6px; text-align: center;">${item.quantity.toLocaleString()}</td>
                     <td style="padding: 8px 6px; text-align: right;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
@@ -7020,13 +7023,15 @@
             const description = doc.description || '';
             const lineItems = (doc.itemDetails && Array.isArray(doc.itemDetails) && doc.itemDetails.length > 0)
                 ? doc.itemDetails.map(item => ({
-                    description: item.description || item.itemType || 'Service',
+                    serviceType: item.itemType || 'Service',
+                    description: item.description || '',
                     subText: item.subText || '',
                     quantity: parseFloat(item.quantity || 0),
                     unitPrice: parseFloat(item.unitPrice || 0),
                     total: parseFloat(item.total || 0)
                 }))
                 : [{
+                    serviceType: itemType,
                     description: description,
                     subText: '',
                     quantity: quantity,
@@ -7095,8 +7100,9 @@
                             ${lineItems.map(item => `
                             <tr>
                                 <td>
-                                    <div>${item.description}</div>
+                                    <div style="font-weight: 600;">${item.serviceType}</div>
                                     ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
+                                    ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px;">${item.description}</div>` : ''}
                                 </td>
                                 <td>${item.quantity}</td>
                                 <td>Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
