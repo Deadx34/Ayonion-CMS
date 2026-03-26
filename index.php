@@ -6277,6 +6277,46 @@
             loadFinancialDocuments('receipt');
         }
 
+        function normalizeItemTypeLabel(rawItemType, itemDetails) {
+            if (Array.isArray(itemDetails) && itemDetails.length > 0) {
+                const names = itemDetails
+                    .map(item => (item && item.itemType ? String(item.itemType).trim() : ''))
+                    .filter(Boolean);
+                if (names.length > 0) {
+                    return names.join(', ');
+                }
+            }
+
+            const fallback = rawItemType || 'General';
+            if (typeof fallback !== 'string') return String(fallback);
+
+            const parseJsonItemType = (value) => {
+                try {
+                    const parsed = JSON.parse(value);
+                    if (Array.isArray(parsed)) {
+                        if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null) {
+                            const names = parsed.map(item => item.itemType).filter(Boolean);
+                            if (names.length > 0) return names.join(', ');
+                        }
+                        if (parsed.length > 0 && typeof parsed[0] === 'string') {
+                            return parsed.join(', ');
+                        }
+                    }
+                    if (parsed && typeof parsed === 'object' && parsed.itemType) {
+                        return String(parsed.itemType);
+                    }
+                    if (typeof parsed === 'string') {
+                        // Handle double-encoded JSON
+                        return parseJsonItemType(parsed);
+                    }
+                } catch (_) {}
+                return null;
+            };
+
+            const parsedLabel = parseJsonItemType(fallback.trim());
+            return parsedLabel || fallback;
+        }
+
         function loadFinancialDocuments(type) {
              // NOTE: This currently only loads from local appData. Full PHP handler required.
             const docs = appData.documents[type + 's'];
@@ -6303,7 +6343,7 @@
             tbody.innerHTML = sortedDocs.map(doc => {
                 const docNumber = doc.documentNumber || docNum[type] + String(doc.id).slice(-6);
                 const clientName = doc.clientName || doc.client_name || 'Unknown Client';
-                const itemType = doc.itemType || doc.item_type || 'General';
+                const itemType = normalizeItemTypeLabel(doc.itemType || doc.item_type || 'General', doc.itemDetails);
                 const date = doc.date || '';
                 const amount = doc.total || 0;
                 return `
@@ -6957,7 +6997,7 @@
             const title = titles[docType];
             const docNumber = doc.documentNumber || (docNum[docType] + String(doc.id).slice(-6));
             const clientName = doc.clientName || doc.client_name || 'Unknown Client';
-            const itemType = doc.itemType || doc.item_type || 'General';
+            const itemType = normalizeItemTypeLabel(doc.itemType || doc.item_type || 'General', doc.itemDetails);
             const date = formatDate(doc.date);
             const quantity = doc.quantity || 0;
             const unitPrice = doc.unitPrice || doc.unit_price || 0;
