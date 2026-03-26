@@ -6278,10 +6278,12 @@
         }
 
         function normalizeItemTypeLabel(rawItemType, itemDetails) {
+            const uniqueLabels = (labels) => [...new Set(labels.map(label => String(label).trim()).filter(Boolean))];
+
             if (Array.isArray(itemDetails) && itemDetails.length > 0) {
-                const names = itemDetails
+                const names = uniqueLabels(itemDetails
                     .map(item => (item && item.itemType ? String(item.itemType).trim() : ''))
-                    .filter(Boolean);
+                    .filter(Boolean));
                 if (names.length > 0) {
                     return names.join(', ');
                 }
@@ -6295,11 +6297,11 @@
                     const parsed = JSON.parse(value);
                     if (Array.isArray(parsed)) {
                         if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null) {
-                            const names = parsed.map(item => item.itemType).filter(Boolean);
+                            const names = uniqueLabels(parsed.map(item => item.itemType).filter(Boolean));
                             if (names.length > 0) return names.join(', ');
                         }
                         if (parsed.length > 0 && typeof parsed[0] === 'string') {
-                            return parsed.join(', ');
+                            return uniqueLabels(parsed).join(', ');
                         }
                     }
                     if (parsed && typeof parsed === 'object' && parsed.itemType) {
@@ -6314,7 +6316,20 @@
             };
 
             const parsedLabel = parseJsonItemType(fallback.trim());
-            return parsedLabel || fallback;
+            if (parsedLabel) return parsedLabel;
+
+            // Try common escaped JSON format: [{\"itemType\":\"Monthly Payment\"}]
+            const unescaped = fallback.replace(/\\"/g, '"');
+            const unescapedParsed = parseJsonItemType(unescaped.trim());
+            if (unescapedParsed) return unescapedParsed;
+
+            // Last resort: extract only itemType values from malformed JSON-like text
+            const regexMatches = [...fallback.matchAll(/"itemType"\s*:\s*"([^"]+)"/g)].map(match => match[1]);
+            if (regexMatches.length > 0) {
+                return uniqueLabels(regexMatches).join(', ');
+            }
+
+            return fallback;
         }
 
         function loadFinancialDocuments(type) {
