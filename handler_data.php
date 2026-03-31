@@ -10,6 +10,7 @@ $response_data = [
     'clients' => [],
     'contentCredits' => [],
     'campaigns' => [],
+    'invoiceRecords' => [],
     'documents' => [
         'quotations' => [],
         'invoices' => [],
@@ -89,7 +90,24 @@ if ($campaign_result) {
     }
 }
 
-// --- 4. Fetch All Documents ---
+// --- 4. Fetch Invoices Table Records ---
+$invoice_sql = "SELECT * FROM invoices ORDER BY created_at DESC";
+$invoice_result = $conn->query($invoice_sql);
+if ($invoice_result) {
+    while ($row = $invoice_result->fetch_assoc()) {
+        $response_data['invoiceRecords'][] = [
+            'id' => (int)$row['id'],
+            'clientId' => (int)$row['client_id'],
+            'totalAmount' => (float)$row['total_amount'],
+            'invoiceNumber' => $row['invoice_number'],
+            'dueDate' => $row['due_date'],
+            'status' => $row['status'],
+            'createdAt' => $row['created_at']
+        ];
+    }
+}
+
+// --- 5. Fetch All Documents ---
 $document_sql = "SELECT * FROM documents ORDER BY date DESC";
 $document_result = $conn->query($document_sql);
 if ($document_result) {

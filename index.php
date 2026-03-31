@@ -2797,6 +2797,7 @@
             clients: [],
             contentCredits: [],
             campaigns: [],
+            invoiceRecords: [],
             documents: { quotations: [], invoices: [], receipts: [] },
             users: [
                 { id: 1, username: 'admin', role: 'admin', password: 'password', isTempPassword: false },
@@ -2850,6 +2851,7 @@
                 appData.clients = loadedData.clients || [];
                 appData.contentCredits = loadedData.contentCredits || [];
                 appData.campaigns = loadedData.campaigns || [];
+                appData.invoiceRecords = loadedData.invoiceRecords || [];
                 appData.documents = loadedData.documents || { quotations: [], invoices: [], receipts: [] };
                 appData.users = loadedData.users || [
                     { id: 1, username: 'admin', role: 'admin', password: 'password', isTempPassword: false },
@@ -2936,6 +2938,7 @@
                     appData.clients = data.clients || [];
                     appData.contentCredits = data.contentCredits || [];
                     appData.campaigns = data.campaigns || [];
+                    appData.invoiceRecords = data.invoiceRecords || [];
                     // Ensure all document types are populated
                     appData.documents.quotations = (data.documents && data.documents.quotations) || [];
                     appData.documents.invoices = (data.documents && data.documents.invoices) || [];
@@ -7620,6 +7623,7 @@
             const clients = appData.clients || [];
             const campaigns = appData.campaigns || [];
             const contentCredits = appData.contentCredits || [];
+            const invoiceRecords = appData.invoiceRecords || [];
             const invoices = (appData.documents && appData.documents.invoices) ? appData.documents.invoices : [];
 
             const totalClients = clients.length;
@@ -7642,11 +7646,20 @@
             const now = new Date();
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
+
+            const invoicesThisMonth = invoiceRecords.filter(invoice => {
+                const invoiceDate = new Date(invoice.createdAt || '');
+                return !isNaN(invoiceDate.getTime()) && invoiceDate.getMonth() === currentMonth && invoiceDate.getFullYear() === currentYear;
+            });
+
             const invoiceDocsThisMonth = invoices.filter(doc => {
                 const docDate = new Date(doc.date || '');
                 return !isNaN(docDate.getTime()) && docDate.getMonth() === currentMonth && docDate.getFullYear() === currentYear;
             });
-            const invoiceValueThisMonth = invoiceDocsThisMonth.reduce((sum, doc) => sum + (parseFloat(doc.total) || 0), 0);
+
+            const invoiceValueThisMonth = invoicesThisMonth.length > 0
+                ? invoicesThisMonth.reduce((sum, invoice) => sum + (parseFloat(invoice.totalAmount) || 0), 0)
+                : invoiceDocsThisMonth.reduce((sum, doc) => sum + (parseFloat(doc.total) || 0), 0);
 
             document.getElementById('totalClients').textContent = totalClients.toLocaleString();
             document.getElementById('totalContentUsed').textContent = totalContentUsed.toLocaleString();
@@ -7719,7 +7732,7 @@
                 <li class="mb-2">Best performing client: <strong>${bestClientName}</strong></li>
                 <li class="mb-2">Published contents: <strong>${publishedCount}/${contentCredits.length}</strong></li>
                 <li class="mb-2">Total campaign spend: <strong>Rs. ${campaigns.reduce((sum, c) => sum + (parseFloat(c.spend) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></li>
-                <li class="mb-0">Invoices this month: <strong>${invoiceDocsThisMonth.length}</strong></li>
+                <li class="mb-0">Invoices this month: <strong>${invoicesThisMonth.length > 0 ? invoicesThisMonth.length : invoiceDocsThisMonth.length}</strong></li>
             `;
         }
 
