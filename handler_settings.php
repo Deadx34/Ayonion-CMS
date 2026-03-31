@@ -5,6 +5,17 @@ header('Content-Type: application/json');
 include 'includes/config.php';
 $conn = connect_db();
 
+function ensureSettingsColumn(mysqli $conn, string $columnName, string $columnDefinition): void {
+    $columnNameEscaped = $conn->real_escape_string($columnName);
+    $checkSql = "SHOW COLUMNS FROM settings LIKE '$columnNameEscaped'";
+    $checkResult = $conn->query($checkSql);
+
+    if ($checkResult && $checkResult->num_rows === 0) {
+        $safeColumnName = str_replace('`', '``', $columnName);
+        $conn->query("ALTER TABLE settings ADD COLUMN `{$safeColumnName}` {$columnDefinition}");
+    }
+}
+
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents("php://input"), true);
 
@@ -36,14 +47,39 @@ try {
         throw new Exception("Authentication required.", 401);
     }
 
-    // Auto-migrate settings table for new financial document fields
-    @$conn->query("ALTER TABLE settings ADD COLUMN bank_name VARCHAR(255) NULL");
-    @$conn->query("ALTER TABLE settings ADD COLUMN bank_branch VARCHAR(255) NULL");
-    @$conn->query("ALTER TABLE settings ADD COLUMN bank_account_name VARCHAR(255) NULL");
-    @$conn->query("ALTER TABLE settings ADD COLUMN bank_account_number VARCHAR(100) NULL");
-    @$conn->query("ALTER TABLE settings ADD COLUMN doc_thank_you_text TEXT NULL");
-    @$conn->query("ALTER TABLE settings ADD COLUMN doc_payment_instructions TEXT NULL");
-    @$conn->query("ALTER TABLE settings ADD COLUMN doc_bank_intro TEXT NULL");
+    // Ensure settings table exists for fresh/legacy databases
+    $conn->query("CREATE TABLE IF NOT EXISTS settings (
+        id TINYINT UNSIGNED NOT NULL,
+        company_name VARCHAR(255) NOT NULL,
+        logo_url TEXT NULL,
+        logo_light TEXT NULL,
+        logo_dark TEXT NULL,
+        email VARCHAR(255) NULL,
+        phone VARCHAR(50) NULL,
+        address TEXT NULL,
+        website VARCHAR(255) NULL,
+        bank_name VARCHAR(255) NULL,
+        bank_branch VARCHAR(255) NULL,
+        bank_account_name VARCHAR(255) NULL,
+        bank_account_number VARCHAR(100) NULL,
+        doc_thank_you_text TEXT NULL,
+        doc_payment_instructions TEXT NULL,
+        doc_bank_intro TEXT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    // Auto-migrate settings table safely for legacy databases
+    ensureSettingsColumn($conn, 'logo_light', 'TEXT NULL');
+    ensureSettingsColumn($conn, 'logo_dark', 'TEXT NULL');
+    ensureSettingsColumn($conn, 'bank_name', 'VARCHAR(255) NULL');
+    ensureSettingsColumn($conn, 'bank_branch', 'VARCHAR(255) NULL');
+    ensureSettingsColumn($conn, 'bank_account_name', 'VARCHAR(255) NULL');
+    ensureSettingsColumn($conn, 'bank_account_number', 'VARCHAR(100) NULL');
+    ensureSettingsColumn($conn, 'doc_thank_you_text', 'TEXT NULL');
+    ensureSettingsColumn($conn, 'doc_payment_instructions', 'TEXT NULL');
+    ensureSettingsColumn($conn, 'doc_bank_intro', 'TEXT NULL');
 
     // Ensure a row exists (id=1 acts as singleton)
     $conn->query("INSERT INTO settings (id, company_name, logo_url, logo_light, logo_dark, email, phone, address, website, bank_name, bank_branch, bank_account_name, bank_account_number, doc_thank_you_text, doc_payment_instructions, doc_bank_intro) 
