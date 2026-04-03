@@ -664,13 +664,6 @@
                             <p>Content Published Rate</p>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #166534 0%, #14532d 100%)">
-                            <i class="fas fa-file-invoice-dollar fa-2x mb-2"></i>
-                            <h3 id="invoiceValueThisMonth">Rs. 0.00</h3>
-                            <p>Invoice Value (This Month)</p>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="row">
@@ -4043,7 +4036,6 @@
                 'totalCampaigns',
                 'creditsUtilization',
                 'budgetUtilization',
-                'invoiceValueThisMonth',
                 'publishedRate'
             ];
 
@@ -7930,7 +7922,6 @@
             document.getElementById('creditsUtilization').textContent = `${creditsUtilization.toFixed(1)}%`;
             document.getElementById('budgetUtilization').textContent = `${budgetUtilization.toFixed(1)}%`;
             document.getElementById('publishedRate').textContent = `${publishedRate.toFixed(1)}%`;
-            document.getElementById('invoiceValueThisMonth').textContent = `Rs. ${invoiceValueThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             document.querySelectorAll('.stat-card.skeleton-card').forEach(card => card.classList.remove('skeleton-card'));
 
