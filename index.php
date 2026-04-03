@@ -279,7 +279,6 @@
         /* Adjust content area when warning banner is shown */
         body:has(#tempPasswordWarning[style*="display: block"]) .content-area { padding-top: 60px; }
         .top-bar { background: var(--card); padding: 16px 24px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 16px rgba(5,44,71,0.08); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 900; backdrop-filter: saturate(180%) blur(8px); border: 1px solid var(--border); }
-        .topbar-main { min-width: 0; }
         .page-title { font-size: 1.6rem; font-weight: 700; color: var(--text-primary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-info { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
         .user-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--light); color: var(--dark); padding: 6px 10px; border-radius: 999px; font-weight: 600; }
@@ -401,33 +400,16 @@
             body.sidebar-open .sidebar { transform: translateX(0); }
             body.sidebar-open .sidebar-backdrop { opacity: 1; pointer-events: auto; }
             .content-area { margin-left: 0; padding: 16px; }
-            .top-bar {
-                padding: 14px;
-                border-radius: 18px;
-                gap: 10px;
-                align-items: stretch;
-                background: linear-gradient(135deg, var(--dark), var(--dark-secondary));
-                border: none;
-                box-shadow: 0 12px 30px rgba(3, 11, 13, 0.14);
-            }
-            .top-bar > .topbar-main {
-                width: 100%;
-                justify-content: flex-start;
-                align-items: center;
-                gap: 10px;
-            }
-            .page-title { font-size: 1.15rem; max-width: 100%; white-space: normal; line-height: 1.2; color: #fff; }
-            .user-info { width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+            .top-bar { padding: 12px 16px; border-radius: 12px; gap: 10px; align-items: flex-start; }
+            .top-bar > .d-flex { width: 100%; justify-content: space-between; }
+            .page-title { font-size: 1.2rem; max-width: 100%; white-space: normal; line-height: 1.2; }
+            .user-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
             .user-chip, .badge { font-size: 0.85rem; }
-            .user-chip { width: auto; background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.12); }
-            .user-chip i { color: #fff; }
-            .badge.bg-primary { background: rgba(255,255,255,0.16) !important; color: #fff !important; }
-            #sidebarToggle { min-width: 44px; min-height: 44px; border-radius: 14px; background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.16); }
-            #sidebarToggle:hover { background: rgba(255,255,255,0.2); color: #fff; }
+            #sidebarToggle { min-width: 44px; min-height: 44px; }
             .sidebar-header { padding: 24px 18px; }
             .sidebar .nav-item { margin: 4px 12px; }
             .sidebar .nav-link { padding: 12px 16px; }
-            .stat-card { padding: 18px; border-radius: 20px; box-shadow: 0 10px 24px rgba(5,44,71,0.12); }
+            .stat-card { padding: 18px; }
             .document-preview { padding: 0; }
             .logo-preview { width: 32px; height: 32px; }
             .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -436,8 +418,8 @@
             .btn { width: 100%; margin-bottom: 8px; }
             .card-header .btn { width: auto; }
             .top-bar { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
-            .top-bar > .topbar-main { flex-direction: row; align-items: center; }
-            .page-title { width: auto; text-align: left; }
+            .top-bar > .d-flex { flex-direction: row; align-items: center; }
+            .page-title { width: 100%; text-align: left; }
             .user-info { justify-content: space-between; }
             .user-chip { width: 100%; justify-content: space-between; }
             .sidebar { width: 88vw; max-width: 300px; }
@@ -531,7 +513,7 @@
 
         <main class="content-area">
             <div class="top-bar">
-                <div class="d-flex align-items-center gap-2 flex-grow-1 topbar-main">
+                <div class="d-flex align-items-center gap-2 flex-grow-1">
                     <button class="btn btn-outline-secondary d-lg-none" id="sidebarToggle" title="Menu"><i class="fas fa-bars"></i></button>
                     <h1 class="page-title" id="pageTitle">Dashboard</h1>
                 </div>
