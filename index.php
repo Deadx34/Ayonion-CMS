@@ -214,12 +214,25 @@
             left: 0; 
             top: 0; 
             width: 260px; 
-            z-index: 1000; 
+            z-index: 1040; 
             overflow-y: auto; 
             overflow-x: hidden;
             transition: transform 0.3s ease; 
             scrollbar-width: thin; 
             scrollbar-color: rgba(255, 255, 255, 0.81) rgba(255, 255, 255, 0.1); 
+        }
+        body.sidebar-open {
+            overflow: hidden;
+        }
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 11, 13, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 1030;
+            backdrop-filter: blur(2px);
         }
         .sidebar::-webkit-scrollbar { 
             width: 8px; 
@@ -383,11 +396,19 @@
         .clickable { cursor: pointer; transition: all 0.2s; }
         .clickable:hover { color: var(--primary-solid); font-weight: 600; }
         @media (max-width: 991.98px) {
-            .sidebar { transform: translateX(-100%); width: 260px; position: fixed; }
+            .sidebar { transform: translateX(-105%); width: min(86vw, 320px); position: fixed; box-shadow: 12px 0 30px rgba(0,0,0,0.18); }
             body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open .sidebar-backdrop { opacity: 1; pointer-events: auto; }
             .content-area { margin-left: 0; padding: 16px; }
-            .top-bar { padding: 12px 16px; border-radius: 12px; gap: 10px; }
-            .page-title { font-size: 1.3rem; max-width: 70vw; }
+            .top-bar { padding: 12px 16px; border-radius: 12px; gap: 10px; align-items: flex-start; }
+            .top-bar > .d-flex { width: 100%; justify-content: space-between; }
+            .page-title { font-size: 1.2rem; max-width: 100%; white-space: normal; line-height: 1.2; }
+            .user-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+            .user-chip, .badge { font-size: 0.85rem; }
+            #sidebarToggle { min-width: 44px; min-height: 44px; }
+            .sidebar-header { padding: 24px 18px; }
+            .sidebar .nav-item { margin: 4px 12px; }
+            .sidebar .nav-link { padding: 12px 16px; }
             .stat-card { padding: 18px; }
             .document-preview { padding: 0; }
             .logo-preview { width: 32px; height: 32px; }
@@ -396,10 +417,14 @@
         @media (max-width: 575.98px) {
             .btn { width: 100%; margin-bottom: 8px; }
             .card-header .btn { width: auto; }
-            .top-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+            .top-bar { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
+            .top-bar > .d-flex { flex-direction: row; align-items: center; }
             .page-title { width: 100%; text-align: left; }
             .user-info { justify-content: space-between; }
             .user-chip { width: 100%; justify-content: space-between; }
+            .sidebar { width: 88vw; max-width: 300px; }
+            .sidebar-header h3 { font-size: 1.2rem; }
+            .sidebar-header p { font-size: 0.8rem; }
         }
         /* Make all modals fullscreen on small screens */
         @media (max-width: 575.98px) {
@@ -484,6 +509,7 @@
                 </button>
             </div>
         </nav>
+        <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
 
         <main class="content-area">
             <div class="top-bar">
@@ -3854,10 +3880,15 @@
         document.addEventListener('click', function(e) {
             const toggleBtn = document.getElementById('sidebarToggle');
             const sidebarEl = document.querySelector('.sidebar');
+            const backdropEl = document.getElementById('sidebarBackdrop');
             const target = e.target;
             // Toggle when hamburger clicked
             if (target && toggleBtn && (target.id === 'sidebarToggle' || toggleBtn.contains(target))) {
                 document.body.classList.toggle('sidebar-open');
+                return;
+            }
+            if (target && backdropEl && backdropEl.contains(target)) {
+                document.body.classList.remove('sidebar-open');
                 return;
             }
             // Close if clicking outside when open
@@ -3866,6 +3897,11 @@
                 if (!clickedInsideSidebar) {
                     document.body.classList.remove('sidebar-open');
                 }
+            }
+        });
+        document.querySelector('.sidebar')?.addEventListener('click', function(e) {
+            if (window.innerWidth <= 991.98 && e.target.closest('.nav-link')) {
+                document.body.classList.remove('sidebar-open');
             }
         });
         document.addEventListener('keydown', function(e) {
