@@ -7846,6 +7846,43 @@
                 return;
             }
 
+            const parseFlexibleDate = (input) => {
+                if (!input) return null;
+                if (input instanceof Date) return isNaN(input.getTime()) ? null : input;
+                const value = String(input).trim();
+                if (!value) return null;
+
+                const nativeDate = new Date(value);
+                if (!isNaN(nativeDate.getTime())) return nativeDate;
+
+                const dmyMatch = value.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+                if (dmyMatch) {
+                    const day = parseInt(dmyMatch[1], 10);
+                    const month = parseInt(dmyMatch[2], 10) - 1;
+                    const year = parseInt(dmyMatch[3], 10);
+                    const parsed = new Date(year, month, day);
+                    return isNaN(parsed.getTime()) ? null : parsed;
+                }
+
+                const ymdMatch = value.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+                if (ymdMatch) {
+                    const year = parseInt(ymdMatch[1], 10);
+                    const month = parseInt(ymdMatch[2], 10) - 1;
+                    const day = parseInt(ymdMatch[3], 10);
+                    const parsed = new Date(year, month, day);
+                    return isNaN(parsed.getTime()) ? null : parsed;
+                }
+
+                return null;
+            };
+
+            const parseFlexibleAmount = (value) => {
+                if (value === null || value === undefined) return 0;
+                if (typeof value === 'number') return isNaN(value) ? 0 : value;
+                const numeric = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
+                return isNaN(numeric) ? 0 : numeric;
+            };
+
             const clients = appData.clients || [];
             const campaigns = appData.campaigns || [];
             const contentCredits = appData.contentCredits || [];
@@ -7874,18 +7911,18 @@
             const currentYear = now.getFullYear();
 
             const invoicesThisMonth = invoiceRecords.filter(invoice => {
-                const invoiceDate = new Date(invoice.createdAt || '');
-                return !isNaN(invoiceDate.getTime()) && invoiceDate.getMonth() === currentMonth && invoiceDate.getFullYear() === currentYear;
+                const invoiceDate = parseFlexibleDate(invoice.createdAt || invoice.created_at || invoice.date || invoice.invoiceDate || '');
+                return invoiceDate && invoiceDate.getMonth() === currentMonth && invoiceDate.getFullYear() === currentYear;
             });
 
             const invoiceDocsThisMonth = invoices.filter(doc => {
-                const docDate = new Date(doc.date || '');
-                return !isNaN(docDate.getTime()) && docDate.getMonth() === currentMonth && docDate.getFullYear() === currentYear;
+                const docDate = parseFlexibleDate(doc.date || doc.createdAt || doc.created_at || doc.invoiceDate || '');
+                return docDate && docDate.getMonth() === currentMonth && docDate.getFullYear() === currentYear;
             });
 
             const invoiceValueThisMonth = invoicesThisMonth.length > 0
-                ? invoicesThisMonth.reduce((sum, invoice) => sum + (parseFloat(invoice.totalAmount) || 0), 0)
-                : invoiceDocsThisMonth.reduce((sum, doc) => sum + (parseFloat(doc.total) || 0), 0);
+                ? invoicesThisMonth.reduce((sum, invoice) => sum + parseFlexibleAmount(invoice.totalAmount ?? invoice.total_amount ?? invoice.total ?? invoice.amount), 0)
+                : invoiceDocsThisMonth.reduce((sum, doc) => sum + parseFlexibleAmount(doc.total ?? doc.totalAmount ?? doc.amount), 0);
 
             document.getElementById('totalClients').textContent = totalClients.toLocaleString();
             document.getElementById('totalContentUsed').textContent = totalContentUsed.toLocaleString();
