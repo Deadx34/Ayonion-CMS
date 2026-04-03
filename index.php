@@ -400,12 +400,13 @@
             body.sidebar-open .sidebar { transform: translateX(0); }
             body.sidebar-open .sidebar-backdrop { opacity: 1; pointer-events: auto; }
             .content-area { margin-left: 0; padding: 16px; }
-            .top-bar { padding: 12px 16px; border-radius: 12px; gap: 10px; align-items: flex-start; }
-            .top-bar > .d-flex { width: 100%; justify-content: space-between; }
-            .page-title { font-size: 1.2rem; max-width: 100%; white-space: normal; line-height: 1.2; }
-            .user-info { width: 100%; justify-content: flex-start; flex-wrap: wrap; }
+            .top-bar { padding: 12px 16px; border-radius: 12px; gap: 10px; align-items: center; flex-wrap: nowrap; }
+            .top-bar > .d-flex { width: auto; justify-content: flex-start; flex-wrap: nowrap; min-width: 0; }
+            .page-title { font-size: 1.2rem; max-width: 100%; white-space: nowrap; line-height: 1.2; }
+            .user-info { width: auto; justify-content: flex-end; flex-wrap: nowrap; margin-left: auto; }
             .user-chip, .badge { font-size: 0.85rem; }
-            #sidebarToggle { min-width: 44px; min-height: 44px; }
+            .top-bar .btn { width: auto; margin-bottom: 0; }
+            #sidebarToggle { width: 44px !important; min-width: 44px; height: 44px; min-height: 44px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
             .sidebar-header { padding: 24px 18px; }
             .sidebar .nav-item { margin: 4px 12px; }
             .sidebar .nav-link { padding: 12px 16px; }
@@ -417,11 +418,12 @@
         @media (max-width: 575.98px) {
             .btn { width: 100%; margin-bottom: 8px; }
             .card-header .btn { width: auto; }
-            .top-bar { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
-            .top-bar > .d-flex { flex-direction: row; align-items: center; }
-            .page-title { width: 100%; text-align: left; }
-            .user-info { justify-content: space-between; }
-            .user-chip { width: 100%; justify-content: space-between; }
+            .top-bar { flex-direction: row; align-items: center; gap: 8px; padding: 10px 12px; flex-wrap: nowrap; }
+            .top-bar > .d-flex { flex-direction: row; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; }
+            .page-title { width: auto; text-align: left; font-size: 1.1rem; min-width: 0; }
+            .user-info { justify-content: flex-end; gap: 6px; min-width: fit-content; }
+            .user-chip { width: auto; padding: 6px 8px; gap: 6px; }
+            .badge { padding: 6px 8px; }
             .sidebar { width: 88vw; max-width: 300px; }
             .sidebar-header h3 { font-size: 1.2rem; }
             .sidebar-header p { font-size: 0.8rem; }
