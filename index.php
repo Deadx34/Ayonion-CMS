@@ -422,11 +422,76 @@
             .top-bar > .d-flex { flex-direction: row; align-items: center; gap: 8px; min-width: 0; flex: 1 1 auto; }
             .page-title { width: auto; text-align: left; font-size: 1.1rem; min-width: 0; }
             .user-info { justify-content: flex-end; gap: 6px; min-width: fit-content; }
-            .user-chip { width: auto; padding: 6px 8px; gap: 6px; }
+            .user-chip { width: auto; padding: 6px 10px; gap: 6px; border-radius: 999px; }
             .badge { padding: 6px 8px; }
             .sidebar { width: 88vw; max-width: 300px; }
             .sidebar-header h3 { font-size: 1.2rem; }
             .sidebar-header p { font-size: 0.8rem; }
+
+            .content-area { padding: 12px; max-width: 460px; margin: 0 auto; }
+            .top-bar { margin-bottom: 14px; border-radius: 14px; }
+            .card { margin-bottom: 14px; border-radius: 14px; }
+            .card-header { padding: 14px 16px; border-radius: 14px 14px 0 0 !important; }
+
+            #dashboard .row {
+                --bs-gutter-x: 0.85rem;
+                --bs-gutter-y: 0.85rem;
+            }
+            #dashboard .col-lg-3.col-md-6 {
+                width: 50%;
+                margin-bottom: 0 !important;
+            }
+            #dashboard .col-lg-3.col-md-6:last-child {
+                width: 100%;
+            }
+            #dashboard .col-lg-8,
+            #dashboard .col-lg-4 {
+                width: 100%;
+                margin-bottom: 0 !important;
+            }
+
+            #dashboard .stat-card {
+                padding: 14px 12px;
+                border-radius: 12px;
+                margin-bottom: 0;
+                min-height: 126px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+            #dashboard .stat-card i {
+                font-size: 1.35rem !important;
+                margin-bottom: 6px !important;
+            }
+            #dashboard .stat-card h3 {
+                font-size: 2.15rem;
+                margin: 2px 0;
+                line-height: 1.1;
+            }
+            #dashboard .stat-card p {
+                font-size: 0.75rem;
+                line-height: 1.2;
+                margin-bottom: 0;
+            }
+
+            #dashboard .col-lg-3.col-md-6:last-child .stat-card {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                padding: 14px 16px;
+                text-align: left;
+                min-height: 0;
+            }
+            #dashboard .col-lg-3.col-md-6:last-child .stat-card i {
+                margin-bottom: 0 !important;
+                font-size: 1.7rem !important;
+            }
+            #dashboard .col-lg-3.col-md-6:last-child .stat-card p {
+                font-size: 1rem;
+            }
         }
         /* Make all modals fullscreen on small screens */
         @media (max-width: 575.98px) {
