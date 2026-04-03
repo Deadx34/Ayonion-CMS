@@ -395,6 +395,33 @@
         .evidence-preview img { width: 100%; height: 100%; object-fit: cover; }
         .clickable { cursor: pointer; transition: all 0.2s; }
         .clickable:hover { color: var(--primary-solid); font-weight: 600; }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.38) 50%, rgba(255,255,255,0) 100%);
+            background-size: 220% 100%;
+            animation: skeleton-loading 1.25s ease-in-out infinite;
+        }
+        .skeleton-line {
+            display: inline-block;
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background-color: var(--dark-tertiary);
+        }
+        .skeleton-line.sm { height: 9px; width: 60%; }
+        .skeleton-line.md { height: 11px; width: 80%; }
+        .skeleton-line.lg { height: 14px; width: 95%; }
+        .skeleton-cell { padding: 14px 10px !important; }
+        .stat-card.skeleton-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card.skeleton-card .skeleton-line {
+            background: rgba(255,255,255,0.35);
+        }
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
         @media (max-width: 991.98px) {
             .sidebar { transform: translateX(-105%); width: min(86vw, 320px); position: fixed; box-shadow: 12px 0 30px rgba(0,0,0,0.18); }
             body.sidebar-open .sidebar { transform: translateX(0); }
@@ -448,6 +475,9 @@
             #dashboard .col-lg-4 {
                 width: 100%;
                 margin-bottom: 0 !important;
+            }
+            #dashboard > .row:first-child {
+                margin-bottom: 10px;
             }
 
             #dashboard .stat-card {
@@ -3977,6 +4007,69 @@
             }
         });
 
+        const skeletonTimeouts = {};
+        const SKELETON_DELAY_MS = 220;
+
+        function scheduleSkeletonRender(key, renderFn) {
+            if (skeletonTimeouts[key]) {
+                clearTimeout(skeletonTimeouts[key]);
+            }
+            skeletonTimeouts[key] = setTimeout(() => {
+                delete skeletonTimeouts[key];
+                renderFn();
+            }, SKELETON_DELAY_MS);
+        }
+
+        function showTableSkeleton(tbodyId, columns = 6, rows = 5) {
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return;
+
+            const skeletonRows = Array.from({ length: rows }).map(() => {
+                const cells = Array.from({ length: columns }).map((_, index) => `
+                    <td class="skeleton-cell ${index === 0 ? 'ps-3' : ''}">
+                        <span class="skeleton-line ${index % 3 === 0 ? 'lg' : 'md'} skeleton-shimmer"></span>
+                    </td>
+                `).join('');
+                return `<tr>${cells}</tr>`;
+            }).join('');
+
+            tbody.innerHTML = skeletonRows;
+        }
+
+        function showDashboardSkeleton() {
+            const statIds = [
+                'totalClients',
+                'totalContentUsed',
+                'totalCampaigns',
+                'creditsUtilization',
+                'budgetUtilization',
+                'invoiceValueThisMonth',
+                'publishedRate'
+            ];
+
+            statIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (!element) return;
+                const card = element.closest('.stat-card');
+                if (card) card.classList.add('skeleton-card');
+                element.innerHTML = '<span class="skeleton-line lg skeleton-shimmer" style="height: 22px; max-width: 90px;"></span>';
+            });
+
+            const platformBody = document.getElementById('dashboardPlatformTableBody');
+            if (platformBody) {
+                showTableSkeleton('dashboardPlatformTableBody', 4, 4);
+            }
+
+            const insightsList = document.getElementById('dashboardInsightsList');
+            if (insightsList) {
+                insightsList.innerHTML = Array.from({ length: 5 }).map((_, idx) => `
+                    <li class="mb-2">
+                        <span class="skeleton-line ${idx === 0 ? 'md' : 'lg'} skeleton-shimmer"></span>
+                    </li>
+                `).join('');
+            }
+        }
+
         // ============================================
         // USER MANAGEMENT
         // ============================================
@@ -4207,9 +4300,15 @@
             }
         });
 
-        function loadClientsTable() {
+        function loadClientsTable(useSkeleton = true) {
             const tbody = document.getElementById('clientsTableBody');
             const canDelete = hasPermission('canDeleteClient');
+
+            if (useSkeleton) {
+                showTableSkeleton('clientsTableBody', 9, 6);
+                scheduleSkeletonRender('clientsTable', () => loadClientsTable(false));
+                return;
+            }
 
            
 
@@ -4712,10 +4811,16 @@
         // CONTENT CREDIT MANAGEMENT (PHP Handlers)
         // ============================================
 
-        function loadContentCredits() {
+        function loadContentCredits(useSkeleton = true) {
             const clientId = parseInt(document.getElementById('contentClientSelect').value);
             const tbody = document.getElementById('contentTableBody');
             const info = document.getElementById('contentCreditsInfo');
+
+            if (useSkeleton) {
+                showTableSkeleton('contentTableBody', 8, 6);
+                scheduleSkeletonRender('contentCredits', () => loadContentCredits(false));
+                return;
+            }
 
             selectedClientContentId = clientId;
             saveToLocalStorage();
@@ -5730,10 +5835,16 @@
         // CAMPAIGN MANAGEMENT (PHP Handlers)
         // ============================================
 
-        function loadCampaigns() {
+        function loadCampaigns(useSkeleton = true) {
             const clientId = parseInt(document.getElementById('campaignClientSelect').value);
             const tbody = document.getElementById('campaignsTableBody');
             const budgetInfo = document.getElementById('campaignBudgetInfo');
+
+            if (useSkeleton) {
+                showTableSkeleton('campaignsTableBody', 9, 6);
+                scheduleSkeletonRender('campaigns', () => loadCampaigns(false));
+                return;
+            }
 
             selectedClientCampaignId = clientId;
             saveToLocalStorage();
@@ -6955,11 +7066,17 @@
             loadFinancialDocuments('receipt');
         }
 
-        function loadFinancialDocuments(type) {
+        function loadFinancialDocuments(type, useSkeleton = true) {
              // NOTE: This currently only loads from local appData. Full PHP handler required.
             const docs = appData.documents[type + 's'];
             const tbody = document.getElementById(type + 'sTableBody');
             const canDelete = hasPermission('canDeleteClient');
+
+            if (useSkeleton) {
+                showTableSkeleton(type + 'sTableBody', 6, 5);
+                scheduleSkeletonRender(`finance-${type}`, () => loadFinancialDocuments(type, false));
+                return;
+            }
 
             if (!tbody) return;
 
@@ -7722,7 +7839,13 @@
         // ============================================
         // DASHBOARD
         // ============================================
-        function loadDashboard() {
+        function loadDashboard(useSkeleton = true) {
+            if (useSkeleton) {
+                showDashboardSkeleton();
+                scheduleSkeletonRender('dashboard', () => loadDashboard(false));
+                return;
+            }
+
             const clients = appData.clients || [];
             const campaigns = appData.campaigns || [];
             const contentCredits = appData.contentCredits || [];
@@ -7771,6 +7894,8 @@
             document.getElementById('budgetUtilization').textContent = `${budgetUtilization.toFixed(1)}%`;
             document.getElementById('publishedRate').textContent = `${publishedRate.toFixed(1)}%`;
             document.getElementById('invoiceValueThisMonth').textContent = `Rs. ${invoiceValueThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            document.querySelectorAll('.stat-card.skeleton-card').forEach(card => card.classList.remove('skeleton-card'));
 
             const platformMap = {};
             campaigns.forEach(campaign => {
