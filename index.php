@@ -8562,6 +8562,12 @@
                 if (result.success) {
                     showAlert(`Invoice created successfully! Invoice #${result.invoiceNumber}`, 'success');
                     bootstrap.Modal.getInstance(document.getElementById('invoicePreviewModal')).hide();
+
+                    await loadAllDataFromPHP();
+                    loadDashboard();
+                    if (document.getElementById('campaignClientSelect')?.value) {
+                        loadCampaigns();
+                    }
                     
                     // Reset selections
                     selectedCampaigns = [];
