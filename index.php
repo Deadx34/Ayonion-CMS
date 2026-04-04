@@ -468,9 +468,6 @@
                 width: 50%;
                 margin-bottom: 0 !important;
             }
-            #dashboard .col-lg-3.col-md-6:last-child {
-                width: 100%;
-            }
             #dashboard .col-lg-8,
             #dashboard .col-lg-4 {
                 width: 100%;
@@ -504,23 +501,6 @@
                 font-size: 0.75rem;
                 line-height: 1.2;
                 margin-bottom: 0;
-            }
-
-            #dashboard .col-lg-3.col-md-6:last-child .stat-card {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 12px;
-                padding: 14px 16px;
-                text-align: left;
-                min-height: 0;
-            }
-            #dashboard .col-lg-3.col-md-6:last-child .stat-card i {
-                margin-bottom: 0 !important;
-                font-size: 1.7rem !important;
-            }
-            #dashboard .col-lg-3.col-md-6:last-child .stat-card p {
-                font-size: 1rem;
             }
         }
         /* Make all modals fullscreen on small screens */
@@ -622,46 +602,25 @@
 
             <div id="dashboard" class="section active">
                 <div class="row">
-                    <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="col-lg-4 col-md-6 mb-4">
                         <div class="stat-card" style="background: linear-gradient(135deg, #052C47 0%, #1A364A 100%)">
                             <i class="fas fa-users fa-2x mb-2"></i>
                             <h3 id="totalClients">0</h3>
                             <p>Total Clients</p>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #618698 0%, #2E404C 100%)">
-                            <i class="fas fa-file-alt fa-2x mb-2"></i>
-                            <h3 id="totalContentUsed">0</h3>
-                            <p>Content Credits Used</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="col-lg-4 col-md-6 mb-4">
                         <div class="stat-card" style="background: linear-gradient(135deg, #0f766e 0%, #0f766e 100%)">
                             <i class="fas fa-bullhorn fa-2x mb-2"></i>
                             <h3 id="totalCampaigns">0</h3>
                             <p>Active Campaigns</p>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%)">
-                            <i class="fas fa-coins fa-2x mb-2"></i>
-                            <h3 id="creditsUtilization">0%</h3>
-                            <p>Credits Utilization</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="col-lg-4 col-md-6 mb-4">
                         <div class="stat-card" style="background: linear-gradient(135deg, #b45309 0%, #92400e 100%)">
-                            <i class="fas fa-wallet fa-2x mb-2"></i>
-                            <h3 id="budgetUtilization">0%</h3>
-                            <p>Budget Utilization</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #0369a1 0%, #1e3a8a 100%)">
-                            <i class="fas fa-upload fa-2x mb-2"></i>
-                            <h3 id="publishedRate">0%</h3>
-                            <p>Content Published Rate</p>
+                            <i class="fas fa-receipt fa-2x mb-2"></i>
+                            <h3 id="totalRevenueThisMonth">Rs. 0.00</h3>
+                            <p>Total Revenue This Month</p>
                         </div>
                     </div>
                 </div>
@@ -4032,11 +3991,8 @@
         function showDashboardSkeleton() {
             const statIds = [
                 'totalClients',
-                'totalContentUsed',
                 'totalCampaigns',
-                'creditsUtilization',
-                'budgetUtilization',
-                'publishedRate'
+                'totalRevenueThisMonth'
             ];
 
             statIds.forEach(id => {
@@ -7333,6 +7289,7 @@
                     if (result.success) {
                         showAlert(result.message, 'success');
                         await loadAllDataFromPHP();
+                        loadDashboard();
                         loadFinancialDocuments(formData.docType);
 						document.activeElement && typeof document.activeElement.blur === 'function' && document.activeElement.blur();
 						bootstrap.Modal.getInstance(document.getElementById('documentModal')).hide();
@@ -7555,6 +7512,7 @@
                     if (result.success) {
                         showAlert(result.message, 'success');
                         await loadAllDataFromPHP();
+                        loadDashboard();
                         loadFinancialDocuments(type);
                     } else {
                         showAlert(result.message || 'Failed to delete document.', 'danger');
@@ -7880,6 +7838,7 @@
             const contentCredits = appData.contentCredits || [];
             const invoiceRecords = appData.invoiceRecords || [];
             const invoices = (appData.documents && appData.documents.invoices) ? appData.documents.invoices : [];
+            const receipts = (appData.documents && appData.documents.receipts) ? appData.documents.receipts : [];
 
             const totalClients = clients.length;
             const totalContentUsed = clients.reduce((sum, c) => sum + (parseInt(c.usedCredits) || 0), 0);
@@ -7916,12 +7875,18 @@
                 ? invoicesThisMonth.reduce((sum, invoice) => sum + parseFlexibleAmount(invoice.totalAmount ?? invoice.total_amount ?? invoice.total ?? invoice.amount), 0)
                 : invoiceDocsThisMonth.reduce((sum, doc) => sum + parseFlexibleAmount(doc.total ?? doc.totalAmount ?? doc.amount), 0);
 
+            const receiptsThisMonth = receipts.filter(receipt => {
+                const receiptDate = parseFlexibleDate(receipt.date || receipt.createdAt || receipt.created_at || receipt.receiptDate || '');
+                return receiptDate && receiptDate.getMonth() === currentMonth && receiptDate.getFullYear() === currentYear;
+            });
+
+            const totalRevenueThisMonth = receiptsThisMonth.reduce((sum, receipt) => {
+                return sum + parseFlexibleAmount(receipt.total ?? receipt.totalAmount ?? receipt.total_amount ?? receipt.amount);
+            }, 0);
+
             document.getElementById('totalClients').textContent = totalClients.toLocaleString();
-            document.getElementById('totalContentUsed').textContent = totalContentUsed.toLocaleString();
             document.getElementById('totalCampaigns').textContent = totalCampaigns.toLocaleString();
-            document.getElementById('creditsUtilization').textContent = `${creditsUtilization.toFixed(1)}%`;
-            document.getElementById('budgetUtilization').textContent = `${budgetUtilization.toFixed(1)}%`;
-            document.getElementById('publishedRate').textContent = `${publishedRate.toFixed(1)}%`;
+            document.getElementById('totalRevenueThisMonth').textContent = `Rs. ${totalRevenueThisMonth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             document.querySelectorAll('.stat-card.skeleton-card').forEach(card => card.classList.remove('skeleton-card'));
 
