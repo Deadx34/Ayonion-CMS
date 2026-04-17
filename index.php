@@ -6795,9 +6795,8 @@
                                 Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.<br><br>
                                 <strong>Payment Instructions:</strong><br>
                                 • All cheques should be crossed and made payable to Ayonion Studios (pvt) Ltd.<br>
-                                • A 50% of advance payment is required. (Excluding package payments)<br>
-                                • The quotation is valid for two weeks from the day issued.<br>
-                                • This is a computer generated quotation, No signature required.<br><br>
+                                • The invoice is valid for two weeks from the day issued.<br>
+                                • This is a computer generated invoice, No signature required.<br><br>
                                 <div style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 4px; border-left: 3px solid #3498db;">
                                     <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">Please deposit the advance payment to the below account</div>
                                     <div><strong>Ayonion Studios (pvt) Ltd</strong></div>
