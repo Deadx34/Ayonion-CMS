@@ -6727,22 +6727,22 @@
 
             // Generate table rows for all line items
             const tableRows = lineItems.map(item => `
-                <tr style="border-bottom: 1px solid #e5e7eb; height: auto;">
-                    <td style="padding: 8px 6px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; vertical-align: top; height: auto;">
+                <tr style="border-bottom: 1px solid #e5e7eb; height: auto; overflow: visible;">
+                    <td style="padding: 8px 6px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; vertical-align: top; height: auto; overflow: visible;">
                         <div style="font-weight: 600;">${item.serviceType}</div>
-                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; height: auto;">${item.subText}</div>` : ''}
-                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap; height: auto;">${item.description}</div>` : ''}
+                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; height: auto; overflow: visible;">${item.subText}</div>` : ''}
+                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap; height: auto; overflow: visible;">${item.description}</div>` : ''}
                     </td>
-                    <td style="padding: 8px 6px; text-align: center; vertical-align: top; height: auto;">${item.quantity.toLocaleString()}</td>
-                    <td style="padding: 8px 6px; text-align: right; vertical-align: top; height: auto;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td style="padding: 8px 6px; text-align: right; font-weight: bold; vertical-align: top; height: auto;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 8px 6px; text-align: center; vertical-align: top; height: auto; overflow: visible;">${item.quantity.toLocaleString()}</td>
+                    <td style="padding: 8px 6px; text-align: right; vertical-align: top; height: auto; overflow: visible;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 8px 6px; text-align: right; font-weight: bold; vertical-align: top; height: auto; overflow: visible;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 </tr>
             `).join('');
 
             const html = `
-                <div style="display: flex; min-height: 100vh; font-family: Arial, sans-serif;">
+                <div style="display: flex; font-family: Arial, sans-serif; min-height: auto; height: auto;">
                     <!-- Sidebar -->
-                    <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column;">
+                    <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column; flex-shrink: 0;">
                         <div style="margin-bottom: 15px; text-align: center;">
                             ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 158px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
@@ -6783,7 +6783,7 @@
                     </div>
                     
                     <!-- Main Content -->
-                    <div style="width: 70%; background: white; padding: 20px 25px; display: flex; flex-direction: column;">
+                    <div style="width: 70%; background: white; padding: 20px 25px; display: flex; flex-direction: column; flex-grow: 1; overflow: visible; height: auto;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1;">
                             <div style="flex: 1;">
                                 <div style="font-size: 12px; color: #7f8c8d; margin-bottom: 3px;">Customer</div>
@@ -6799,7 +6799,7 @@
                             </div>
                         </div>
                         
-                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; table-layout: auto;">
+                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; table-layout: auto; overflow: visible;">
                             <colgroup>
                                 <col style="width: 50%;">
                                 <col style="width: 17%;">
@@ -6955,11 +6955,17 @@
                             font-family: Arial, sans-serif;
                             padding: 20px;
                             margin: 0;
+                            overflow: visible;
+                        }
+                        html {
+                            overflow: visible;
+                            height: auto;
                         }
                         table {
                             width: 100%;
                             border-collapse: collapse;
                             table-layout: auto;
+                            overflow: visible;
                         }
                         th, td {
                             padding: 8px;
@@ -6970,9 +6976,11 @@
                             word-break: break-word;
                             white-space: normal;
                             height: auto !important;
+                            overflow: visible !important;
                         }
                         tbody tr {
                             height: auto;
+                            overflow: visible;
                         }
                         td {
                             vertical-align: top;
@@ -6990,6 +6998,7 @@
                         }
                         tr {
                             page-break-inside: avoid;
+                            overflow: visible;
                         }
                         /* Handle subtext and description divs */
                         td > div {
@@ -6997,32 +7006,46 @@
                             overflow-wrap: break-word;
                             word-break: break-word;
                             white-space: pre-wrap;
+                            overflow: visible;
                         }
                         @media print {
                             body {
                                 padding: 0;
                                 margin: 0;
+                                overflow: visible !important;
+                                height: auto !important;
+                            }
+                            html {
+                                overflow: visible !important;
+                                height: auto !important;
                             }
                             table {
                                 table-layout: auto !important;
+                                overflow: visible !important;
                             }
                             th, td {
                                 word-wrap: break-word !important;
                                 overflow-wrap: break-word !important;
                                 word-break: break-word !important;
                                 white-space: normal !important;
+                                overflow: visible !important;
+                                height: auto !important;
                             }
                             td > div {
                                 word-wrap: break-word !important;
                                 overflow-wrap: break-word !important;
                                 word-break: break-word !important;
                                 white-space: pre-wrap !important;
+                                overflow: visible !important;
+                                height: auto !important;
                             }
                             td {
                                 vertical-align: top !important;
                             }
                             tr {
                                 page-break-inside: avoid !important;
+                                overflow: visible !important;
+                                height: auto !important;
                             }
                             .no-print {
                                 display: none !important;
