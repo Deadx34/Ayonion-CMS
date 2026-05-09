@@ -164,19 +164,86 @@ function generateDocumentPDF($doc, $settings) {
                     <th>Total</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>{$itemType}</td>
-                    <td>{$description}</td>
-                    <td>{$quantity}</td>
-                    <td>Rs. {$unitPrice}</td>
-                    <td>Rs. {$total}</td>
-                </tr>
-                <tr class='total-row'>
-                    <td colspan='4' style='text-align: right;'>Total Amount:</td>
-                    <td>Rs. {$total}</td>
-                </tr>
-            </tbody>
+                <tbody>
+                    <?php
+                        // Build detailed rows from item_details if available, otherwise split item_type by commas
+                        $rowsHtml = '';
+                        $builtFromDetails = false;
+
+                        if (!empty($doc['item_details'])) {
+                            $decoded = json_decode($doc['item_details'], true);
+                            if ($decoded && !is_array($decoded)) {
+                                $decoded = [$decoded];
+                            }
+                            if (is_array($decoded) && count($decoded) > 0) {
+                                $builtFromDetails = true;
+                                foreach ($decoded as $it) {
+                                    if (is_string($it)) {
+                                        $try = json_decode($it, true);
+                                        if ($try) $it = $try; else $it = ['itemType' => $it];
+                                    }
+                                    $service = htmlspecialchars($it['itemType'] ?? $it['item_type'] ?? 'Service');
+                                    $desc = htmlspecialchars($it['description'] ?? '');
+                                    $sub = htmlspecialchars($it['subText'] ?? $it['sub_text'] ?? '');
+                                    $qty = isset($it['quantity']) && $it['quantity'] !== null ? $it['quantity'] : '';
+                                    $uprice = isset($it['unitPrice']) && $it['unitPrice'] !== null ? number_format($it['unitPrice'], 2) : '';
+                                    $t = isset($it['total']) && $it['total'] !== null ? number_format($it['total'], 2) : '';
+
+                                    $rowsHtml .= "<tr>\n";
+                                    $rowsHtml .= "<td><div style='font-weight:600;'>{$service}</div>";
+                                    if ($sub !== '') $rowsHtml .= "<div style='font-size:11px;color:#666;margin-top:4px;white-space:pre-wrap;'>" . nl2br($sub) . "</div>";
+                                    if ($desc !== '' && $desc !== $service) $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . nl2br($desc) . "</div>";
+                                    $rowsHtml .= "</td>\n";
+                                    $rowsHtml .= "<td>" . ($qty !== '' ? $qty : '') . "</td>\n";
+                                    $rowsHtml .= "<td>" . ($uprice !== '' ? 'Rs. ' . $uprice : '') . "</td>\n";
+                                    $rowsHtml .= "<td>" . ($t !== '' ? 'Rs. ' . $t : '') . "</td>\n";
+                                    $rowsHtml .= "</tr>\n";
+                                }
+                            }
+                        }
+
+                        if (!$builtFromDetails) {
+                            $raw = $itemType;
+                            $parts = array_filter(array_map('trim', explode(',', $raw)));
+                            if (count($parts) > 1) {
+                                foreach ($parts as $idx => $p) {
+                                    $pSafe = htmlspecialchars($p);
+                                    if ($idx === 0) {
+                                        $rowsHtml .= "<tr>\n";
+                                        $rowsHtml .= "<td><div style='font-weight:600;'>{$pSafe}</div>";
+                                        if ($description) $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . htmlspecialchars($description) . "</div>";
+                                        $rowsHtml .= "</td>\n";
+                                        $rowsHtml .= "<td>" . ($quantity !== null ? $quantity : '') . "</td>\n";
+                                        $rowsHtml .= "<td>Rs. {$unitPrice}</td>\n";
+                                        $rowsHtml .= "<td>Rs. {$total}</td>\n";
+                                        $rowsHtml .= "</tr>\n";
+                                    } else {
+                                        $rowsHtml .= "<tr>\n";
+                                        $rowsHtml .= "<td><div style='font-weight:600;'>{$pSafe}</div></td>\n";
+                                        $rowsHtml .= "<td></td>\n";
+                                        $rowsHtml .= "<td></td>\n";
+                                        $rowsHtml .= "<td></td>\n";
+                                        $rowsHtml .= "</tr>\n";
+                                    }
+                                }
+                            } else {
+                                $rowsHtml .= "<tr>\n";
+                                $rowsHtml .= "<td>" . htmlspecialchars($itemType) . "</td>\n";
+                                $rowsHtml .= "<td>" . htmlspecialchars($description) . "</td>\n";
+                                $rowsHtml .= "<td>" . ($quantity !== null ? $quantity : '') . "</td>\n";
+                                $rowsHtml .= "<td>Rs. {$unitPrice}</td>\n";
+                                $rowsHtml .= "<td>Rs. {$total}</td>\n";
+                                $rowsHtml .= "</tr>\n";
+                            }
+                        }
+
+                        echo $rowsHtml;
+                    ?>
+                    <tr class='total-row'>
+                        <td colspan='4' style='text-align: right;'>Total Amount:</td>
+                        <td>Rs. <?php echo htmlspecialchars($total); ?></td>
+                    </tr>
+                </tbody>
         </table>
         
         <div class='footer'>
