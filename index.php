@@ -6681,15 +6681,15 @@
 
             // Generate table rows for all line items
             const tableRows = lineItems.map(item => `
-                <tr style="border-bottom: 1px solid #e5e7eb;">
-                    <td style="padding: 8px 6px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">
+                <tr style="border-bottom: 1px solid #e5e7eb; height: auto;">
+                    <td style="padding: 8px 6px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; vertical-align: top; height: auto;">
                         <div style="font-weight: 600;">${item.serviceType}</div>
-                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%;">${item.subText}</div>` : ''}
-                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">${item.description}</div>` : ''}
+                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; height: auto;">${item.subText}</div>` : ''}
+                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap; height: auto;">${item.description}</div>` : ''}
                     </td>
-                    <td style="padding: 8px 6px; text-align: center; vertical-align: middle;">${item.quantity.toLocaleString()}</td>
-                    <td style="padding: 8px 6px; text-align: right; vertical-align: middle;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td style="padding: 8px 6px; text-align: right; font-weight: bold; vertical-align: middle;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 8px 6px; text-align: center; vertical-align: top; height: auto;">${item.quantity.toLocaleString()}</td>
+                    <td style="padding: 8px 6px; text-align: right; vertical-align: top; height: auto;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 8px 6px; text-align: right; font-weight: bold; vertical-align: top; height: auto;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 </tr>
             `).join('');
 
@@ -6913,26 +6913,70 @@
                         table {
                             width: 100%;
                             border-collapse: collapse;
+                            table-layout: auto;
                         }
                         th, td {
                             padding: 8px;
                             text-align: left;
                             border: 1px solid #ddd;
+                            word-wrap: break-word;
+                            overflow-wrap: break-word;
+                            word-break: break-word;
+                            white-space: normal;
+                            height: auto !important;
+                        }
+                        tbody tr {
+                            height: auto;
+                        }
+                        td {
+                            vertical-align: top;
                         }
                         th {
                             background-color: #030b0d !important;
                             color: white !important;
                             -webkit-print-color-adjust: exact;
                             print-color-adjust: exact;
+                            white-space: nowrap;
                         }
                         img {
                             max-width: 100%;
                             height: auto;
                         }
+                        tr {
+                            page-break-inside: avoid;
+                        }
+                        /* Handle subtext and description divs */
+                        td > div {
+                            word-wrap: break-word;
+                            overflow-wrap: break-word;
+                            word-break: break-word;
+                            white-space: pre-wrap;
+                        }
                         @media print {
                             body {
                                 padding: 0;
                                 margin: 0;
+                            }
+                            table {
+                                table-layout: auto !important;
+                            }
+                            th, td {
+                                word-wrap: break-word !important;
+                                overflow-wrap: break-word !important;
+                                word-break: break-word !important;
+                                white-space: normal !important;
+                            }
+                            td > div {
+                                word-wrap: break-word !important;
+                                overflow-wrap: break-word !important;
+                                word-break: break-word !important;
+                                white-space: pre-wrap !important;
+                            }
+                            td {
+                                vertical-align: top !important;
+                            }
+                            tr {
+                                page-break-inside: avoid !important;
                             }
                             .no-print {
                                 display: none !important;
