@@ -7209,14 +7209,17 @@
                 const rawLabel = itemType;
                 const parts = String(rawLabel).split(',').map(s => s.trim()).filter(Boolean);
                 if (parts.length > 1) {
-                    lineItems = parts.map((p, idx) => ({
-                        serviceType: p,
-                        description: idx === 0 ? description : '',
-                        subText: idx === 0 ? '' : '',
-                        quantity: idx === 0 ? quantity : null,
-                        unitPrice: idx === 0 ? unitPrice : null,
-                        total: idx === 0 ? total : null
-                    }));
+                    lineItems = parts.map((p, idx) => {
+                        const isOtherRow = /other/i.test(String(p));
+                        return {
+                            serviceType: p,
+                            description: isOtherRow ? description : '',
+                            subText: '',
+                            quantity: idx === 0 ? quantity : null,
+                            unitPrice: idx === 0 ? unitPrice : null,
+                            total: idx === 0 ? total : null
+                        };
+                    });
                 } else {
                     lineItems = [{
                         serviceType: itemType,

@@ -98,30 +98,54 @@ if ($document_result) {
         $item_type = $row['item_type'];
         $item_details = null;
 
-        // Handle JSON-encoded item details (robustly supports array/object/double-encoded JSON)
+        // Handle JSON-encoded item details (supports escaped/double-encoded JSON)
         if (is_string($item_type)) {
             $raw_item_type = trim($item_type);
-            $decoded_items = json_decode($raw_item_type, true);
 
-            // Handle double-encoded JSON strings
-            if (is_string($decoded_items)) {
-                $decoded_items = json_decode($decoded_items, true);
+            $decodeCandidates = [
+                $raw_item_type,
+                stripslashes($raw_item_type),
+                str_replace('\\"', '"', $raw_item_type)
+            ];
+
+            $decoded_items = null;
+            foreach ($decodeCandidates as $candidate) {
+                $tmp = json_decode($candidate, true);
+                if (is_string($tmp)) {
+                    $tmp2 = json_decode($tmp, true);
+                    if (is_array($tmp2)) {
+                        $tmp = $tmp2;
+                    }
+                }
+                if (is_array($tmp)) {
+                    $decoded_items = $tmp;
+                    break;
+                }
             }
 
             if (is_array($decoded_items)) {
-                // If a single object is provided, normalize to array
-                if (isset($decoded_items['itemType'])) {
+                if (isset($decoded_items['itemType']) || isset($decoded_items['item_type'])) {
                     $decoded_items = [$decoded_items];
                 }
 
-                // New format with detailed item objects
-                if (isset($decoded_items[0]) && is_array($decoded_items[0]) && isset($decoded_items[0]['itemType'])) {
-                    $item_details = $decoded_items;
-                    $item_names = array_filter(array_column($decoded_items, 'itemType'));
+                if (isset($decoded_items[0]) && is_array($decoded_items[0])) {
+                    // Normalize keys for frontend consistency
+                    $normalized = [];
+                    foreach ($decoded_items as $entry) {
+                        $normalized[] = [
+                            'itemType' => $entry['itemType'] ?? $entry['item_type'] ?? 'Service',
+                            'description' => $entry['description'] ?? '',
+                            'subText' => $entry['subText'] ?? $entry['sub_text'] ?? '',
+                            'quantity' => isset($entry['quantity']) ? (float)$entry['quantity'] : 0,
+                            'unitPrice' => isset($entry['unitPrice']) ? (float)$entry['unitPrice'] : (isset($entry['unit_price']) ? (float)$entry['unit_price'] : 0),
+                            'total' => isset($entry['total']) ? (float)$entry['total'] : 0
+                        ];
+                    }
+
+                    $item_details = $normalized;
+                    $item_names = array_filter(array_column($normalized, 'itemType'));
                     $item_type = !empty($item_names) ? implode(', ', $item_names) : 'General';
-                }
-                // Old format with just item type strings
-                elseif (isset($decoded_items[0]) && is_string($decoded_items[0])) {
+                } elseif (isset($decoded_items[0]) && is_string($decoded_items[0])) {
                     $item_type = implode(', ', $decoded_items);
                 }
             }

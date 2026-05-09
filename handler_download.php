@@ -166,13 +166,26 @@ function generateDocumentPDF($doc, $settings) {
             </thead>
                 <tbody>
                     <?php
-                        // Build detailed rows from item_details if available, otherwise split item_type by commas
+                        // Build detailed rows from JSON stored in item_type (or item_details if present), otherwise split item_type by commas
                         $rowsHtml = '';
                         $builtFromDetails = false;
 
+                        $rawDetails = '';
                         if (!empty($doc['item_details'])) {
-                            $decoded = json_decode($doc['item_details'], true);
-                            if ($decoded && !is_array($decoded)) {
+                            $rawDetails = $doc['item_details'];
+                        } elseif (!empty($doc['item_type']) && is_string($doc['item_type']) && str_contains(trim($doc['item_type']), '[')) {
+                            $rawDetails = $doc['item_type'];
+                        }
+
+                        if (!empty($rawDetails)) {
+                            $decoded = json_decode($rawDetails, true);
+                            if (is_string($decoded)) {
+                                $decoded = json_decode($decoded, true);
+                            }
+                            if (!is_array($decoded)) {
+                                $decoded = json_decode(stripslashes($rawDetails), true);
+                            }
+                            if (is_array($decoded) && (isset($decoded['itemType']) || isset($decoded['item_type']))) {
                                 $decoded = [$decoded];
                             }
                             if (is_array($decoded) && count($decoded) > 0) {
