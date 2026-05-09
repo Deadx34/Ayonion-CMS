@@ -198,7 +198,10 @@
             .modal-dialog { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
             .modal-content, .modal-body { box-shadow: none !important; border: none !important; padding: 0 !important; }
             .document-preview { box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
+            .document-preview table { width: 100% !important; table-layout: auto !important; }
             .document-preview table thead tr { background-color: #BDDFE8 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
+            .document-preview table tbody tr { page-break-inside: avoid !important; }
+            .document-preview table td { word-wrap: break-word !important; overflow-wrap: break-word !important; word-break: break-word !important; white-space: normal !important; }
         }
     </style>
 </head>
@@ -6679,14 +6682,14 @@
             // Generate table rows for all line items
             const tableRows = lineItems.map(item => `
                 <tr style="border-bottom: 1px solid #e5e7eb;">
-                    <td style="padding: 8px 6px;">
+                    <td style="padding: 8px 6px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">
                         <div style="font-weight: 600;">${item.serviceType}</div>
-                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
-                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px;">${item.description}</div>` : ''}
+                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%;">${item.subText}</div>` : ''}
+                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">${item.description}</div>` : ''}
                     </td>
-                    <td style="padding: 8px 6px; text-align: center;">${item.quantity.toLocaleString()}</td>
-                    <td style="padding: 8px 6px; text-align: right;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td style="padding: 8px 6px; text-align: right; font-weight: bold;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 8px 6px; text-align: center; vertical-align: middle;">${item.quantity.toLocaleString()}</td>
+                    <td style="padding: 8px 6px; text-align: right; vertical-align: middle;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 8px 6px; text-align: right; font-weight: bold; vertical-align: middle;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                 </tr>
             `).join('');
 
@@ -6750,7 +6753,13 @@
                             </div>
                         </div>
                         
-                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px;">
+                        <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; table-layout: auto;">
+                            <colgroup>
+                                <col style="width: 50%;">
+                                <col style="width: 17%;">
+                                <col style="width: 17%;">
+                                <col style="width: 16%;">
+                            </colgroup>
                             <thead>
                                 <tr style="background: #030b0d; border-bottom: 2px solid #ecf0f1; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
                                     <th style="padding: 8px 6px; text-align: left; font-weight: bold; color: white;">Description</th>
