@@ -117,6 +117,9 @@
             -webkit-user-select: text;
             -moz-user-select: text;
             -ms-user-select: text;
+            height: auto !important;
+            max-height: none !important;
+            overflow: visible !important;
         }
         .document-preview * {
             pointer-events: none;
@@ -179,6 +182,22 @@
             .modal-content { height: 100%; border-radius: 0; }
         }
         .logout-btn { position: absolute; bottom: 20px; left: 20px; right: 20px; }
+        
+        /* Modal height handling for large documents */
+        #viewDocumentModal .modal-dialog {
+            max-height: none !important;
+            height: auto !important;
+        }
+        #viewDocumentModal .modal-body {
+            max-height: none !important;
+            height: auto !important;
+            overflow: visible !important;
+            padding: 20px;
+        }
+        #viewDocumentModal .modal-content {
+            max-height: none !important;
+            height: auto !important;
+        }
         
         /* 5-column layout for client detail buttons */
         .col-md-2-4 {
@@ -6938,8 +6957,8 @@
                 return;
             }
 
-            // Create a new window for printing
-            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            // Create a new window for printing - allow height to be dynamic based on content
+            const printWindow = window.open('', '_blank', 'width=1200,height=800');
             
             // Get the document content
             const content = documentPreview.innerHTML;
