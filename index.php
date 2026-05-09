@@ -7548,10 +7548,13 @@
                         width: 100%;
                         border-collapse: collapse;
                         margin-bottom: 30px;
+                        display: table;
+                        table-layout: fixed;
                     }
                     .campaign-table thead {
                         background: #052C47;
                         color: white;
+                        display: table-header-group;
                     }
                     .campaign-table th {
                         padding: 15px 12px;
@@ -7560,11 +7563,23 @@
                         font-size: 13px;
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
+                        display: table-cell;
+                    }
+                    .campaign-table tbody {
+                        display: table-row-group;
+                    }
+                    .campaign-table tbody tr {
+                        display: table-row;
+                        width: 100%;
                     }
                     .campaign-table td {
                         padding: 15px 12px;
                         border-bottom: 1px solid #e0e0e0;
                         font-size: 14px;
+                        display: table-cell;
+                        vertical-align: middle;
+                        word-wrap: break-word;
+                        overflow-wrap: break-word;
                     }
                     .campaign-table tbody tr:hover {
                         background: #f8f9fa;
@@ -7595,7 +7610,30 @@
                         .amount-summary {
                             background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important;
                         }
+                        .campaign-table {
+                            display: table !important;
+                            width: 100% !important;
+                            table-layout: fixed !important;
+                        }
                         .campaign-table thead {
+                            background: #052C47 !important;
+                            display: table-header-group !important;
+                        }
+                        .campaign-table tbody {
+                            display: table-row-group !important;
+                        }
+                        .campaign-table tbody tr {
+                            display: table-row !important;
+                            page-break-inside: avoid !important;
+                            width: 100% !important;
+                        }
+                        .campaign-table td,
+                        .campaign-table th {
+                            display: table-cell !important;
+                            vertical-align: middle !important;
+                            border-bottom: 1px solid #e0e0e0 !important;
+                        }
+                        .campaign-table th {
                             background: #052C47 !important;
                         }
                         .footer-section {
@@ -7666,20 +7704,7 @@
                                     <th style="text-align: right;">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                ${campaigns.map(c => {
-                                    const endDateTime = c.campaignEndDate && c.campaignEndTime 
-                                        ? `${formatDate(c.campaignEndDate)} ${c.campaignEndTime}`
-                                        : 'N/A';
-                                    return `
-                                    <tr>
-                                        <td>${c.adName}</td>
-                                        <td>${getPlatformBadge(c.platform)}</td>
-                                        <td>${endDateTime}</td>
-                                        <td style="text-align: right; font-weight: 600;">Rs. ${parseFloat(c.spend).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                    </tr>`;
-                                }).join('')}
-                            </tbody>
+                            <tbody>${campaigns.map(c => {const endDateTime = c.campaignEndDate && c.campaignEndTime ? `${formatDate(c.campaignEndDate)} ${c.campaignEndTime}` : 'N/A'; return `<tr><td>${c.adName}</td><td>${getPlatformBadge(c.platform)}</td><td>${endDateTime}</td><td style="text-align: right; font-weight: 600;">Rs. ${parseFloat(c.spend).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td></tr>`;}).join('')}</tbody>
                         </table>
                     </div>
                     
