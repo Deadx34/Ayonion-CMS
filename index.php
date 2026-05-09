@@ -6734,14 +6734,30 @@
             if (lineItems.length === 0) {
                 const qty = parseFloat(doc.quantity || 0);
                 const unit = parseFloat(doc.unitPrice || doc.unit_price || 0);
-                lineItems = [{
-                    serviceType: normalizeItemTypeLabel(doc.itemType || doc.item_type || 'Service', doc.itemDetails),
-                    description: doc.description || '',
-                    subText: doc.subText || doc.sub_text || '',
-                    quantity: qty,
-                    unitPrice: unit,
-                    total: total
-                }];
+                const rawLabel = normalizeItemTypeLabel(doc.itemType || doc.item_type || 'Service', doc.itemDetails);
+
+                // If label contains multiple comma-separated services, split into separate rows.
+                const parts = String(rawLabel).split(',').map(s => s.trim()).filter(Boolean);
+                if (parts.length > 1) {
+                    // Show amounts only on the first row, leave subsequent rows amount/quantity blank
+                    lineItems = parts.map((p, idx) => ({
+                        serviceType: p,
+                        description: idx === 0 ? (doc.description || '') : '',
+                        subText: idx === 0 ? (doc.subText || doc.sub_text || '') : '',
+                        quantity: idx === 0 ? qty : null,
+                        unitPrice: idx === 0 ? unit : null,
+                        total: idx === 0 ? total : null
+                    }));
+                } else {
+                    lineItems = [{
+                        serviceType: rawLabel,
+                        description: doc.description || '',
+                        subText: doc.subText || doc.sub_text || '',
+                        quantity: qty,
+                        unitPrice: unit,
+                        total: total
+                    }];
+                }
             }
 
             // Generate table rows for all line items
@@ -6752,9 +6768,9 @@
                         ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; height: auto; overflow: visible;">${item.subText}</div>` : ''}
                         ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap; height: auto; overflow: visible;">${item.description}</div>` : ''}
                     </td>
-                    <td style="padding: 8px 6px; text-align: center; vertical-align: top; height: auto; overflow: visible;">${item.quantity.toLocaleString()}</td>
-                    <td style="padding: 8px 6px; text-align: right; vertical-align: top; height: auto; overflow: visible;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                    <td style="padding: 8px 6px; text-align: right; font-weight: bold; vertical-align: top; height: auto; overflow: visible;">Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td style="padding: 8px 6px; text-align: center; vertical-align: top; height: auto; overflow: visible;">${item.quantity || item.quantity === 0 ? item.quantity.toLocaleString() : ''}</td>
+                    <td style="padding: 8px 6px; text-align: right; vertical-align: top; height: auto; overflow: visible;">${item.unitPrice || item.unitPrice === 0 ? 'Rs. ' + item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
+                    <td style="padding: 8px 6px; text-align: right; font-weight: bold; vertical-align: top; height: auto; overflow: visible;">${item.total || item.total === 0 ? 'Rs. ' + item.total.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
                 </tr>
             `).join('');
 
@@ -7178,23 +7194,40 @@
             const unitPrice = doc.unitPrice || doc.unit_price || 0;
             const total = doc.total || 0;
             const description = doc.description || '';
-            const lineItems = (doc.itemDetails && Array.isArray(doc.itemDetails) && doc.itemDetails.length > 0)
-                ? doc.itemDetails.map(item => ({
+            let lineItems = [];
+            if (doc.itemDetails && Array.isArray(doc.itemDetails) && doc.itemDetails.length > 0) {
+                lineItems = doc.itemDetails.map(item => ({
                     serviceType: item.itemType || 'Service',
                     description: item.description || '',
                     subText: item.subText || '',
                     quantity: parseFloat(item.quantity || 0),
                     unitPrice: parseFloat(item.unitPrice || 0),
                     total: parseFloat(item.total || 0)
-                }))
-                : [{
-                    serviceType: itemType,
-                    description: description,
-                    subText: '',
-                    quantity: quantity,
-                    unitPrice: unitPrice,
-                    total: total
-                }];
+                }));
+            } else {
+                // Fallback: split comma-separated itemType into multiple rows if needed
+                const rawLabel = itemType;
+                const parts = String(rawLabel).split(',').map(s => s.trim()).filter(Boolean);
+                if (parts.length > 1) {
+                    lineItems = parts.map((p, idx) => ({
+                        serviceType: p,
+                        description: idx === 0 ? description : '',
+                        subText: idx === 0 ? '' : '',
+                        quantity: idx === 0 ? quantity : null,
+                        unitPrice: idx === 0 ? unitPrice : null,
+                        total: idx === 0 ? total : null
+                    }));
+                } else {
+                    lineItems = [{
+                        serviceType: itemType,
+                        description: description,
+                        subText: '',
+                        quantity: quantity,
+                        unitPrice: unitPrice,
+                        total: total
+                    }];
+                }
+            }
             
             return `
                 <!DOCTYPE html>
@@ -7255,17 +7288,17 @@
                         </thead>
                         <tbody>
                             ${lineItems.map(item => `
-                            <tr>
-                                <td>
-                                    <div style="font-weight: 600;">${item.serviceType}</div>
-                                    ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
-                                    ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px;">${item.description}</div>` : ''}
-                                </td>
-                                <td>${item.quantity}</td>
-                                <td>Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                                <td>Rs. ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
-                            </tr>
-                            `).join('')}
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600;">${item.serviceType}</div>
+                                        ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
+                                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px;">${item.description}</div>` : ''}
+                                    </td>
+                                    <td>${item.quantity || item.quantity === 0 ? item.quantity : ''}</td>
+                                    <td>${item.unitPrice || item.unitPrice === 0 ? 'Rs. ' + item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
+                                    <td>${item.total || item.total === 0 ? 'Rs. ' + item.total.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
+                                </tr>
+                                `).join('')}
                         </tbody>
                     </table>
                     
