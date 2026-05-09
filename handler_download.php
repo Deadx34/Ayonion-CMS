@@ -206,25 +206,31 @@ function generateDocumentPDF($doc, $settings) {
                             $raw = $itemType;
                             $parts = array_filter(array_map('trim', explode(',', $raw)));
                             if (count($parts) > 1) {
+                                $descSafe = htmlspecialchars($description);
                                 foreach ($parts as $idx => $p) {
                                     $pSafe = htmlspecialchars($p);
+                                    // Assign description only to the part that represents 'Other' service
+                                    $rowDesc = '';
+                                    if (stripos($p, 'other') !== false) {
+                                        $rowDesc = $descSafe;
+                                    } elseif (count($parts) === 1) {
+                                        $rowDesc = $descSafe;
+                                    }
+
+                                    $rowsHtml .= "<tr>\n";
+                                    $rowsHtml .= "<td><div style='font-weight:600;'>{$pSafe}</div>";
+                                    if ($rowDesc !== '') $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . $rowDesc . "</div>";
+                                    $rowsHtml .= "</td>\n";
                                     if ($idx === 0) {
-                                        $rowsHtml .= "<tr>\n";
-                                        $rowsHtml .= "<td><div style='font-weight:600;'>{$pSafe}</div>";
-                                        if ($description) $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . htmlspecialchars($description) . "</div>";
-                                        $rowsHtml .= "</td>\n";
                                         $rowsHtml .= "<td>" . ($quantity !== null ? $quantity : '') . "</td>\n";
                                         $rowsHtml .= "<td>Rs. {$unitPrice}</td>\n";
                                         $rowsHtml .= "<td>Rs. {$total}</td>\n";
-                                        $rowsHtml .= "</tr>\n";
                                     } else {
-                                        $rowsHtml .= "<tr>\n";
-                                        $rowsHtml .= "<td><div style='font-weight:600;'>{$pSafe}</div></td>\n";
                                         $rowsHtml .= "<td></td>\n";
                                         $rowsHtml .= "<td></td>\n";
                                         $rowsHtml .= "<td></td>\n";
-                                        $rowsHtml .= "</tr>\n";
                                     }
+                                    $rowsHtml .= "</tr>\n";
                                 }
                             } else {
                                 $rowsHtml .= "<tr>\n";
