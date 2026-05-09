@@ -6354,6 +6354,43 @@
             return fallback;
         }
 
+        function parseDocumentItemDetails(doc) {
+            const normalizeEntries = (entries) => entries.map(item => ({
+                serviceType: item.itemType || item.item_type || 'Service',
+                description: item.description || '',
+                subText: item.subText || item.sub_text || '',
+                quantity: item.quantity === '' || item.quantity === null || typeof item.quantity === 'undefined' ? null : parseFloat(item.quantity),
+                unitPrice: item.unitPrice === '' || item.unitPrice === null || typeof item.unitPrice === 'undefined' ? null : parseFloat(item.unitPrice || item.unit_price),
+                total: item.total === '' || item.total === null || typeof item.total === 'undefined' ? null : parseFloat(item.total)
+            }));
+
+            if (Array.isArray(doc.itemDetails) && doc.itemDetails.length > 0) {
+                return normalizeEntries(doc.itemDetails);
+            }
+
+            const candidates = [doc.rawItemType, doc.itemType, doc.item_type]
+                .filter(v => typeof v === 'string' && v.trim().length > 0);
+
+            for (const raw of candidates) {
+                const attempts = [raw, raw.replace(/\\"/g, '"')];
+                for (const attempt of attempts) {
+                    let parsed = null;
+                    try { parsed = JSON.parse(attempt); } catch (_) {}
+                    if (typeof parsed === 'string') {
+                        try { parsed = JSON.parse(parsed); } catch (_) {}
+                    }
+                    if (parsed && !Array.isArray(parsed) && typeof parsed === 'object') {
+                        parsed = [parsed];
+                    }
+                    if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
+                        return normalizeEntries(parsed);
+                    }
+                }
+            }
+
+            return [];
+        }
+
         function loadFinancialDocuments(type) {
              // NOTE: This currently only loads from local appData. Full PHP handler required.
             const docs = appData.documents[type + 's'];
@@ -6673,62 +6710,7 @@
             const total = parseFloat(doc.total || 0);
             
             // Check if we have detailed item information (new format)
-            let lineItems = [];
-            
-            // Try to parse itemDetails if it's a string (might be JSON encoded)
-            let parsedItemDetails = doc.itemDetails;
-            
-            // Handle string encoding
-            if (typeof parsedItemDetails === 'string') {
-                try {
-                    parsedItemDetails = JSON.parse(parsedItemDetails);
-                } catch (e) {
-                    console.warn('Could not parse itemDetails string:', parsedItemDetails);
-                    parsedItemDetails = null;
-                }
-            }
-            
-            // Handle case where it might be double-encoded
-            if (typeof parsedItemDetails === 'string') {
-                try {
-                    parsedItemDetails = JSON.parse(parsedItemDetails);
-                } catch (e) {
-                    console.warn('Could not parse double-encoded itemDetails:', parsedItemDetails);
-                    parsedItemDetails = null;
-                }
-            }
-            
-            // Ensure parsedItemDetails is an array
-            if (parsedItemDetails && !Array.isArray(parsedItemDetails)) {
-                parsedItemDetails = [parsedItemDetails];
-            }
-            
-            // Add debugging
-            if (parsedItemDetails && Array.isArray(parsedItemDetails)) {
-                console.log('Parsed itemDetails:', parsedItemDetails);
-            }
-            
-            if (parsedItemDetails && Array.isArray(parsedItemDetails) && parsedItemDetails.length > 0) {
-                // New format with detailed item information - create one row per item
-                lineItems = parsedItemDetails.map(item => {
-                    // Handle case where item might be a string or other format
-                    if (typeof item === 'string') {
-                        try {
-                            item = JSON.parse(item);
-                        } catch (e) {
-                            item = { itemType: item };
-                        }
-                    }
-                    return {
-                        serviceType: item.itemType || item.item_type || 'Service',
-                        description: item.description || '',
-                        subText: item.subText || item.sub_text || '',
-                        quantity: parseFloat(item.quantity || 0),
-                        unitPrice: parseFloat(item.unitPrice || item.unit_price || 0),
-                        total: parseFloat(item.total || 0)
-                    };
-                });
-            }
+            let lineItems = parseDocumentItemDetails(doc);
             
             // Fallback to old format if no valid line items
             if (lineItems.length === 0) {
@@ -7194,17 +7176,8 @@
             const unitPrice = doc.unitPrice || doc.unit_price || 0;
             const total = doc.total || 0;
             const description = doc.description || '';
-            let lineItems = [];
-            if (doc.itemDetails && Array.isArray(doc.itemDetails) && doc.itemDetails.length > 0) {
-                lineItems = doc.itemDetails.map(item => ({
-                    serviceType: item.itemType || 'Service',
-                    description: item.description || '',
-                    subText: item.subText || '',
-                    quantity: parseFloat(item.quantity || 0),
-                    unitPrice: parseFloat(item.unitPrice || 0),
-                    total: parseFloat(item.total || 0)
-                }));
-            } else {
+            let lineItems = parseDocumentItemDetails(doc);
+            if (!lineItems.length) {
                 // Fallback: split comma-separated itemType into multiple rows if needed
                 const rawLabel = itemType;
                 const parts = String(rawLabel).split(',').map(s => s.trim()).filter(Boolean);

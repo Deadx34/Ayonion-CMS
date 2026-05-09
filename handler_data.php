@@ -158,6 +158,7 @@ if ($document_result) {
             'clientName' => $row['client_name'] ?: 'Unknown Client',
             'docType' => $row['doc_type'],
             'itemType' => $item_type ?: 'General',
+            'rawItemType' => $row['item_type'] ?? '',
             'itemDetails' => $item_details, // Include detailed item information
             'description' => $row['description'] ?: '',
             'quantity' => (int)$row['quantity'],
