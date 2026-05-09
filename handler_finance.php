@@ -176,11 +176,30 @@ try {
     $avgQuantity = array_sum(array_column($itemDetails, 'quantity')) / count($itemDetails);
     $avgUnitPrice = array_sum(array_column($itemDetails, 'unitPrice')) / count($itemDetails);
     
-    // Store short labels in `item_type` (for backwards compatibility) and full JSON in `item_details`
-    $sql_insert_doc = "INSERT INTO documents 
+    // Escape JSON payloads for SQL
+    $itemDetailsJsonEsc = $conn->real_escape_string($itemDetailsJson);
+    $itemTypesJsonEsc = $conn->real_escape_string($itemTypesJson);
+
+    // Detect whether the documents table has an item_details column
+    $hasItemDetails = false;
+    $colCheck = $conn->query("SHOW COLUMNS FROM documents LIKE 'item_details'");
+    if ($colCheck && $colCheck->num_rows > 0) {
+        $hasItemDetails = true;
+    }
+
+    if ($hasItemDetails) {
+        // Store short labels in `item_type` and full JSON in `item_details`
+        $sql_insert_doc = "INSERT INTO documents 
         (id, document_number, client_id, client_name, doc_type, item_type, item_details, description, quantity, unit_price, total, date) 
         VALUES 
-        ('$id', '$documentNumberEscaped', $clientId, '$clientName', '$docType', '$itemTypesJson', '$itemDetailsJson', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
+        ('$id', '$documentNumberEscaped', $clientId, '$clientName', '$docType', '$itemTypesJsonEsc', '$itemDetailsJsonEsc', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
+    } else {
+        // Legacy fallback: write JSON into item_type to avoid breaking older DB schemas
+        $sql_insert_doc = "INSERT INTO documents 
+        (id, document_number, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+        VALUES 
+        ('$id', '$documentNumberEscaped', $clientId, '$clientName', '$docType', '$itemDetailsJsonEsc', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
+    }
 
     if (!query_db($conn, $sql_insert_doc)) {
         throw new Exception("Failed to save document to the database.");
