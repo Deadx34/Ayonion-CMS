@@ -98,6 +98,90 @@ function generateDocumentPDF($doc, $settings) {
     $quantity = $doc['quantity'];
     $unitPrice = number_format($doc['unit_price'], 2);
     $total = number_format($doc['total'], 2);
+
+    // Build detailed rows from JSON stored in item_type (or item_details if present), otherwise split item_type by commas
+    $rowsHtml = '';
+    $builtFromDetails = false;
+
+    $rawDetails = '';
+    if (!empty($doc['item_details'])) {
+        $rawDetails = $doc['item_details'];
+    } elseif (!empty($doc['item_type']) && is_string($doc['item_type']) && strpos(trim($doc['item_type']), '[') !== false) {
+        $rawDetails = $doc['item_type'];
+    }
+
+    if (!empty($rawDetails)) {
+        $decoded = json_decode($rawDetails, true);
+        if (is_string($decoded)) {
+            $decoded = json_decode($decoded, true);
+        }
+        if (!is_array($decoded)) {
+            $decoded = json_decode(stripslashes($rawDetails), true);
+        }
+        if (is_array($decoded) && (isset($decoded['itemType']) || isset($decoded['item_type']))) {
+            $decoded = [$decoded];
+        }
+        if (is_array($decoded) && count($decoded) > 0) {
+            $builtFromDetails = true;
+            foreach ($decoded as $it) {
+                if (is_string($it)) {
+                    $try = json_decode($it, true);
+                    if ($try) $it = $try; else $it = ['itemType' => $it];
+                }
+                $service = htmlspecialchars($it['itemType'] ?? $it['item_type'] ?? 'Service');
+                $desc = htmlspecialchars($it['description'] ?? '');
+                $sub = htmlspecialchars($it['subText'] ?? $it['sub_text'] ?? '');
+                $qty = isset($it['quantity']) && $it['quantity'] !== null ? $it['quantity'] : '';
+                $uprice = isset($it['unitPrice']) && $it['unitPrice'] !== null ? number_format($it['unitPrice'], 2) : '';
+                $t = isset($it['total']) && $it['total'] !== null ? number_format($it['total'], 2) : '';
+
+                $rowsHtml .= "<tr>\n";
+                $rowsHtml .= "<td><div style='font-weight:600;'>{$service}</div>";
+                if ($sub !== '') $rowsHtml .= "<div style='font-size:11px;color:#666;margin-top:4px;white-space:pre-wrap;'>" . nl2br($sub) . "</div>";
+                if ($desc !== '' && $desc !== $service) $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . nl2br($desc) . "</div>";
+                $rowsHtml .= "</td>\n";
+                $rowsHtml .= "<td>" . ($qty !== '' ? $qty : '') . "</td>\n";
+                $rowsHtml .= "<td>" . ($uprice !== '' ? 'Rs. ' . $uprice : '') . "</td>\n";
+                $rowsHtml .= "<td>" . ($t !== '' ? 'Rs. ' . $t : '') . "</td>\n";
+                $rowsHtml .= "</tr>\n";
+            }
+        }
+    }
+
+    if (!$builtFromDetails) {
+        $raw = $itemType;
+        $parts = array_filter(array_map('trim', explode(',', $raw)));
+        if (count($parts) > 1) {
+            $descSafe = htmlspecialchars($description);
+            foreach ($parts as $idx => $p) {
+                $pSafe = htmlspecialchars($p);
+                $rowDesc = (stripos($p, 'other') !== false) ? $descSafe : '';
+
+                $rowsHtml .= "<tr>\n";
+                $rowsHtml .= "<td><div style='font-weight:600;'>{$pSafe}</div>";
+                if ($rowDesc !== '') $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . $rowDesc . "</div>";
+                $rowsHtml .= "</td>\n";
+                if ($idx === 0) {
+                    $rowsHtml .= "<td>" . ($quantity !== null ? $quantity : '') . "</td>\n";
+                    $rowsHtml .= "<td>Rs. {$unitPrice}</td>\n";
+                    $rowsHtml .= "<td>Rs. {$total}</td>\n";
+                } else {
+                    $rowsHtml .= "<td></td>\n";
+                    $rowsHtml .= "<td></td>\n";
+                    $rowsHtml .= "<td></td>\n";
+                }
+                $rowsHtml .= "</tr>\n";
+            }
+        } else {
+            $rowsHtml .= "<tr>\n";
+            $rowsHtml .= "<td>" . htmlspecialchars($itemType) . "</td>\n";
+            $rowsHtml .= "<td>" . htmlspecialchars($description) . "</td>\n";
+            $rowsHtml .= "<td>" . ($quantity !== null ? $quantity : '') . "</td>\n";
+            $rowsHtml .= "<td>Rs. {$unitPrice}</td>\n";
+            $rowsHtml .= "<td>Rs. {$total}</td>\n";
+            $rowsHtml .= "</tr>\n";
+        }
+    }
     
     $html = "
     <!DOCTYPE html>
@@ -164,105 +248,13 @@ function generateDocumentPDF($doc, $settings) {
                     <th>Total</th>
                 </tr>
             </thead>
-                <tbody>
-                    <?php
-                        // Build detailed rows from JSON stored in item_type (or item_details if present), otherwise split item_type by commas
-                        $rowsHtml = '';
-                        $builtFromDetails = false;
-
-                        $rawDetails = '';
-                        if (!empty($doc['item_details'])) {
-                            $rawDetails = $doc['item_details'];
-                        } elseif (!empty($doc['item_type']) && is_string($doc['item_type']) && str_contains(trim($doc['item_type']), '[')) {
-                            $rawDetails = $doc['item_type'];
-                        }
-
-                        if (!empty($rawDetails)) {
-                            $decoded = json_decode($rawDetails, true);
-                            if (is_string($decoded)) {
-                                $decoded = json_decode($decoded, true);
-                            }
-                            if (!is_array($decoded)) {
-                                $decoded = json_decode(stripslashes($rawDetails), true);
-                            }
-                            if (is_array($decoded) && (isset($decoded['itemType']) || isset($decoded['item_type']))) {
-                                $decoded = [$decoded];
-                            }
-                            if (is_array($decoded) && count($decoded) > 0) {
-                                $builtFromDetails = true;
-                                foreach ($decoded as $it) {
-                                    if (is_string($it)) {
-                                        $try = json_decode($it, true);
-                                        if ($try) $it = $try; else $it = ['itemType' => $it];
-                                    }
-                                    $service = htmlspecialchars($it['itemType'] ?? $it['item_type'] ?? 'Service');
-                                    $desc = htmlspecialchars($it['description'] ?? '');
-                                    $sub = htmlspecialchars($it['subText'] ?? $it['sub_text'] ?? '');
-                                    $qty = isset($it['quantity']) && $it['quantity'] !== null ? $it['quantity'] : '';
-                                    $uprice = isset($it['unitPrice']) && $it['unitPrice'] !== null ? number_format($it['unitPrice'], 2) : '';
-                                    $t = isset($it['total']) && $it['total'] !== null ? number_format($it['total'], 2) : '';
-
-                                    $rowsHtml .= "<tr>\n";
-                                    $rowsHtml .= "<td><div style='font-weight:600;'>{$service}</div>";
-                                    if ($sub !== '') $rowsHtml .= "<div style='font-size:11px;color:#666;margin-top:4px;white-space:pre-wrap;'>" . nl2br($sub) . "</div>";
-                                    if ($desc !== '' && $desc !== $service) $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . nl2br($desc) . "</div>";
-                                    $rowsHtml .= "</td>\n";
-                                    $rowsHtml .= "<td>" . ($qty !== '' ? $qty : '') . "</td>\n";
-                                    $rowsHtml .= "<td>" . ($uprice !== '' ? 'Rs. ' . $uprice : '') . "</td>\n";
-                                    $rowsHtml .= "<td>" . ($t !== '' ? 'Rs. ' . $t : '') . "</td>\n";
-                                    $rowsHtml .= "</tr>\n";
-                                }
-                            }
-                        }
-
-                        if (!$builtFromDetails) {
-                            $raw = $itemType;
-                            $parts = array_filter(array_map('trim', explode(',', $raw)));
-                            if (count($parts) > 1) {
-                                $descSafe = htmlspecialchars($description);
-                                foreach ($parts as $idx => $p) {
-                                    $pSafe = htmlspecialchars($p);
-                                    // Assign description only to the part that represents 'Other' service
-                                    $rowDesc = '';
-                                    if (stripos($p, 'other') !== false) {
-                                        $rowDesc = $descSafe;
-                                    } elseif (count($parts) === 1) {
-                                        $rowDesc = $descSafe;
-                                    }
-
-                                    $rowsHtml .= "<tr>\n";
-                                    $rowsHtml .= "<td><div style='font-weight:600;'>{$pSafe}</div>";
-                                    if ($rowDesc !== '') $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . $rowDesc . "</div>";
-                                    $rowsHtml .= "</td>\n";
-                                    if ($idx === 0) {
-                                        $rowsHtml .= "<td>" . ($quantity !== null ? $quantity : '') . "</td>\n";
-                                        $rowsHtml .= "<td>Rs. {$unitPrice}</td>\n";
-                                        $rowsHtml .= "<td>Rs. {$total}</td>\n";
-                                    } else {
-                                        $rowsHtml .= "<td></td>\n";
-                                        $rowsHtml .= "<td></td>\n";
-                                        $rowsHtml .= "<td></td>\n";
-                                    }
-                                    $rowsHtml .= "</tr>\n";
-                                }
-                            } else {
-                                $rowsHtml .= "<tr>\n";
-                                $rowsHtml .= "<td>" . htmlspecialchars($itemType) . "</td>\n";
-                                $rowsHtml .= "<td>" . htmlspecialchars($description) . "</td>\n";
-                                $rowsHtml .= "<td>" . ($quantity !== null ? $quantity : '') . "</td>\n";
-                                $rowsHtml .= "<td>Rs. {$unitPrice}</td>\n";
-                                $rowsHtml .= "<td>Rs. {$total}</td>\n";
-                                $rowsHtml .= "</tr>\n";
-                            }
-                        }
-
-                        echo $rowsHtml;
-                    ?>
-                    <tr class='total-row'>
-                        <td colspan='4' style='text-align: right;'>Total Amount:</td>
-                        <td>Rs. <?php echo htmlspecialchars($total); ?></td>
-                    </tr>
-                </tbody>
+            <tbody>
+                {$rowsHtml}
+                <tr class='total-row'>
+                    <td colspan='4' style='text-align: right;'>Total Amount:</td>
+                    <td>Rs. {$total}</td>
+                </tr>
+            </tbody>
         </table>
         
         <div class='footer'>
