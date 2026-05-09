@@ -39,9 +39,28 @@ if ($action === 'delete') {
         
         $doc = $doc_result->fetch_assoc();
         $clientId = (int)$doc['client_id'];
-        $itemType = $doc['item_type'];
         $quantity = (int)$doc['quantity'];
         $total = (float)$doc['total'];
+
+        // Support legacy string in item_type and new JSON in item_details
+        $itemType = $doc['item_type'] ?? '';
+        if (!empty($doc['item_details'])) {
+            $parsed = json_decode($doc['item_details'], true);
+            if (is_string($parsed)) $parsed = json_decode($parsed, true);
+            if (!is_array($parsed)) $parsed = json_decode(stripslashes($doc['item_details']), true);
+            // If item_details is an array, summarize for rollback logic
+            if (is_array($parsed)) {
+                $adBudgetTotal = 0;
+                $creditsTotal = 0;
+                foreach ($parsed as $it) {
+                    $itType = $it['itemType'] ?? $it['item_type'] ?? '';
+                    $itTotal = isset($it['total']) ? (float)$it['total'] : 0;
+                    $itQty = isset($it['quantity']) ? (int)$it['quantity'] : 0;
+                    if ($itType === 'Ad Budget') $adBudgetTotal += $itTotal;
+                    if ($itType === 'Extra Content Credits') $creditsTotal += $itQty;
+                }
+            }
+        }
 
         // Delete the document
         $delete_sql = "DELETE FROM documents WHERE id = '$docId'";
@@ -51,10 +70,23 @@ if ($action === 'delete') {
 
         // If it was a receipt, revert the client profile updates
         if ($docType === 'receipt') {
-            if ($itemType === 'Ad Budget') {
+            // Prefer aggregated totals from parsed item_details when available
+            if (isset($adBudgetTotal) && $adBudgetTotal > 0) {
+                $revert_sql = "UPDATE clients SET total_ad_budget = total_ad_budget - $adBudgetTotal WHERE id = $clientId";
+                if (!query_db($conn, $revert_sql)) {
+                    throw new Exception("Failed to revert client ad budget.");
+                }
+            } elseif ($itemType === 'Ad Budget') {
                 $revert_sql = "UPDATE clients SET total_ad_budget = total_ad_budget - $total WHERE id = $clientId";
                 if (!query_db($conn, $revert_sql)) {
                     throw new Exception("Failed to revert client ad budget.");
+                }
+            }
+
+            if (isset($creditsTotal) && $creditsTotal > 0) {
+                $revert_sql = "UPDATE clients SET extra_credits = extra_credits - $creditsTotal WHERE id = $clientId";
+                if (!query_db($conn, $revert_sql)) {
+                    throw new Exception("Failed to revert client credits.");
                 }
             } elseif ($itemType === 'Extra Content Credits') {
                 $revert_sql = "UPDATE clients SET extra_credits = extra_credits - $quantity WHERE id = $clientId";
@@ -144,10 +176,11 @@ try {
     $avgQuantity = array_sum(array_column($itemDetails, 'quantity')) / count($itemDetails);
     $avgUnitPrice = array_sum(array_column($itemDetails, 'unitPrice')) / count($itemDetails);
     
+    // Store short labels in `item_type` (for backwards compatibility) and full JSON in `item_details`
     $sql_insert_doc = "INSERT INTO documents 
-        (id, document_number, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+        (id, document_number, client_id, client_name, doc_type, item_type, item_details, description, quantity, unit_price, total, date) 
         VALUES 
-        ('$id', '$documentNumberEscaped', $clientId, '$clientName', '$docType', '$itemDetailsJson', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
+        ('$id', '$documentNumberEscaped', $clientId, '$clientName', '$docType', '$itemTypesJson', '$itemDetailsJson', '$description', $avgQuantity, $avgUnitPrice, $total, '$date')";
 
     if (!query_db($conn, $sql_insert_doc)) {
         throw new Exception("Failed to save document to the database.");
