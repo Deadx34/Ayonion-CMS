@@ -6747,8 +6747,8 @@
                 <tr style="border-bottom: 1px solid #e5e7eb; height: auto; overflow: visible;">
                     <td style="padding: 8px 6px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; vertical-align: top; height: auto; overflow: visible;">
                         <div style="font-weight: 600;">${item.serviceType}</div>
-                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; height: auto; overflow: visible;">${item.subText}</div>` : ''}
                         ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; white-space: pre-wrap; height: auto; overflow: visible;">${item.description}</div>` : ''}
+                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; height: auto; overflow: visible;">${item.subText}</div>` : ''}
                     </td>
                     <td style="padding: 8px 6px; text-align: center; vertical-align: top; height: auto; overflow: visible;">${item.quantity || item.quantity === 0 ? item.quantity.toLocaleString() : ''}</td>
                     <td style="padding: 8px 6px; text-align: right; vertical-align: top; height: auto; overflow: visible;">${item.unitPrice || item.unitPrice === 0 ? 'Rs. ' + item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
@@ -7267,8 +7267,8 @@
                                 <tr>
                                     <td>
                                         <div style="font-weight: 600;">${item.serviceType}</div>
-                                        ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
                                         ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px;">${item.description}</div>` : ''}
+                                        ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
                                     </td>
                                     <td>${item.quantity || item.quantity === 0 ? item.quantity : ''}</td>
                                     <td>${item.unitPrice || item.unitPrice === 0 ? 'Rs. ' + item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>

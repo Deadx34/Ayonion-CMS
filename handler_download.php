@@ -137,8 +137,8 @@ function generateDocumentPDF($doc, $settings) {
 
                 $rowsHtml .= "<tr>\n";
                 $rowsHtml .= "<td><div style='font-weight:600;'>{$service}</div>";
-                if ($sub !== '') $rowsHtml .= "<div style='font-size:11px;color:#666;margin-top:4px;white-space:pre-wrap;'>" . nl2br($sub) . "</div>";
                 if ($desc !== '' && $desc !== $service) $rowsHtml .= "<div style='font-size:11px;color:#555;margin-top:4px;white-space:pre-wrap;'>" . nl2br($desc) . "</div>";
+                if ($sub !== '') $rowsHtml .= "<div style='font-size:11px;color:#666;margin-top:4px;white-space:pre-wrap;'>" . nl2br($sub) . "</div>";
                 $rowsHtml .= "</td>\n";
                 $rowsHtml .= "<td>" . ($qty !== '' ? $qty : '') . "</td>\n";
                 $rowsHtml .= "<td>" . ($uprice !== '' ? 'Rs. ' . $uprice : '') . "</td>\n";
