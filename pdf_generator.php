@@ -24,7 +24,10 @@ class SimplePDF {
         $this->content .= "ET\n";
     }
     
-    public function addLine($x1, $y1, $x2, $y2) {
+    // draw a stroked line; $width is stroke width in points (default 0.5 for thinner lines)
+    public function addLine($x1, $y1, $x2, $y2, $width = 0.5) {
+        // set stroke width
+        $this->content .= "$width w\n";
         $this->content .= "$x1 $y1 m\n";
         $this->content .= "$x2 $y2 l\n";
         $this->content .= "S\n";
