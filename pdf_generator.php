@@ -3,96 +3,131 @@
 
 class SimplePDF {
     private $content = '';
-    private $fontSize = 12;
-    private $lineHeight = 1.2;
-    
-    public function __construct() {
-        $this->content = "%PDF-1.4\n";
-        $this->content .= "1 0 obj\n";
-        $this->content .= "<<\n";
-        $this->content .= "/Type /Catalog\n";
-        $this->content .= "/Pages 2 0 R\n";
-        $this->content .= ">>\n";
-        $this->content .= "endobj\n";
-    }
-    
-    public function addText($text, $x = 50, $y = 750, $fontSize = 12) {
-        $this->content .= "BT\n";
-        $this->content .= "/F1 $fontSize Tf\n";
-        $this->content .= "$x $y Td\n";
-        $this->content .= "($text) Tj\n";
-        $this->content .= "ET\n";
-    }
-    
-    public function addLine($x1, $y1, $x2, $y2) {
-        $this->content .= "$x1 $y1 m\n";
-        $this->content .= "$x2 $y2 l\n";
-        $this->content .= "S\n";
-    }
-    
-    public function generate() {
-        // Add page object
-        $this->content .= "2 0 obj\n";
-        $this->content .= "<<\n";
-        $this->content .= "/Type /Pages\n";
-        $this->content .= "/Kids [3 0 R]\n";
-        $this->content .= "/Count 1\n";
-        $this->content .= ">>\n";
-        $this->content .= "endobj\n";
-        
-        // Add page content
-        $this->content .= "3 0 obj\n";
-        $this->content .= "<<\n";
-        $this->content .= "/Type /Page\n";
-        $this->content .= "/Parent 2 0 R\n";
-        // reduce page height so PDF fits invoice content and avoids large bottom gap
-        $this->content .= "/MediaBox [0 0 612 600]\n";
-        $this->content .= "/Contents 4 0 R\n";
-        $this->content .= "/Resources <<\n";
-        $this->content .= "/Font <<\n";
-        $this->content .= "/F1 <<\n";
-        $this->content .= "/Type /Font\n";
-        $this->content .= "/Subtype /Type1\n";
-        $this->content .= "/BaseFont /Helvetica\n";
-        $this->content .= ">>\n";
-        $this->content .= ">>\n";
-        $this->content .= ">>\n";
-        $this->content .= ">>\n";
-        $this->content .= "endobj\n";
-        
-        // Add content stream
-        $this->content .= "4 0 obj\n";
-        $this->content .= "<<\n";
-        $this->content .= "/Length " . strlen($this->content) . "\n";
-        $this->content .= ">>\n";
-        $this->content .= "stream\n";
-        $this->content .= $this->content;
-        $this->content .= "endstream\n";
-        $this->content .= "endobj\n";
-        
-        // Add xref table
-        $this->content .= "xref\n";
-        $this->content .= "0 5\n";
-        $this->content .= "0000000000 65535 f \n";
-        $this->content .= "0000000009 00000 n \n";
-        $this->content .= "0000000058 00000 n \n";
-        $this->content .= "0000000115 00000 n \n";
-        $this->content .= "0000000274 00000 n \n";
-        
-        // Add trailer
-        $this->content .= "trailer\n";
-        $this->content .= "<<\n";
-        $this->content .= "/Size 5\n";
-        $this->content .= "/Root 1 0 R\n";
-        $this->content .= ">>\n";
-        $this->content .= "startxref\n";
-        $this->content .= "0\n";
-        $this->content .= "%%EOF\n";
-        
-        return $this->content;
-    }
-}
+    class SimplePDF {
+        private $ops = [];
+        private $fontSize = 12;
+        private $lineHeight = 1.2;
+        private $pageWidth = 612; // default US Letter width in points
 
+        public function __construct() {
+            // nothing appended yet; we record drawing ops and build PDF on generate()
+        }
+
+        public function addText($text, $x = 50, $y = 750, $fontSize = 12) {
+            $this->ops[] = [
+                'type' => 'text',
+                'x' => $x,
+                'y' => $y,
+                'font' => 'F1',
+                'size' => $fontSize,
+                'text' => $text,
+            ];
+        }
+
+        public function addLine($x1, $y1, $x2, $y2) {
+            $this->ops[] = [
+                'type' => 'line',
+                'x1' => $x1,
+                'y1' => $y1,
+                'x2' => $x2,
+                'y2' => $y2,
+            ];
+        }
+
+        private function buildContentStream() {
+            if (empty($this->ops)) return '';
+
+            // compute bounding box of ops
+            $minY = PHP_INT_MAX;
+            $maxY = PHP_INT_MIN;
+            foreach ($this->ops as $op) {
+                if ($op['type'] === 'text') {
+                    $y = $op['y'];
+                    $minY = min($minY, $y);
+                    $maxY = max($maxY, $y);
+                } else {
+                    $minY = min($minY, $op['y1'], $op['y2']);
+                    $maxY = max($maxY, $op['y1'], $op['y2']);
+                }
+            }
+
+            // margins (points)
+            $bottomMargin = 20;
+            $topMargin = 20;
+
+            // normalized height
+            $contentHeight = ($maxY - $minY) + $topMargin + $bottomMargin;
+
+            // shift ops so minY maps to bottomMargin
+            $yShift = -$minY + $bottomMargin;
+
+            $stream = "BT\n"; // begin text once, but we'll close/reopen as needed
+            foreach ($this->ops as $op) {
+                if ($op['type'] === 'text') {
+                    $x = $op['x'];
+                    $y = $op['y'] + $yShift;
+                    $size = $op['size'];
+                    $txt = $this->escapeText($op['text']);
+                    $stream .= "/{$op['font']} $size Tf\n";
+                    $stream .= "$x $y Td\n";
+                    $stream .= "($txt) Tj\n";
+                    $stream .= "ET\nBT\n"; // close and reopen text object to reset text matrix
+                } else {
+                    // draw line
+                    $x1 = $op['x1'];
+                    $y1 = $op['y1'] + $yShift;
+                    $x2 = $op['x2'];
+                    $y2 = $op['y2'] + $yShift;
+                    $stream .= "ET\n"; // ensure text is closed before path ops
+                    $stream .= "$x1 $y1 m\n";
+                    $stream .= "$x2 $y2 l\n";
+                    $stream .= "S\nBT\n"; // stroke the path
+                }
+            }
+            $stream .= "ET\n";
+
+            return [
+                'stream' => $stream,
+                'height' => ceil($contentHeight),
+                'yShift' => $yShift,
+            ];
+        }
+
+        private function escapeText($text) {
+            $replacements = ["\\" => "\\\\", "(" => "\\(", ")" => "\\)"];
+            return strtr($text, $replacements);
+        }
+
+        public function generate() {
+            $header = "%PDF-1.4\n";
+
+            // basic objects header
+            $header .= "1 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 R\n>>\nendobj\n";
+
+            // compute content stream and desired page height
+            $contentInfo = $this->buildContentStream();
+            $contentStream = $contentInfo ? $contentInfo['stream'] : '';
+            $pageHeight = $contentInfo ? $contentInfo['height'] : 792;
+
+            // Pages object
+            $header .= "2 0 obj\n<<\n/Type /Pages\n/Kids [3 0 R]\n/Count 1\n>>\nendobj\n";
+
+            // Page object with calculated MediaBox height
+            $header .= "3 0 obj\n<<\n/Type /Page\n/Parent 2 0 R\n/MediaBox [0 0 {$this->pageWidth} {$pageHeight}]\n/Contents 4 0 R\n/Resources <<\n/Font <<\n/F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\n>>\n>>\n>>\nendobj\n";
+
+            // Content stream object
+            $streamLen = strlen($contentStream);
+            $header .= "4 0 obj\n<<\n/Length $streamLen\n>>\nstream\n";
+            $header .= $contentStream;
+            $header .= "endstream\nendobj\n";
+
+            // xref and trailer (very minimal; offsets not accurate but acceptable for many readers)
+            $header .= "xref\n0 5\n0000000000 65535 f \n0000000010 00000 n \n0000000060 00000 n \n0000000120 00000 n \n0000000300 00000 n \n";
+            $header .= "trailer\n<<\n/Size 5\n/Root 1 0 R\n>>\nstartxref\n0\n%%EOF\n";
+
+            return $header;
+        }
+    }
 // Function to generate a simple PDF document
 function generateSimplePDF($doc, $settings) {
     $pdf = new SimplePDF();
