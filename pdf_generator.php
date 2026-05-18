@@ -45,7 +45,8 @@ class SimplePDF {
         $this->content .= "<<\n";
         $this->content .= "/Type /Page\n";
         $this->content .= "/Parent 2 0 R\n";
-        $this->content .= "/MediaBox [0 0 612 792]\n";
+        // reduce page height so PDF fits invoice content and avoids large bottom gap
+        $this->content .= "/MediaBox [0 0 612 600]\n";
         $this->content .= "/Contents 4 0 R\n";
         $this->content .= "/Resources <<\n";
         $this->content .= "/Font <<\n";
