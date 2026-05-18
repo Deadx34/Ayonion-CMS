@@ -50,8 +50,10 @@ class SimplePDF {
         $this->content .= "<<\n";
         $this->content .= "/Type /Page\n";
         $this->content .= "/Parent 2 0 R\n";
-        // crop bottom 120 points to remove large blank space while keeping layout
-        $this->content .= "/MediaBox [0 120 612 792]\n";
+        // keep full MediaBox (preserve coordinates) but set a CropBox
+        // to visually trim the bottom 120 points without changing layout
+        $this->content .= "/MediaBox [0 0 612 792]\n";
+        $this->content .= "/CropBox [0 120 612 792]\n";
         $this->content .= "/Contents 4 0 R\n";
         $this->content .= "/Resources <<\n";
         $this->content .= "/Font <<\n";
