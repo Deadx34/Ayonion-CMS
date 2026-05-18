@@ -190,12 +190,14 @@ function generateDocumentPDF($doc, $settings) {
         <meta charset='UTF-8'>
         <title>{$title} - {$docNumber}</title>
         <style>
+            html, body { height: 100%; }
+            .document-page { min-height: 100vh; display: flex; flex-direction: column; }
             body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
             .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid {$color}; padding-bottom: 20px; }
             .company-info { margin-bottom: 20px; }
             .document-title { font-size: 28px; font-weight: bold; color: {$color}; margin: 10px 0; }
             .document-number { font-size: 18px; color: #666; }
-            .content { display: flex; justify-content: space-between; margin: 30px 0; }
+            .content { display: flex; justify-content: space-between; margin: 30px 0; flex: 1 1 auto; }
             .client-info, .company-details { width: 45%; }
             .section-title { font-size: 16px; font-weight: bold; color: {$color}; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
             .info-row { margin: 5px 0; }
@@ -204,11 +206,12 @@ function generateDocumentPDF($doc, $settings) {
             .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
             .table th { background-color: #f8f9fa; font-weight: bold; }
             .total-row { background-color: #f8f9fa; font-weight: bold; }
-            .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 14px; }
+            .footer { margin-top: auto; padding-top: 20px; border-top: 2px solid #eee; text-align: center; color: #666; font-size: 14px; }
             @media print { body { margin: 0; } }
         </style>
     </head>
     <body>
+        <div class='document-page'>
         <div class='header'>
             <div class='company-info'>
                 <h1 style='margin: 0; color: {$color};'>{$companyName}</h1>
@@ -260,6 +263,7 @@ function generateDocumentPDF($doc, $settings) {
         <div class='footer'>
             <p>Thank you for your business!</p>
             <p>Generated on " . date('F j, Y \a\t g:i A') . "</p>
+        </div>
         </div>
     </body>
     </html>";

@@ -39,12 +39,22 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
         <title>Content Credit Report - {$client['companyName']}</title>
         <style>
             @page { margin: 0.75in; }
+            html, body { height: 100%; }
             body { 
                 font-family: 'Lato', 'Arial', sans-serif; 
                 margin: 0; 
                 padding: 0; 
                 color: #333; 
                 line-height: 1.4;
+            }
+            .report-page {
+                font-family: Arial, sans-serif;
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
             }
             .header { 
                 display: flex; 
@@ -138,7 +148,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 print-color-adjust: exact;
             }
             .footer { 
-                margin-top: 40px; 
+                margin-top: auto; 
                 padding-top: 20px; 
                 border-top: 2px solid #eee; 
                 text-align: center; 
@@ -178,6 +188,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
                 .report-content {
                     page-break-before: avoid !important;
                     break-before: avoid !important;
+                    flex: 1 1 auto !important;
                 }
                 /* Prevent table headers from repeating on every page */
                 .content-table thead {
@@ -194,7 +205,7 @@ function generateContentReportPDF($client, $contents, $companyInfo, $isSelectedR
         </style>
     </head>
     <body>
-        <div style='font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; background: white;'>
+        <div class='report-page'>
             <!-- Company Header -->
             <div class='report-header' style='background: #0d0e10; padding: 20px 40px;'>
                 <table style='width: 100%; border-collapse: collapse;'>
