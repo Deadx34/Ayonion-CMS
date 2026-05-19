@@ -6757,9 +6757,9 @@
             `).join('');
 
             const html = `
-                <div style="display: flex; font-family: Arial, sans-serif; min-height: auto; height: auto;">
+                <div style="display: flex; font-family: Arial, sans-serif; min-height: 100vh; height: 100vh; align-items: stretch; width: 100%; box-sizing: border-box; overflow: hidden;">
                     <!-- Sidebar -->
-                    <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column; flex-shrink: 0;">
+                    <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column; flex-shrink: 0; min-height: 100vh; height: 100%; box-sizing: border-box; justify-content: space-between;">
                         <div style="margin-bottom: 15px; text-align: center;">
                             ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 158px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
@@ -6800,7 +6800,7 @@
                     </div>
                     
                     <!-- Main Content -->
-                    <div style="width: 70%; background: white; padding: 20px 25px; display: flex; flex-direction: column; flex-grow: 1; overflow: visible; height: auto;">
+                    <div style="width: 70%; background: white; padding: 20px 25px; display: flex; flex-direction: column; flex-grow: 1; min-height: 100vh; height: 100%; box-sizing: border-box; overflow: visible;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1;">
                             <div style="flex: 1;">
                                 <div style="font-size: 12px; color: #7f8c8d; margin-bottom: 3px;">Customer</div>
