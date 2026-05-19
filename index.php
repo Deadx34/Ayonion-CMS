@@ -6852,7 +6852,7 @@
                         </div>
                         
                         ${type === 'receipt' ? `
-                        <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid ${colors[type]};">
+                        <div style="margin-top: auto; padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid ${colors[type]};">
                             <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Payment Confirmation.</div>
                             <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you!</div>
                             <div style="font-size: 12px; line-height: 1.6; color: #555;">
@@ -6861,7 +6861,7 @@
                             </div>
                         </div>
                         ` : type === 'quotation' ? `
-                        <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+                        <div style="margin-top: auto; padding: 12px; background: #f8f9fa; border-radius: 6px;">
                             <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you</div>
                             <div style="font-size: 12px; line-height: 1.4; color: #555;">
                                 Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.<br><br>
@@ -6878,7 +6878,7 @@
                             </div>
                         </div>
                         ` : `
-                        <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+                        <div style="margin-top: auto; padding: 12px; background: #f8f9fa; border-radius: 6px;">
                             <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you</div>
                             <div style="font-size: 12px; line-height: 1.4; color: #555;">
                                 Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.<br><br>
@@ -6896,7 +6896,7 @@
                         </div>
                         `}
                         
-                        <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; font-size: 12px;">
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; font-size: 12px;">
                             Thank you and have a good day! Team Ayonion Studios.
                         </div>
                     </div>
