@@ -439,7 +439,7 @@
                                             <input type="checkbox" class="form-check-input" id="selectAllContents" onchange="toggleSelectAllContents()" title="Select All">
                                         </th>
                                         <th>Creative</th><th>Content Type</th><th>Credits</th>
-                                        <th>Published Date</th><th>Preview</th><th>Link</th><th>Actions</th>
+                                        <th>Upload Date</th><th>Published Date</th><th>Preview</th><th>Link</th><th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="contentTableBody"></tbody>
@@ -1214,6 +1214,10 @@
                                     <div class="mb-2">
                                         <strong>Status:</strong><br>
                                         <span id="viewStatus" class="badge"></span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>Upload Date:</strong><br>
+                                        <span id="viewUploadDate" class="text-dark"></span>
                                     </div>
                                     <div class="mb-2">
                                         <strong>Published Date:</strong><br>
@@ -4121,12 +4125,17 @@
                 groupedContents[monthKey].items.push(c);
             });
 
-            // Sort items within each group by ID (newest first)
+            // Sort items within each group by upload date (newest first), then by ID
             Object.values(groupedContents).forEach(group => {
-                group.items.sort((a, b) => b.id - a.id);
+                group.items.sort((a, b) => {
+                    const dateA = new Date(a.startDate).getTime() || 0;
+                    const dateB = new Date(b.startDate).getTime() || 0;
+                    if (dateA !== dateB) return dateB - dateA;
+                    return b.id - a.id;
+                });
             });
 
-            // Sort groups by date (newest first)
+            // Sort groups by upload date (newest first)
             const sortedGroups = Object.entries(groupedContents).sort((a, b) => b[1].date - a[1].date);
             
             // Generate HTML with grouped sections
@@ -4168,6 +4177,7 @@
                         <td>${c.creative}</td>
                         <td>${c.contentType}</td>
                         <td><span class="badge bg-warning">${c.credits}</span></td>
+                        <td>${c.startDate ? formatDate(c.startDate) : '-'}</td>
                         <td>${c.publishedDate ? formatDate(c.publishedDate) : '-'}</td>
                         <td>
                             ${c.imageUrl ? 
@@ -4650,9 +4660,17 @@
             statusElement.className = `badge bg-${getStatusColor(content.status)}`;
             
             // Set published date or show "Not published"
+            const viewUploadDateElement = document.getElementById('viewUploadDate');
+            if (content.startDate) {
+                viewUploadDateElement.textContent = formatDate(content.startDate);
+            } else {
+                viewUploadDateElement.textContent = 'Unknown';
+            }
+
             const publishedDateElement = document.getElementById('viewPublishedDate');
             if (content.publishedDate) {
                 publishedDateElement.textContent = formatDate(content.publishedDate);
+                publishedDateElement.className = 'text-dark';
             } else {
                 publishedDateElement.textContent = 'Not published';
                 publishedDateElement.className = 'text-muted';
