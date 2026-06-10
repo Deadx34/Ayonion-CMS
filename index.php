@@ -790,20 +790,12 @@
                 <div class="modal-body">
                     <form id="changeRenewalDateForm">
                         <div class="mb-3">
-                            <label class="form-label">Client</label>
-                            <input type="text" class="form-control" id="adminRenewalClientName" readonly>
-                        </div>
-                        <div class="mb-3">
                             <label class="form-label">Current Renewal Date</label>
-                            <input type="text" class="form-control" id="adminCurrentRenewalDate" readonly>
+                            <div id="adminCurrentRenewalDate" class="form-control bg-light text-dark" style="height:auto;">&nbsp;</div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">New Renewal Date</label>
                             <input type="date" class="form-control" id="adminNewRenewalDate" required>
-                        </div>
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Only admins can update the renewal date. This will affect the client's next cycle.
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Save Renewal Date</button>
                     </form>
@@ -3916,7 +3908,6 @@
                 return;
             }
 
-            document.getElementById('adminRenewalClientName').textContent = client.companyName;
             document.getElementById('adminCurrentRenewalDate').textContent = formatDate(client.renewalDate);
             document.getElementById('adminNewRenewalDate').value = client.renewalDate;
 
