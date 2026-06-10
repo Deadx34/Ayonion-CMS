@@ -8,7 +8,7 @@ include 'includes/config.php';
 $conn = connect_db();
 
 // Configuration
-define('DEFAULT_MONTHLY_CREDITS', 40);
+// Keep package credits as defined per client; do not overwrite with a fixed default.
 
 // Check if this is a manual trigger or cron trigger
 $manual_trigger = isset($_GET['manual']) && $_GET['manual'] === 'true';
@@ -48,39 +48,38 @@ try {
         try {
             $client_id = $client['id'];
             $client_name = $client['company_name'];
-            
+
             // Calculate current available credits
             $total_credits = $client['package_credits'] + $client['extra_credits'] + $client['carried_forward_credits'];
-            $available_credits = $total_credits - $client['used_credits'];
-            
+            $available_credits = max(0, $total_credits - $client['used_credits']);
+
             // Auto carry forward: All unused credits carry forward
-            $credits_to_carry = max(0, $available_credits);
-            
+            $credits_to_carry = $available_credits;
+
             // Calculate new renewal date (1 month from current renewal date)
             $current_renewal = new DateTime($client['renewal_date']);
             $new_renewal = $current_renewal->modify('+1 month')->format('Y-m-d');
-            
+
             // Update client with new cycle
             $update_sql = "UPDATE clients SET 
-                package_credits = " . DEFAULT_MONTHLY_CREDITS . ",
                 carried_forward_credits = $credits_to_carry,
                 used_credits = 0,
                 renewal_date = '$new_renewal',
                 last_carry_forward = NOW()
                 WHERE id = $client_id";
-            
+
             if (!$conn->query($update_sql)) {
                 throw new Exception("Failed to update client $client_id: " . $conn->error);
             }
-            
+
             // Log the carry forward action
-            $new_total = DEFAULT_MONTHLY_CREDITS + $credits_to_carry;
+            $new_total = $client['package_credits'] + $credits_to_carry;
             $log_message .= "  ✓ Client: $client_name (ID: $client_id)\n";
             $log_message .= "    Previous: Used {$client['used_credits']} of $total_credits credits\n";
             $log_message .= "    Carried Forward: $credits_to_carry credits\n";
-            $log_message .= "    New Cycle: " . DEFAULT_MONTHLY_CREDITS . " + $credits_to_carry = $new_total total credits\n";
+            $log_message .= "    New Cycle: {$client['package_credits']} + $credits_to_carry = $new_total total credits\n";
             $log_message .= "    New Renewal Date: $new_renewal\n\n";
-            
+
             $results[] = [
                 'client_id' => $client_id,
                 'client_name' => $client_name,
@@ -89,9 +88,9 @@ try {
                 'new_renewal_date' => $new_renewal,
                 'status' => 'success'
             ];
-            
+
             $processed_count++;
-            
+
         } catch (Exception $e) {
             $error_count++;
             $log_message .= "  ✗ Error processing client $client_name (ID: $client_id): " . $e->getMessage() . "\n";

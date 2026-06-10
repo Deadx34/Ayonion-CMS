@@ -230,38 +230,28 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'auto_carry_forwar
             
             // Calculate unused credits
             $totalCredits = $client['package_credits'] + $client['extra_credits'] + $client['carried_forward_credits'];
-            $unusedCredits = $totalCredits - $client['used_credits'];
+            $unusedCredits = max(0, $totalCredits - $client['used_credits']);
             
-            if ($unusedCredits > 0) {
-                // Move to next month
-                $newRenewalDate = date('Y-m-d', strtotime($currentRenewal . ' +1 month'));
+            // Move to next month
+            $newRenewalDate = date('Y-m-d', strtotime($currentRenewal . ' +1 month'));
+            
+            // Update client: carry forward unused credits, reset used credits, update renewal date
+            $updateSql = "UPDATE clients SET 
+                         carried_forward_credits = $unusedCredits,
+                         used_credits = 0,
+                         renewal_date = '$newRenewalDate',
+                         last_carry_forward_date = '$today'
+                         WHERE id = $clientId";
                 
-                // Update client: carry forward unused credits, reset used credits, update renewal date
-                $updateSql = "UPDATE clients SET 
-                             carried_forward_credits = $unusedCredits,
-                             used_credits = 0,
-                             renewal_date = '$newRenewalDate',
-                             last_carry_forward_date = '$today'
-                             WHERE id = $clientId";
-                
-                if (query_db($conn, $updateSql)) {
-                    $processed++;
-                    $results[] = [
-                        'client_id' => $clientId,
-                        'client_name' => $client['company_name'],
-                        'carried_forward' => $unusedCredits,
-                        'new_renewal_date' => $newRenewalDate,
-                        'subscription_end_date' => $client['subscription_end_date']
-                    ];
-                }
-            } else {
-                // Even if no credits to carry forward, update renewal date
-                $newRenewalDate = date('Y-m-d', strtotime($currentRenewal . ' +1 month'));
-                $updateSql = "UPDATE clients SET 
-                             renewal_date = '$newRenewalDate',
-                             last_carry_forward_date = '$today'
-                             WHERE id = $clientId";
-                query_db($conn, $updateSql);
+            if (query_db($conn, $updateSql)) {
+                $processed++;
+                $results[] = [
+                    'client_id' => $clientId,
+                    'client_name' => $client['company_name'],
+                    'carried_forward' => $unusedCredits,
+                    'new_renewal_date' => $newRenewalDate,
+                    'subscription_end_date' => $client['subscription_end_date']
+                ];
             }
         }
     }
