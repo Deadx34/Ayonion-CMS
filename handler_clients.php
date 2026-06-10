@@ -8,6 +8,10 @@ ini_set('log_errors', 1);
 
 header('Content-Type: application/json');
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 try {
     include 'includes/config.php';
     $conn = connect_db();
@@ -118,7 +122,14 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
         echo json_encode(["success" => false, "message" => "Invalid client ID."]);
         exit;
     }
-    
+
+    $currentClientResult = $conn->query("SELECT renewal_date FROM clients WHERE id = $clientId LIMIT 1");
+    $currentRenewalDate = '';
+    if ($currentClientResult && $currentClientResult->num_rows > 0) {
+        $currentRow = $currentClientResult->fetch_assoc();
+        $currentRenewalDate = $currentRow['renewal_date'];
+    }
+
     $partnerId = $conn->real_escape_string($input['partnerId'] ?? '');
     $companyName = $conn->real_escape_string($input['companyName'] ?? '');
     $renewalDate = $conn->real_escape_string($input['renewalDate'] ?? '');
@@ -132,7 +143,10 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
     $pauseStartDate = $conn->real_escape_string($input['pauseStartDate'] ?? null);
     $pauseEndDate = $conn->real_escape_string($input['pauseEndDate'] ?? null);
 
-    // Recalculate subscription end date if subscription months changed
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        $renewalDate = $currentRenewalDate;
+    }
+
     $subscriptionEndDate = date('Y-m-d', strtotime($renewalDate . " +{$subscriptionMonths} months"));
 
     $sql = "UPDATE clients SET 
@@ -159,6 +173,39 @@ else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_client') {
     } else {
         http_response_code(500);
         echo json_encode(["success" => false, "message" => "Failed to update client: " . $conn->error]);
+    }
+}
+else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'update_renewal_date') {
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        http_response_code(403);
+        echo json_encode(["success" => false, "message" => "Only admins can change renewal dates."]);
+        exit;
+    }
+
+    $clientId = (int)($input['clientId'] ?? 0);
+    $newRenewalDate = $conn->real_escape_string($input['newRenewalDate'] ?? '');
+
+    if ($clientId <= 0 || empty($newRenewalDate)) {
+        http_response_code(400);
+        echo json_encode(["success" => false, "message" => "Client ID and new renewal date are required."]);
+        exit;
+    }
+
+    $currentClientResult = $conn->query("SELECT subscription_months FROM clients WHERE id = $clientId LIMIT 1");
+    $subscriptionMonths = 12;
+    if ($currentClientResult && $currentClientResult->num_rows > 0) {
+        $currentRow = $currentClientResult->fetch_assoc();
+        $subscriptionMonths = (int)$currentRow['subscription_months'];
+    }
+
+    $subscriptionEndDate = date('Y-m-d', strtotime($newRenewalDate . " +{$subscriptionMonths} months"));
+    $sql = "UPDATE clients SET renewal_date = '$newRenewalDate', subscription_end_date = '$subscriptionEndDate' WHERE id = $clientId";
+
+    if (query_db($conn, $sql)) {
+        echo json_encode(["success" => true, "message" => "Renewal date updated successfully."]);
+    } else {
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => "Failed to update renewal date: " . $conn->error]);
     }
 }
 // --- 5. HANDLE AUTO CARRY FORWARD (POST) ---

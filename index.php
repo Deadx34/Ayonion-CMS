@@ -697,6 +697,11 @@
                                 <i class="fas fa-edit me-2"></i>Edit Client Info
                             </button>
                         </div>
+                        <div class="col-md-2-4" id="renewalDateAdminAction" style="display:none;">
+                            <button class="btn btn-outline-primary w-100 mb-2" onclick="showChangeRenewalDateModal()">
+                                <i class="fas fa-calendar-alt me-2"></i>Change Renewal Date
+                            </button>
+                        </div>
                         <div class="col-md-2-4">
                             <button class="btn btn-warning w-100 mb-2" onclick="showEditCreditsModal()">
                                 <i class="fas fa-coins me-2"></i>Edit Credits
@@ -774,6 +779,39 @@
         </div>
     </div>
 
+    <!-- Change Renewal Date Modal -->
+    <div class="modal fade" id="changeRenewalDateModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-calendar-alt me-2"></i>Change Renewal Date</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changeRenewalDateForm">
+                        <div class="mb-3">
+                            <label class="form-label">Client</label>
+                            <input type="text" class="form-control" id="adminRenewalClientName" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Current Renewal Date</label>
+                            <input type="text" class="form-control" id="adminCurrentRenewalDate" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Renewal Date</label>
+                            <input type="date" class="form-control" id="adminNewRenewalDate" required>
+                        </div>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Only admins can update the renewal date. This will affect the client's next cycle.
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Save Renewal Date</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Client Info Modal -->
     <div class="modal fade" id="editClientModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
@@ -798,6 +836,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Monthly Renewal Date</label>
                                 <input type="date" class="form-control" id="editRenewalDate" required>
+                                <small id="editRenewalDateNote" class="text-muted">Only admins can change this date.</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Subscription Duration (Months)</label>
@@ -2244,9 +2283,11 @@
                 canManageContent: true,
                 canManageCampaigns: true,
                 canManageFinances: true,
-                canManageUsers: true
+                canManageUsers: true,
+                canChangeRenewalDate: true
             },
             marketer: {
+                canChangeRenewalDate: false,
                 sections: ['dashboard', 'clients', 'content', 'campaigns', 'profile'],
                 canAddClient: false,
                 canDeleteClient: false,
@@ -2262,9 +2303,11 @@
                 canManageContent: false,
                 canManageCampaigns: false,
                 canManageFinances: true,
-                canManageUsers: false
+                canManageUsers: false,
+                canChangeRenewalDate: false
             },
             moderator: {
+                canChangeRenewalDate: false,
                 sections: ['dashboard', 'clients', 'content', 'campaigns', 'finances', 'profile'],
                 canAddClient: false,
                 canDeleteClient: false,
@@ -2543,6 +2586,11 @@
             const actionsHeader = document.getElementById('clientActionsHeader');
             if (actionsHeader) {
                 actionsHeader.style.display = userPermissions.canDeleteClient ? 'table-cell' : 'none';
+            }
+
+            const renewalDateAdminAction = document.getElementById('renewalDateAdminAction');
+            if (renewalDateAdminAction) {
+                renewalDateAdminAction.style.display = userPermissions.canChangeRenewalDate ? 'block' : 'none';
             }
 
             // Hide Settings tab if not admin
@@ -3768,6 +3816,8 @@
             }
         });
 
+        document.getElementById('changeRenewalDateForm').addEventListener('submit', handleChangeRenewalDateForm);
+
         // Edit Client Info Modal Functions
         function showEditClientModal() {
             if (!selectedClientId) {
@@ -3787,6 +3837,24 @@
             document.getElementById('editCompanyName').value = client.companyName;
             document.getElementById('editRenewalDate').value = client.renewalDate;
             document.getElementById('editSubscriptionMonths').value = client.subscriptionMonths || 12;
+
+            const editRenewalDateInput = document.getElementById('editRenewalDate');
+            const editRenewalDateNote = document.getElementById('editRenewalDateNote');
+            if (currentUser.role !== 'admin') {
+                editRenewalDateInput.disabled = true;
+                editRenewalDateInput.classList.add('bg-light');
+                editRenewalDateInput.title = 'Only admins can change renewal dates.';
+                if (editRenewalDateNote) {
+                    editRenewalDateNote.textContent = 'Only admins can change this renewal date.';
+                }
+            } else {
+                editRenewalDateInput.disabled = false;
+                editRenewalDateInput.classList.remove('bg-light');
+                editRenewalDateInput.title = '';
+                if (editRenewalDateNote) {
+                    editRenewalDateNote.textContent = 'Only admins can change this date.';
+                }
+            }
             
             // Set managing platforms checkboxes
             document.querySelectorAll('.edit-managing-platform').forEach(checkbox => {
@@ -3835,6 +3903,61 @@
             if (clientDetailsModal) clientDetailsModal.hide();
             
             new bootstrap.Modal(document.getElementById('editClientModal')).show();
+        }
+
+        function showChangeRenewalDateModal() {
+            if (!selectedClientId) {
+                showAlert('No client selected', 'warning');
+                return;
+            }
+            const client = appData.clients.find(c => c.id === selectedClientId);
+            if (!client) {
+                showAlert('Client not found', 'danger');
+                return;
+            }
+
+            document.getElementById('adminRenewalClientName').textContent = client.companyName;
+            document.getElementById('adminCurrentRenewalDate').textContent = formatDate(client.renewalDate);
+            document.getElementById('adminNewRenewalDate').value = client.renewalDate;
+
+            new bootstrap.Modal(document.getElementById('changeRenewalDateModal')).show();
+        }
+
+        async function handleChangeRenewalDateForm(e) {
+            e.preventDefault();
+            if (currentUser.role !== 'admin') {
+                showAlert('Only admins can change client renewal dates.', 'danger');
+                return;
+            }
+
+            const clientId = selectedClientId;
+            const newRenewalDate = document.getElementById('adminNewRenewalDate').value;
+            if (!newRenewalDate) {
+                showAlert('Please select a new renewal date.', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('handler_clients.php?action=update_renewal_date', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ clientId: clientId, newRenewalDate: newRenewalDate })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('Renewal date updated successfully.', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('changeRenewalDateModal')).hide();
+                    await loadAllDataFromPHP();
+                    loadClientsTable();
+                    showClientDetails(clientId);
+                } else {
+                    showAlert(result.message || 'Failed to update renewal date.', 'danger');
+                }
+            } catch (error) {
+                showAlert('Network error updating renewal date: ' + error.message, 'danger');
+            }
         }
 
         async function handleEditLogoUpload(input) {
