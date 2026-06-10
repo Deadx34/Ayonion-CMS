@@ -2646,7 +2646,7 @@
             const menuItems = [
                 { id: 'dashboard', icon: 'home', label: 'Dashboard' },
                 { id: 'clients', icon: 'users', label: 'Client Profiles' },
-                { id: 'content', icon: 'file-alt', label: 'Content Credits' },
+                { id: 'content', icon: 'file-alt', label: 'Content' },
                 { id: 'campaigns', icon: 'bullhorn', label: 'Ad Campaigns' },
                 { id: 'finances', icon: 'file-invoice-dollar', label: 'Financial Management' },
                 { id: 'profile', icon: 'user-circle', label: 'My Profile' },
