@@ -3261,7 +3261,7 @@
             const titles = {
                 dashboard: 'Dashboard',
                 clients: 'Client Profiles',
-                content: 'Content Credits',
+                content: 'Content',
                 campaigns: 'Ad Campaigns',
                 finances: 'Financial Management',
                 profile: 'My Profile',
