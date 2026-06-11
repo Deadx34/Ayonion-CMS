@@ -183,6 +183,104 @@ try {
         }
     }
     
+    // --- 5. HANDLE CREATE NON-CUSTOMER INVOICE (POST) ---
+    else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'create_non_customer') {
+        $invoiceId = time() . mt_rand(100, 999);
+        $customerName = $conn->real_escape_string($input['customerName'] ?? '');
+        $items = $input['items'] ?? [];
+        $notes = $conn->real_escape_string($input['notes'] ?? '');
+        
+        if (empty($customerName)) {
+            throw new Exception("Customer name is required for non-customer invoices.");
+        }
+        
+        if (empty($items)) {
+            throw new Exception("At least one invoice item is required.");
+        }
+        
+        // Calculate total amount from items
+        $totalAmount = 0.00;
+        foreach ($items as $item) {
+            $quantity = (float)($item['quantity'] ?? 1);
+            $unitPrice = (float)($item['unitPrice'] ?? 0);
+            $totalAmount += ($quantity * $unitPrice);
+        }
+        
+        if ($totalAmount <= 0) {
+            throw new Exception("Invoice total must be greater than zero.");
+        }
+        
+        // Generate invoice number
+        $invoiceNumber = generateDocumentNumber($conn, 'invoice');
+        
+        // Calculate due date (30 days from now)
+        $dueDate = date('Y-m-d', strtotime('+30 days'));
+        
+        // 1. Create Invoice Record with customer_name and is_non_customer flags
+        $invoiceNumberEscaped = $conn->real_escape_string($invoiceNumber);
+        $dueDateEscaped = $conn->real_escape_string($dueDate);
+        $customerNameEscaped = $conn->real_escape_string($customerName);
+        
+        $sql_invoice = "INSERT INTO invoices (
+            id, client_id, customer_name, is_non_customer, total_amount, invoice_number, due_date, notes, status
+        ) VALUES (
+            '$invoiceId', NULL, '$customerNameEscaped', TRUE, $totalAmount, '$invoiceNumberEscaped', '$dueDateEscaped', '$notes', 'draft'
+        )";
+        
+        if (!query_db($conn, $sql_invoice)) {
+            throw new Exception("Failed to create non-customer invoice.");
+        }
+        
+        // 2. Create Invoice Items
+        foreach ($items as $item) {
+            $description = $conn->real_escape_string($item['description'] ?? 'Service');
+            $quantity = (float)($item['quantity'] ?? 1);
+            $unitPrice = (float)($item['unitPrice'] ?? 0);
+            $amount = $quantity * $unitPrice;
+            
+            $sql_item = "INSERT INTO invoice_items (
+                invoice_id, campaign_id, amount, description
+            ) VALUES (
+                '$invoiceId', NULL, $amount, '$description'
+            )";
+            
+            if (!query_db($conn, $sql_item)) {
+                throw new Exception("Failed to create invoice item.");
+            }
+        }
+        
+        $conn->commit();
+        echo json_encode([
+            "success" => true, 
+            "message" => "Non-customer invoice created successfully.",
+            "invoiceId" => $invoiceId,
+            "invoiceNumber" => $invoiceNumber,
+            "totalAmount" => $totalAmount
+        ]);
+    }
+    
+    // --- 6. HANDLE GET ALL NON-CUSTOMER INVOICES (GET) ---
+    else if ($action === 'list_non_customer') {
+        $sql = "SELECT i.*, NULL as company_name, NULL as partner_id 
+                FROM invoices i 
+                WHERE i.is_non_customer = TRUE 
+                ORDER BY i.created_at DESC";
+        
+        $result = $conn->query($sql);
+        $invoices = [];
+        
+        if ($result) {
+            while ($invoice = $result->fetch_assoc()) {
+                $invoices[] = $invoice;
+            }
+        }
+        
+        echo json_encode([
+            "success" => true,
+            "invoices" => $invoices
+        ]);
+    }
+    
     else {
         throw new Exception("Invalid API endpoint request.", 400);
     }

@@ -505,17 +505,22 @@
                     <div class="card-header"><span><i class="fas fa-file-invoice me-2"></i>Financial Documents</span></div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <button class="btn btn-primary w-100 mb-2" onclick="showCreateDocumentModal('quotation')">
                                     <i class="fas fa-file-alt me-2"></i>Create Quotation
                                 </button>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <button class="btn btn-success w-100 mb-2" onclick="showCreateDocumentModal('invoice')">
                                     <i class="fas fa-file-invoice me-2"></i>Create Invoice
                                 </button>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <button class="btn btn-info w-100 mb-2" onclick="showNonCustomerInvoiceModal()">
+                                    <i class="fas fa-user-plus me-2"></i>Non-Customer Invoice
+                                </button>
+                            </div>
+                            <div class="col-md-3">
                                 <button class="btn btn-warning w-100 mb-2" onclick="showCreateDocumentModal('receipt')">
                                     <i class="fas fa-receipt me-2"></i>Create Receipt
                                 </button>
@@ -2085,6 +2090,81 @@
                     </button>
                     <button type="button" class="btn btn-primary" onclick="saveInvoice()">
                         <i class="fas fa-save me-2"></i>Save Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Non-Customer Invoice Modal -->
+    <div class="modal fade" id="nonCustomerInvoiceModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>Create Non-Customer Invoice
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Customer Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nonCustomerName" placeholder="Enter customer/company name">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Invoice Notes</label>
+                            <textarea class="form-control" id="nonCustomerNotes" rows="2" placeholder="Optional: Add any notes for this invoice"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Invoice Items <span class="text-danger">*</span></label>
+                            <div id="nonCustomerInvoiceItems">
+                                <div class="invoice-item-row mb-2">
+                                    <div class="row g-2">
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control item-description" placeholder="Description (e.g., Service, Product)">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="number" class="form-control item-quantity" placeholder="Qty" value="1" min="1">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control item-price" placeholder="Unit Price" step="0.01" min="0">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeInvoiceItem(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="addInvoiceItem()">
+                                <i class="fas fa-plus me-1"></i>Add Item
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 p-3 bg-light rounded">
+                        <div class="col-md-8">
+                            <strong>Total Amount:</strong>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span id="nonCustomerInvoiceTotal" class="h5">Rs. 0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="createNonCustomerInvoice()">
+                        <i class="fas fa-save me-2"></i>Create Invoice
                     </button>
                 </div>
             </div>
@@ -8002,9 +8082,423 @@
             new bootstrap.Modal(document.getElementById('invoicePreviewModal')).show();
         }
 
+        function showNonCustomerInvoiceModal() {
+            document.getElementById('nonCustomerName').value = '';
+            document.getElementById('nonCustomerNotes').value = '';
+            const itemsContainer = document.getElementById('nonCustomerInvoiceItems');
+            itemsContainer.innerHTML = `
+                <div class="invoice-item-row mb-2">
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control item-description" placeholder="Description (e.g., Service, Product)">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control item-quantity" placeholder="Qty" value="1" min="1">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" class="form-control item-price" placeholder="Unit Price" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeInvoiceItem(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            itemsContainer.querySelectorAll('input').forEach(input => input.addEventListener('input', updateNonCustomerInvoiceTotal));
+            updateNonCustomerInvoiceTotal();
+            currentInvoiceData = { isNonCustomer: true, items: [] };
+            new bootstrap.Modal(document.getElementById('nonCustomerInvoiceModal')).show();
+        }
+
+        function addInvoiceItem() {
+            const itemsContainer = document.getElementById('nonCustomerInvoiceItems');
+            const itemRow = document.createElement('div');
+            itemRow.className = 'invoice-item-row mb-2';
+            itemRow.innerHTML = `
+                <div class="row g-2">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control item-description" placeholder="Description (e.g., Service, Product)">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control item-quantity" placeholder="Qty" value="1" min="1">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" class="form-control item-price" placeholder="Unit Price" step="0.01" min="0">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeInvoiceItem(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            itemsContainer.appendChild(itemRow);
+            itemRow.querySelectorAll('input').forEach(input => input.addEventListener('input', updateNonCustomerInvoiceTotal));
+            updateNonCustomerInvoiceTotal();
+        }
+
+        function removeInvoiceItem(button) {
+            const row = button.closest('.invoice-item-row');
+            if (!row) return;
+            const itemsContainer = document.getElementById('nonCustomerInvoiceItems');
+            if (itemsContainer.querySelectorAll('.invoice-item-row').length <= 1) {
+                showAlert('At least one item is required for non-customer invoices.', 'warning');
+                return;
+            }
+            row.remove();
+            updateNonCustomerInvoiceTotal();
+        }
+
+        function updateNonCustomerInvoiceTotal() {
+            const itemRows = document.querySelectorAll('#nonCustomerInvoiceItems .invoice-item-row');
+            let total = 0;
+            itemRows.forEach(row => {
+                const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                total += quantity * price;
+            });
+            document.getElementById('nonCustomerInvoiceTotal').textContent = `Rs. ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+        }
+
+        function getNonCustomerInvoiceItems() {
+            const itemRows = document.querySelectorAll('#nonCustomerInvoiceItems .invoice-item-row');
+            return Array.from(itemRows).map(row => {
+                return {
+                    description: row.querySelector('.item-description').value.trim() || 'Service',
+                    quantity: parseFloat(row.querySelector('.item-quantity').value) || 1,
+                    unitPrice: parseFloat(row.querySelector('.item-price').value) || 0
+                };
+            }).filter(item => item.quantity > 0 && item.unitPrice >= 0);
+        }
+
+        function renderNonCustomerInvoicePreview(invoiceData) {
+            const now = new Date();
+            const currentDate = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const invoiceNumber = `I10P***${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const items = invoiceData.items || [];
+            const totalAmount = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+
+            const invoiceHTML = `
+                <style>
+                    .invoice-container {
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        background: white;
+                        max-width: 1200px;
+                        margin: 0 auto;
+                    }
+                    .invoice-header {
+                        background: linear-gradient(135deg, #052C47 0%, #764ba2 100%);
+                        color: white;
+                        padding: 40px;
+                        text-align: center;
+                        border-radius: 8px 8px 0 0;
+                    }
+                    .invoice-header h1 {
+                        font-size: 32px;
+                        margin-bottom: 10px;
+                        font-weight: 600;
+                    }
+                    .invoice-header p {
+                        font-size: 16px;
+                        opacity: 0.95;
+                        margin: 5px 0;
+                    }
+                    .client-info {
+                        background: #f8f9fa;
+                        padding: 30px 40px;
+                        border-left: 4px solid #030b0d;
+                        margin: 0;
+                    }
+                    .client-info h2 {
+                        color: #333;
+                        margin-bottom: 20px;
+                        font-size: 20px;
+                        font-weight: 600;
+                    }
+                    .info-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 15px;
+                    }
+                    .info-item {
+                        display: flex;
+                        align-items: flex-start;
+                    }
+                    .info-label {
+                        font-weight: 600;
+                        color: #666;
+                        min-width: 120px;
+                    }
+                    .info-value {
+                        color: #333;
+                        font-weight: 500;
+                    }
+                    .amount-summary {
+                        padding: 40px;
+                        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+                    }
+                    .amount-summary h2 {
+                        color: #333;
+                        margin-bottom: 25px;
+                        font-size: 24px;
+                        text-align: center;
+                        font-weight: 600;
+                    }
+                    .amount-card {
+                        background: white;
+                        padding: 30px;
+                        border-radius: 10px;
+                        text-align: center;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                        max-width: 400px;
+                        margin: 0 auto;
+                    }
+                    .amount-card h3 {
+                        color: #666;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        margin-bottom: 15px;
+                        font-weight: 600;
+                    }
+                    .amount-card .amount {
+                        font-size: 42px;
+                        font-weight: bold;
+                        color: #052C47;
+                        margin: 10px 0;
+                    }
+                    .campaigns-section {
+                        padding: 40px;
+                    }
+                    .campaigns-section h2 {
+                        color: #333;
+                        margin-bottom: 25px;
+                        font-size: 24px;
+                        font-weight: 600;
+                    }
+                    .campaign-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 30px;
+                        display: table;
+                        table-layout: fixed;
+                    }
+                    .campaign-table thead {
+                        background: #052C47;
+                        color: white;
+                        display: table-header-group;
+                    }
+                    .campaign-table th {
+                        padding: 15px 12px;
+                        text-align: left;
+                        font-weight: 600;
+                        font-size: 13px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        display: table-cell;
+                    }
+                    .campaign-table tbody {
+                        display: table-row-group;
+                    }
+                    .campaign-table tbody tr {
+                        display: table-row;
+                        width: 100%;
+                    }
+                    .campaign-table td {
+                        padding: 15px 12px;
+                        border-bottom: 1px solid #e0e0e0;
+                        font-size: 14px;
+                        display: table-cell;
+                        vertical-align: middle;
+                        word-wrap: break-word;
+                        overflow-wrap: break-word;
+                    }
+                    .campaign-table tbody tr:hover {
+                        background: #f8f9fa;
+                    }
+                    .footer-section {
+                        background: #333;
+                        color: white;
+                        padding: 30px 40px;
+                        text-align: center;
+                        border-radius: 0 0 8px 8px;
+                    }
+                    .footer-section p {
+                        font-size: 14px;
+                        opacity: 0.8;
+                        margin: 5px 0;
+                    }
+                    @media print {
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                        }
+                        .invoice-header {
+                            background: linear-gradient(135deg, #052C47 0%, #764ba2 100%) !important;
+                        }
+                        .amount-summary {
+                            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important;
+                        }
+                        .campaign-table {
+                            display: table !important;
+                            width: 100% !important;
+                            table-layout: fixed !important;
+                        }
+                        .campaign-table thead {
+                            background: #052C47 !important;
+                            display: table-header-group !important;
+                        }
+                        .campaign-table tbody {
+                            display: table-row-group !important;
+                        }
+                        .campaign-table tbody tr {
+                            display: table-row !important;
+                            page-break-inside: avoid !important;
+                            width: 100% !important;
+                        }
+                        .campaign-table td,
+                        .campaign-table th {
+                            display: table-cell !important;
+                            vertical-align: middle !important;
+                            border-bottom: 1px solid #e0e0e0 !important;
+                        }
+                        .campaign-table th {
+                            background: #052C47 !important;
+                        }
+                        .footer-section {
+                            background: #333 !important;
+                        }
+                    }
+                </style>
+                <div class="invoice-container">
+                    <div class="invoice-header">
+                        ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<div style="text-align: center; margin-bottom: 20px;"><img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 80px; object-fit: contain;"></div>` : ''}
+                        <h1>Invoice</h1>
+                        <p>Invoice #${invoiceNumber}</p>
+                        <p>Generated on ${currentDate}</p>
+                    </div>
+                    <div class="client-info">
+                        <h2>Bill To</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Customer Name:</span>
+                                <span class="info-value">${invoiceData.customerName}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Invoice Date:</span>
+                                <span class="info-value">${currentDate}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Due Date:</span>
+                                <span class="info-value">${dueDate}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Notes:</span>
+                                <span class="info-value">${invoiceData.notes || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="amount-summary">
+                        <h2>Total Amount Due</h2>
+                        <div class="amount-card">
+                            <h3>Invoice Total</h3>
+                            <div class="amount">Rs. ${totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                            <p style="color: #666; margin-top: 10px; font-size: 14px;">${items.length} Item${items.length !== 1 ? 's' : ''} Included</p>
+                        </div>
+                    </div>
+                    <div class="campaigns-section">
+                        <h2>Invoice Items</h2>
+                        <table class="campaign-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th style="text-align: right;">Quantity</th>
+                                    <th style="text-align: right;">Unit Price</th>
+                                    <th style="text-align: right;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>${items.map(item => `<tr><td>${item.description}</td><td style="text-align:right;">${item.quantity}</td><td style="text-align:right;">Rs. ${item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td><td style="text-align:right; font-weight:600;">Rs. ${(item.quantity * item.unitPrice).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td></tr>`).join('')}</tbody>
+                        </table>
+                    </div>
+                    <div class="footer-section">
+                        <p><strong>Pvt Ltd - Management System</strong> | Generated by Ayonion Studios</p>
+                        <p style="margin-top: 10px; font-size: 12px;">This invoice is confidential and intended for the customer only.</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('invoicePreviewContent').innerHTML = invoiceHTML;
+            new bootstrap.Modal(document.getElementById('invoicePreviewModal')).show();
+        }
+
+        async function createNonCustomerInvoice() {
+            const customerName = document.getElementById('nonCustomerName').value.trim();
+            const notes = document.getElementById('nonCustomerNotes').value.trim();
+            const items = getNonCustomerInvoiceItems();
+
+            if (!customerName) {
+                showAlert('Customer name is required for non-customer invoices.', 'warning');
+                return;
+            }
+
+            if (items.length === 0) {
+                showAlert('Please add at least one invoice item.', 'warning');
+                return;
+            }
+
+            const totalAmount = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+            if (totalAmount <= 0) {
+                showAlert('The invoice total must be greater than zero.', 'warning');
+                return;
+            }
+
+            currentInvoiceData = {
+                isNonCustomer: true,
+                customerName,
+                notes,
+                items,
+                totalAmount
+            };
+
+            renderNonCustomerInvoicePreview(currentInvoiceData);
+            bootstrap.Modal.getInstance(document.getElementById('nonCustomerInvoiceModal')).hide();
+        }
+
         async function saveInvoice() {
             if (!currentInvoiceData) {
                 showAlert('No invoice data available.', 'error');
+                return;
+            }
+
+            if (currentInvoiceData.isNonCustomer) {
+                try {
+                    const response = await fetch('handler_invoices.php?action=create_non_customer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            customerName: currentInvoiceData.customerName,
+                            notes: currentInvoiceData.notes,
+                            items: currentInvoiceData.items
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showAlert(`Invoice created successfully! Invoice #${result.invoiceNumber}`, 'success');
+                        bootstrap.Modal.getInstance(document.getElementById('invoicePreviewModal')).hide();
+                    } else {
+                        showAlert(result.message || 'Failed to create invoice.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error creating non-customer invoice:', error);
+                    showAlert('Failed to create invoice. Please try again.', 'error');
+                }
                 return;
             }
 
@@ -8050,12 +8544,14 @@
             // Create a new window for printing
             const printWindow = window.open('', '_blank');
             const invoiceHTML = document.getElementById('invoicePreviewContent').innerHTML;
-            const clientName = currentInvoiceData.client.company_name || currentInvoiceData.client.partner_id;
+            const invoiceName = currentInvoiceData.isNonCustomer
+                ? currentInvoiceData.customerName
+                : (currentInvoiceData.client?.company_name || currentInvoiceData.client?.partner_id || 'Invoice');
             
             const htmlContent = '<!DOCTYPE html>' +
                 '<html>' +
                 '<head>' +
-                '<title>Invoice - ' + clientName + '</title>' +
+                '<title>Invoice - ' + invoiceName + '</title>' +
                 '<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">' +
                 '<style>' +
                 '@media print { body { margin: 0; } .no-print { display: none; } }' +
