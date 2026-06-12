@@ -57,7 +57,7 @@ if ($action === 'delete') {
                     $itTotal = isset($it['total']) ? (float)$it['total'] : 0;
                     $itQty = isset($it['quantity']) ? (int)$it['quantity'] : 0;
                     if ($itType === 'Ad Budget') $adBudgetTotal += $itTotal;
-                    if ($itType === 'Extra Content Credits') $creditsTotal += $itQty;
+                    if ($itType === 'Extra Credits') $creditsTotal += $itQty;
                 }
             }
         }
@@ -88,7 +88,7 @@ if ($action === 'delete') {
                 if (!query_db($conn, $revert_sql)) {
                     throw new Exception("Failed to revert client credits.");
                 }
-            } elseif ($itemType === 'Extra Content Credits') {
+            } elseif ($itemType === 'Extra Credits') {
                 $revert_sql = "UPDATE clients SET extra_credits = extra_credits - $quantity WHERE id = $clientId";
                 if (!query_db($conn, $revert_sql)) {
                     throw new Exception("Failed to revert client credits.");
@@ -220,7 +220,7 @@ try {
             
             if ($itemType === 'Ad Budget') {
                 $adBudgetTotal += $itemTotal;
-            } elseif ($itemType === 'Extra Content Credits') {
+            } elseif ($itemType === 'Extra Credits') {
                 $creditsTotal += $itemQuantity;
             }
         }

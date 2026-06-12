@@ -43,7 +43,7 @@ if ($client_result) {
     }
 }
 
-// --- 2. Fetch Content Credits ---
+// --- 2. Fetch Credits ---
 $content_sql = "SELECT * FROM content_credits";
 $content_result = $conn->query($content_sql);
 if ($content_result) {

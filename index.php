@@ -304,7 +304,7 @@
                         <div class="stat-card" style="background: linear-gradient(135deg, #618698 0%, #2E404C 100%)">
                             <i class="fas fa-file-alt fa-2x mb-2"></i>
                             <h3 id="totalContentUsed">0</h3>
-                            <p>Content Credits Used</p>
+                            <p>Credits Used</p>
                         </div>
                     </div>
                 </div>
@@ -1031,7 +1031,7 @@
                                 <small class="text-muted">Auto carry forward will work for this duration</small>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Package Content Credits</label>
+                                <label class="form-label">Package Credits</label>
                                 <input type="number" class="form-control" id="newClientPackageCredits" required min="0">
                             </div>
                             <div class="col-md-6 mb-3">
@@ -1690,9 +1690,9 @@
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="itemType2" value="Extra Content Credits">
+                                            <input class="form-check-input" type="checkbox" id="itemType2" value="Extra Credits">
                                             <label class="form-check-label" for="itemType2">
-                                                Extra Content Credits
+                                                Extra Credits
                                             </label>
                                         </div>
                                     </div>
@@ -4229,7 +4229,7 @@
                 showAlert('Access Denied. Only Admins can delete clients.', 'warning');
                 return;
             }
-            const confirmed = await showConfirm('Are you sure you want to delete this client? All related data (content credits, campaigns, documents) will be permanently removed.', 'Delete Client', 'danger');
+            const confirmed = await showConfirm('Are you sure you want to delete this client? All related data (credits, campaigns, documents) will be permanently removed.', 'Delete Client', 'danger');
             if (confirmed) {
                 try {
                     const response = await fetch(`handler_clients.php?action=delete&id=${id}`, { method: 'GET' });
@@ -4268,7 +4268,7 @@
                     <div class="empty-state">
                         <i class="fas fa-file-alt"></i>
                         <h4>Select a Client</h4>
-                        <p>Choose a client to view content credits</p>
+                        <p>Choose a client to view credits</p>
                     </div>
                 </td></tr>`;
                 return;
