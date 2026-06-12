@@ -8502,6 +8502,16 @@
                         } catch (e) {
                             console.warn('Failed to refresh data after creating non-customer invoice', e);
                         }
+                        // Also refresh the invoices list in the Document Archive and switch to the Invoices tab
+                        try {
+                            loadFinancialDocuments('invoice');
+                            const invoicesTabTrigger = document.querySelector('#financeTabs a[href="#invoicesTab"]');
+                            if (invoicesTabTrigger) {
+                                new bootstrap.Tab(invoicesTabTrigger).show();
+                            }
+                        } catch (e) {
+                            console.warn('Failed to refresh Document Archive view', e);
+                        }
                     } else {
                         showAlert(result.message || 'Failed to create invoice.', 'error');
                     }
