@@ -1675,9 +1675,14 @@
                                 <input type="text" class="form-control" id="docNumber" placeholder="Loading..." readonly>
                                 <small class="text-muted">Auto-generated. Click to edit if needed.</small>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <!-- Customer Selection (Dynamic: Dropdown or Text Input) -->
+                            <div class="col-md-6 mb-3" id="clientSelectField">
                                 <label class="form-label">Select Client</label>
                                 <select class="form-select" id="docClientSelect" required></select>
+                            </div>
+                            <div class="col-md-6 mb-3" id="customerNameField" style="display: none;">
+                                <label class="form-label">Customer Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="docCustomerName" placeholder="Enter customer/company name" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Date</label>
@@ -6898,6 +6903,82 @@
                 const docNumberInput = document.getElementById('docNumber');
                 const customDocNumber = docNumberInput && docNumberInput.value && docNumberInput.value !== 'Loading...' ? docNumberInput.value.trim() : null;
                 
+                // Check if this is a non-customer invoice
+                if (isNonCustomerInvoiceMode) {
+                    const customerName = document.getElementById('docCustomerName').value.trim();
+                    if (!customerName) {
+                        showAlert('Please enter a customer name.', 'warning');
+                        return;
+                    }
+                    
+                    const formData = {
+                        isNonCustomer: true,
+                        customerName: customerName,
+                        docType: form.dataset.docType,
+                        itemTypes: selectedItemTypes,
+                        itemDetails: itemDetails,
+                        description: documentDescription,
+                        date: date.value,
+                        customDocumentNumber: customDocNumber
+                    };
+                    
+                    try {
+                        const response = await fetch('handler_invoices.php?action=create_non_customer', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            credentials: 'same-origin',
+                            body: JSON.stringify(formData)
+                        });
+
+                        if (!response.ok) {
+                            const text = await response.text();
+                            throw new Error(`HTTP ${response.status}: ${text}`);
+                        }
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showAlert(`Invoice created successfully! Invoice #${result.invoiceNumber}`, 'success');
+                            bootstrap.Modal.getInstance(document.getElementById('documentModal')).hide();
+                            
+                            // Load fresh data and refresh the non-customer invoices tab
+                            try {
+                                await loadAllDataFromPHP();
+                                loadNonCustomerInvoices();
+                                const nonCustomerTabTrigger = document.querySelector('#financeTabs a[href="#nonCustomerInvoicesTab"]');
+                                if (nonCustomerTabTrigger) {
+                                    new bootstrap.Tab(nonCustomerTabTrigger).show();
+                                }
+                                // View the created document
+                                if (result.documentId) {
+                                    viewDocument('invoice', result.documentId);
+                                }
+                            } catch (e) {
+                                console.warn('Failed to refresh after creating non-customer invoice', e);
+                            }
+                            
+                            // Reset form
+                            this.reset();
+                            document.querySelectorAll('#documentForm input[type="checkbox"]').forEach(cb => cb.checked = false);
+                            updateItemAmounts();
+                            
+                            // Reset mode
+                            isNonCustomerInvoiceMode = false;
+                            document.getElementById('clientSelectField').style.display = 'block';
+                            document.getElementById('customerNameField').style.display = 'none';
+                            document.getElementById('docClientSelect').required = true;
+                            document.getElementById('docCustomerName').required = false;
+                        } else {
+                            showAlert(result.message || 'Failed to create invoice.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error creating non-customer invoice:', error);
+                        showAlert('Error creating non-customer invoice: ' + error.message, 'error');
+                    }
+                    return;
+                }
+                
+                // Regular customer invoice flow
                 const formData = {
 					clientId: parseInt(clientSelect.value),
 					docType: form.dataset.docType,
@@ -7791,6 +7872,7 @@
         // ============================================
         let selectedCampaigns = [];
         let currentInvoiceData = null;
+        let isNonCustomerInvoiceMode = false; // Track if we're creating a non-customer invoice
 
         function toggleAllCampaigns() {
             const selectAll = document.getElementById('selectAllCampaigns');
@@ -8136,33 +8218,46 @@
         }
 
         function showNonCustomerInvoiceModal() {
-            document.getElementById('nonCustomerName').value = '';
-            document.getElementById('nonCustomerNotes').value = '';
-            const itemsContainer = document.getElementById('nonCustomerInvoiceItems');
-            itemsContainer.innerHTML = `
-                <div class="invoice-item-row mb-2">
-                    <div class="row g-2">
-                        <div class="col-md-5">
-                            <input type="text" class="form-control item-description" placeholder="Description (e.g., Service, Product)">
-                        </div>
-                        <div class="col-md-2">
-                            <input type="number" class="form-control item-quantity" placeholder="Qty" value="1" min="1">
-                        </div>
-                        <div class="col-md-3">
-                            <input type="number" class="form-control item-price" placeholder="Unit Price" step="0.01" min="0">
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeInvoiceItem(this)">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            itemsContainer.querySelectorAll('input').forEach(input => input.addEventListener('input', updateNonCustomerInvoiceTotal));
-            updateNonCustomerInvoiceTotal();
-            currentInvoiceData = { isNonCustomer: true, items: [] };
-            new bootstrap.Modal(document.getElementById('nonCustomerInvoiceModal')).show();
+            // Switch to non-customer invoice mode in documentModal
+            isNonCustomerInvoiceMode = true;
+            
+            // Show customer name input, hide client select
+            document.getElementById('clientSelectField').style.display = 'none';
+            document.getElementById('customerNameField').style.display = 'block';
+            document.getElementById('docCustomerName').value = '';
+            document.getElementById('docCustomerName').required = true;
+            
+            // Make sure client select doesn't require value in non-customer mode
+            document.getElementById('docClientSelect').required = false;
+            
+            // Update modal title
+            document.getElementById('documentModalTitle').textContent = '📋 Create Non-Customer Invoice';
+            document.getElementById('documentForm').dataset.docType = 'invoice';
+            
+            // Reset form and checkboxes
+            document.getElementById('documentForm').reset();
+            document.getElementById('docDate').value = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('#documentForm input[type="checkbox"]').forEach(cb => cb.checked = false);
+            
+            // Clear other services
+            document.getElementById('otherServicesContainer').innerHTML = '<small class="text-muted">Click "Add Other Service" to add custom service items</small>';
+            otherServiceCounter = 0;
+            
+            // Update item amounts display
+            updateItemAmounts();
+            
+            // Show the modal
+            new bootstrap.Modal(document.getElementById('documentModal')).show();
+        }
+
+        // Helper function to reset documentModal to customer invoice mode
+        function resetDocumentModalToCustomerMode() {
+            isNonCustomerInvoiceMode = false;
+            document.getElementById('clientSelectField').style.display = 'block';
+            document.getElementById('customerNameField').style.display = 'none';
+            document.getElementById('docClientSelect').required = true;
+            document.getElementById('docCustomerName').required = false;
+            document.getElementById('documentModalTitle').textContent = '📋 Create Document';
         }
 
         function addInvoiceItem() {

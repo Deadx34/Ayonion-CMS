@@ -187,23 +187,32 @@ try {
     else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'create_non_customer') {
         $invoiceId = time() . mt_rand(100, 999);
         $customerName = $conn->real_escape_string($input['customerName'] ?? '');
-        $items = $input['items'] ?? [];
-        $notes = $conn->real_escape_string($input['notes'] ?? '');
+        $itemDetails = $input['itemDetails'] ?? [];  // New format from documentModal
+        $itemTypes = $input['itemTypes'] ?? [];
+        $notes = $conn->real_escape_string($input['description'] ?? $input['notes'] ?? '');
         
         if (empty($customerName)) {
             throw new Exception("Customer name is required for non-customer invoices.");
         }
         
-        if (empty($items)) {
+        if (empty($itemDetails)) {
             throw new Exception("At least one invoice item is required.");
         }
         
-        // Calculate total amount from items
+        // Calculate total amount from itemDetails
         $totalAmount = 0.00;
-        foreach ($items as $item) {
-            $quantity = (float)($item['quantity'] ?? 1);
-            $unitPrice = (float)($item['unitPrice'] ?? 0);
+        $items = [];  // Convert itemDetails to items format for documents table
+        foreach ($itemDetails as $detail) {
+            $quantity = (float)($detail['quantity'] ?? 1);
+            $unitPrice = (float)($detail['unitPrice'] ?? 0);
             $totalAmount += ($quantity * $unitPrice);
+            
+            // Build items array for documents table
+            $items[] = [
+                'description' => $detail['itemType'] ?? $detail['description'] ?? 'Service',
+                'quantity' => $quantity,
+                'unitPrice' => $unitPrice
+            ];
         }
         
         if ($totalAmount <= 0) {
@@ -232,16 +241,16 @@ try {
         }
         
         // 2. Create Invoice Items
-        foreach ($items as $item) {
-            $description = $conn->real_escape_string($item['description'] ?? 'Service');
-            $quantity = (float)($item['quantity'] ?? 1);
-            $unitPrice = (float)($item['unitPrice'] ?? 0);
+        foreach ($itemDetails as $detail) {
+            $itemType = $conn->real_escape_string($detail['itemType'] ?? $detail['description'] ?? 'Service');
+            $quantity = (float)($detail['quantity'] ?? 1);
+            $unitPrice = (float)($detail['unitPrice'] ?? 0);
             $amount = $quantity * $unitPrice;
             
             $sql_item = "INSERT INTO invoice_items (
                 invoice_id, campaign_id, amount, description
             ) VALUES (
-                '$invoiceId', NULL, $amount, '$description'
+                '$invoiceId', NULL, $amount, '$itemType'
             )";
             
             if (!query_db($conn, $sql_item)) {
@@ -250,22 +259,22 @@ try {
         }
 
         // --- 3. Save a corresponding documents row so the existing document PDF/template is reused ---
-        // Prepare a documents ID and payload
         $docId = time() . mt_rand(100, 999);
-        $documentNumber = $invoiceNumber; // Use invoice number as document number
+        $documentNumber = $invoiceNumber;
         $docDate = date('Y-m-d');
 
         // Build item details for documents table
         $docItemDetails = [];
         $docItemTypes = [];
-        foreach ($items as $it) {
-            $docItemTypes[] = $it['description'] ?? 'Service';
+        foreach ($itemDetails as $detail) {
+            $itemType = $detail['itemType'] ?? $detail['description'] ?? 'Service';
+            $docItemTypes[] = $itemType;
             $docItemDetails[] = [
-                'itemType' => $it['description'] ?? 'Service',
-                'description' => $it['description'] ?? '',
-                'quantity' => $it['quantity'] ?? 1,
-                'unitPrice' => $it['unitPrice'] ?? 0,
-                'total' => (float)($it['quantity'] ?? 1) * (float)($it['unitPrice'] ?? 0)
+                'itemType' => $itemType,
+                'description' => $detail['description'] ?? '',
+                'quantity' => (float)($detail['quantity'] ?? 1),
+                'unitPrice' => (float)($detail['unitPrice'] ?? 0),
+                'total' => ((float)($detail['quantity'] ?? 1)) * ((float)($detail['unitPrice'] ?? 0))
             ];
         }
 
