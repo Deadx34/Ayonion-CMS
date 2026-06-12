@@ -535,6 +535,7 @@
                         <ul class="nav nav-tabs mb-3" id="financeTabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#quotationsTab" role="tab">Quotations</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#invoicesTab" role="tab">Invoices</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerInvoicesTab" role="tab"><i class="fas fa-user-plus me-2"></i>Non-Customer Invoices</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#receiptsTab" role="tab">Receipts</a></li>
                         </ul>
                         <div class="tab-content">
@@ -543,6 +544,9 @@
                             </div>
                             <div class="tab-pane fade" id="invoicesTab" role="tabpanel">
                                 <div class="table-responsive"><table class="table table-hover" id="invoicesTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Invoice #</th><th class="sortable" data-sort="client" data-type="string">Client</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="invoicesTableBody"></tbody></table></div>
+                            </div>
+                            <div class="tab-pane fade" id="nonCustomerInvoicesTab" role="tabpanel">
+                                <div class="table-responsive"><table class="table table-hover" id="nonCustomerInvoicesTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Invoice #</th><th class="sortable" data-sort="customer" data-type="string">Customer</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="nonCustomerInvoicesTableBody"></tbody></table></div>
                             </div>
                             <div class="tab-pane fade" id="receiptsTab" role="tabpanel">
                                 <div class="table-responsive"><table class="table table-hover" id="receiptsTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Receipt #</th><th class="sortable" data-sort="client" data-type="string">Client</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="receiptsTableBody"></tbody></table></div>
@@ -6508,7 +6512,56 @@
             populateClientSelect('docClientSelect');
             loadFinancialDocuments('quotation');
             loadFinancialDocuments('invoice');
+            loadNonCustomerInvoices();
             loadFinancialDocuments('receipt');
+        }
+
+        function loadNonCustomerInvoices() {
+            // Load and display non-customer invoices from documents table (where client_id is NULL)
+            const nonCustomerInvoices = (appData.documents?.invoices || []).filter(doc => !doc.clientId);
+            const tbody = document.getElementById('nonCustomerInvoicesTableBody');
+            const canDelete = hasPermission('canDeleteClient');
+
+            if (!tbody) return;
+
+            if (nonCustomerInvoices.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-file-invoice"></i>
+                        <h4>No Non-Customer Invoices Yet</h4>
+                        <p>Create your first non-customer invoice</p>
+                    </div>
+                </td></tr>`;
+                return;
+            }
+
+            // Sort by ID descending (newest first)
+            const sorted = [...nonCustomerInvoices].sort((a, b) => b.id - a.id);
+
+            tbody.innerHTML = sorted.map(doc => {
+                const docNumber = doc.documentNumber || 'INV-' + String(doc.id).slice(-6);
+                const customerName = doc.clientName || 'Unknown Customer';
+                const itemType = normalizeItemTypeLabel(doc.itemType || doc.item_type || 'General', doc.itemDetails);
+                const date = doc.date || '';
+                const amount = doc.total || 0;
+                return `
+                <tr onclick="viewDocument('invoice', ${doc.id})" style="cursor: pointer;"
+                    data-number="${docNumber}"
+                    data-customer="${customerName}"
+                    data-type="${itemType}"
+                    data-date="${date}"
+                    data-amount="${amount}">
+                    <td><strong>${docNumber}</strong></td>
+                    <td>${customerName}</td>
+                    <td><span class="badge bg-info">${itemType}</span></td>
+                    <td>${formatDate(date)}</td>
+                    <td>Rs. ${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                    <td onclick="event.stopPropagation();">
+                        <button class="btn btn-sm btn-primary" onclick="viewDocument('invoice', ${doc.id})"><i class="fas fa-eye"></i></button>
+                        ${canDelete ? `<button class="btn btn-sm btn-danger" onclick="deleteDocument('invoice', ${doc.id})"><i class="fas fa-trash"></i></button>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
         }
 
         function normalizeItemTypeLabel(rawItemType, itemDetails) {
@@ -8502,15 +8555,15 @@
                         } catch (e) {
                             console.warn('Failed to refresh data after creating non-customer invoice', e);
                         }
-                        // Also refresh the invoices list in the Document Archive and switch to the Invoices tab
+                        // Refresh the non-customer invoices list and switch to the Non-Customer Invoices tab
                         try {
-                            loadFinancialDocuments('invoice');
-                            const invoicesTabTrigger = document.querySelector('#financeTabs a[href="#invoicesTab"]');
-                            if (invoicesTabTrigger) {
-                                new bootstrap.Tab(invoicesTabTrigger).show();
+                            loadNonCustomerInvoices();
+                            const nonCustomerTabTrigger = document.querySelector('#financeTabs a[href="#nonCustomerInvoicesTab"]');
+                            if (nonCustomerTabTrigger) {
+                                new bootstrap.Tab(nonCustomerTabTrigger).show();
                             }
                         } catch (e) {
-                            console.warn('Failed to refresh Document Archive view', e);
+                            console.warn('Failed to refresh non-customer invoices view', e);
                         }
                     } else {
                         showAlert(result.message || 'Failed to create invoice.', 'error');
