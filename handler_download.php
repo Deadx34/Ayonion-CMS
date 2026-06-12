@@ -21,7 +21,7 @@ try {
     // Fetch document details
     $doc_sql = "SELECT d.*, c.company_name, c.partner_id, c.industry, c.managing_platforms 
                 FROM documents d 
-                JOIN clients c ON d.client_id = c.id 
+                LEFT JOIN clients c ON d.client_id = c.id 
                 WHERE d.id = ? AND d.doc_type = ?";
     
     $stmt = $conn->prepare($doc_sql);
@@ -90,8 +90,9 @@ function generateDocumentPDF($doc, $settings) {
     $companyPhone = $settings['phone'] ?? '';
     $companyAddress = $settings['address'] ?? '';
     
-    $clientName = $doc['company_name'];
-    $partnerId = $doc['partner_id'];
+    // Prefer client record's company_name when available, otherwise use the stored client_name on the document (for non-customer invoices)
+    $clientName = !empty($doc['company_name']) ? $doc['company_name'] : ($doc['client_name'] ?? '');
+    $partnerId = $doc['partner_id'] ?? '';
     $date = date('F j, Y', strtotime($doc['date']));
     $itemType = $doc['item_type'];
     $description = $doc['description'];
