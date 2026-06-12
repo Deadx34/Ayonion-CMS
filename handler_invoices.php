@@ -185,6 +185,19 @@ try {
     
     // --- 5. HANDLE CREATE NON-CUSTOMER INVOICE (POST) ---
     else if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'create_non_customer') {
+        // First, check if the required columns exist
+        $colCheckCustomer = $conn->query("SHOW COLUMNS FROM invoices LIKE 'customer_name'");
+        $colCheckNonCustomer = $conn->query("SHOW COLUMNS FROM invoices LIKE 'is_non_customer'");
+        
+        if (!$colCheckCustomer || $colCheckCustomer->num_rows === 0 || !$colCheckNonCustomer || $colCheckNonCustomer->num_rows === 0) {
+            throw new Exception(
+                "Database migration required. Please run the migration script:\n" .
+                "database/migrate_add_non_customer_invoice_columns.sql\n\n" .
+                "Missing columns: customer_name or is_non_customer in invoices table.",
+                503
+            );
+        }
+        
         $invoiceId = time() . mt_rand(100, 999);
         $customerName = $conn->real_escape_string($input['customerName'] ?? '');
         $itemDetails = $input['itemDetails'] ?? [];  // New format from documentModal
