@@ -438,7 +438,7 @@
                                         <th style="width: 40px;">
                                             <input type="checkbox" class="form-check-input" id="selectAllContents" onchange="toggleSelectAllContents()" title="Select All">
                                         </th>
-                                        <th>Creative</th><th>Content Type</th><th>Credits</th>
+                                        <th>Creative</th><th>Credits Type</th><th>Credits</th>
                                         <th>Upload Date</th><th>Published Date</th><th>Preview</th><th>Link</th><th>Actions</th>
                                     </tr>
                                 </thead>
@@ -1174,7 +1174,7 @@
                             <input type="text" class="form-control" id="creativeName" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Content Type</label>
+                            <label class="form-label">Credits Type</label>
                             <select class="form-select" id="contentType" required>
                                 <option value="">Select Type</option>
                                 <option value="Graphical post">Graphical post</option>
@@ -1198,7 +1198,7 @@
                             <small class="text-muted">Link to the published content (social media post, video, etc.)</small>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-image me-2"></i>Content Image (Optional)</label>
+                            <label class="form-label"><i class="fas fa-image me-2"></i>Credits Image (Optional)</label>
                             <input type="file" class="form-control" id="contentImageUpload" accept="image/*" onchange="handleContentImageUpload(this)">
                             <small class="text-muted">Upload an image related to this content (Max: 5MB)</small>
                             <div id="contentImagePreview" class="mt-2" style="display: none;">
@@ -1233,7 +1233,7 @@
                                         <span id="viewCreativeName" class="text-dark"></span>
                                     </div>
                                     <div class="mb-2">
-                                        <strong>Content Type:</strong><br>
+                                        <strong>Credits Type:</strong><br>
                                         <span id="viewContentType" class="text-dark"></span>
                                     </div>
                                     <div class="mb-2">
@@ -1289,8 +1289,8 @@
                                 <div class="card-body">
                                     <h6 class="card-title text-primary"><i class="fas fa-images me-2"></i>Content Media</h6>
                                     <div id="contentImageSection" style="display: none;">
-                                        <strong>Content Image:</strong><br>
-                                        <img id="viewContentImage" src="" alt="Content Image" class="img-thumbnail mt-2" style="max-width: 300px; max-height: 300px;">
+                                        <strong>Credits Image:</strong><br>
+                                        <img id="viewContentImage" src="" alt="Credits Image" class="img-thumbnail mt-2" style="max-width: 300px; max-height: 300px;">
                                     </div>
                                     <div id="contentUrlSection" style="display: none;" class="mt-3">
                                         <strong>Content URL:</strong><br>
@@ -3170,7 +3170,7 @@
                     previewImg.src = result.image_url;
                     preview.style.display = 'block';
                     
-                    showAlert('Content image uploaded successfully!', 'success');
+                    showAlert('Credits image uploaded successfully!', 'success');
                 } else {
                     showAlert('Upload failed: ' + result.message, 'danger');
                     input.value = '';
@@ -3311,11 +3311,11 @@
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title"><i class="fas fa-image me-2"></i>Content Image</h5>
+                            <h5 class="modal-title"><i class="fas fa-image me-2"></i>Credits Image</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body text-center">
-                            <img src="${imageUrl}" alt="Content Image" class="img-fluid" style="max-height: 70vh; object-fit: contain;">
+                            <img src="${imageUrl}" alt="Credits Image" class="img-fluid" style="max-height: 70vh; object-fit: contain;">
                         </div>
                         <div class="modal-footer">
                             <a href="${imageUrl}" target="_blank" class="btn btn-primary">
@@ -4291,7 +4291,7 @@
                 tbody.innerHTML = `<tr><td colspan="7" class="text-center">
                     <div class="empty-state">
                         <i class="fas fa-clipboard-list"></i>
-                        <h4>No Content Records</h4>
+                        <h4>No Credits Records</h4>
                         <p>Add your first content item</p>
                     </div>
                 </td></tr>`;
