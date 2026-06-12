@@ -8492,6 +8492,16 @@
                     if (result.success) {
                         showAlert(`Invoice created successfully! Invoice #${result.invoiceNumber}`, 'success');
                         bootstrap.Modal.getInstance(document.getElementById('invoicePreviewModal')).hide();
+                        // Load fresh data and open the standard document preview using the linked documentId
+                        try {
+                            await loadAllDataFromPHP();
+                            if (result.documentId) {
+                                // Open the standard document modal for printing/export
+                                viewDocument('invoice', result.documentId);
+                            }
+                        } catch (e) {
+                            console.warn('Failed to refresh data after creating non-customer invoice', e);
+                        }
                     } else {
                         showAlert(result.message || 'Failed to create invoice.', 'error');
                     }

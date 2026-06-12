@@ -248,6 +248,53 @@ try {
                 throw new Exception("Failed to create invoice item.");
             }
         }
+
+        // --- 3. Save a corresponding documents row so the existing document PDF/template is reused ---
+        // Prepare a documents ID and payload
+        $docId = time() . mt_rand(100, 999);
+        $documentNumber = $invoiceNumber; // Use invoice number as document number
+        $docDate = date('Y-m-d');
+
+        // Build item details for documents table
+        $docItemDetails = [];
+        $docItemTypes = [];
+        foreach ($items as $it) {
+            $docItemTypes[] = $it['description'] ?? 'Service';
+            $docItemDetails[] = [
+                'itemType' => $it['description'] ?? 'Service',
+                'description' => $it['description'] ?? '',
+                'quantity' => $it['quantity'] ?? 1,
+                'unitPrice' => $it['unitPrice'] ?? 0,
+                'total' => (float)($it['quantity'] ?? 1) * (float)($it['unitPrice'] ?? 0)
+            ];
+        }
+
+        $itemDetailsJson = $conn->real_escape_string(json_encode($docItemDetails));
+        $itemTypesJson = $conn->real_escape_string(json_encode($docItemTypes));
+
+        // Detect whether the documents table has an item_details column
+        $hasItemDetails = false;
+        $colCheck = $conn->query("SHOW COLUMNS FROM documents LIKE 'item_details'");
+        if ($colCheck && $colCheck->num_rows > 0) {
+            $hasItemDetails = true;
+        }
+
+        if ($hasItemDetails) {
+            $sql_insert_doc = "INSERT INTO documents 
+            (id, document_number, client_id, client_name, doc_type, item_type, item_details, description, quantity, unit_price, total, date) 
+            VALUES 
+            ('$docId', '$documentNumber', NULL, '$customerNameEscaped', 'invoice', '$itemTypesJson', '$itemDetailsJson', '$notes', 1, $totalAmount, $totalAmount, '$docDate')";
+        } else {
+            // Legacy fallback: store JSON in item_type
+            $sql_insert_doc = "INSERT INTO documents 
+            (id, document_number, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+            VALUES 
+            ('$docId', '$documentNumber', NULL, '$customerNameEscaped', 'invoice', '$itemDetailsJson', '$notes', 1, $totalAmount, $totalAmount, '$docDate')";
+        }
+
+        if (!query_db($conn, $sql_insert_doc)) {
+            throw new Exception("Failed to create linked document for non-customer invoice.");
+        }
         
         $conn->commit();
         echo json_encode([
@@ -255,7 +302,8 @@ try {
             "message" => "Non-customer invoice created successfully.",
             "invoiceId" => $invoiceId,
             "invoiceNumber" => $invoiceNumber,
-            "totalAmount" => $totalAmount
+            "totalAmount" => $totalAmount,
+            "documentId" => $docId
         ]);
     }
     
