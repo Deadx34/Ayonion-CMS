@@ -2779,7 +2779,7 @@
             const menuItems = [
                 { id: 'dashboard', icon: 'home', label: 'Dashboard' },
                 { id: 'clients', icon: 'users', label: 'Client Profiles' },
-                { id: 'content', icon: 'file-alt', label: 'Content' },
+                { id: 'content', icon: 'file-alt', label: 'Credits' },
                 { id: 'campaigns', icon: 'bullhorn', label: 'Ad Campaigns' },
                 { id: 'finances', icon: 'file-invoice-dollar', label: 'Financial Management' },
                 { id: 'profile', icon: 'user-circle', label: 'My Profile' },
@@ -3394,7 +3394,7 @@
             const titles = {
                 dashboard: 'Dashboard',
                 clients: 'Client Profiles',
-                content: 'Content',
+                content: 'Credits',
                 campaigns: 'Ad Campaigns',
                 finances: 'Financial Management',
                 profile: 'My Profile',
