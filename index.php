@@ -398,7 +398,7 @@
 
             <div id="content" class="section">
                 <div class="card">
-                    <div class="card-header"><span><i class="fas fa-file-alt me-2"></i>Content Credit Management</span></div>
+                    <div class="card-header"><span><i class="fas fa-file-alt me-2"></i>Credit Management</span></div>
                     <div class="card-body">
                         <div class="row mb-3 align-items-end">
                             <div class="col-md-4">
