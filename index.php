@@ -7513,50 +7513,58 @@
             return null;
         }
         
-        // ✅ Generate print content for documents
+        // ✅ Generate print content for documents (Professional two-column design)
         function generatePrintContent(doc, docType) {
-            const colors = { quotation: '#618698', invoice: '#030b0d', receipt: '#F7C935' };
             const titles = { quotation: 'QUOTATION', invoice: 'INVOICE', receipt: 'RECEIPT' };
             const docNum = { quotation: 'Q', invoice: 'I', receipt: 'R' };
             
-            const color = colors[docType];
             const title = titles[docType];
             const docNumber = doc.documentNumber || (docNum[docType] + String(doc.id).slice(-6));
             const clientName = doc.clientName || doc.client_name || 'Unknown Client';
             const itemType = normalizeItemTypeLabel(doc.itemType || doc.item_type || 'General', doc.itemDetails);
-            const date = formatDate(doc.date);
-            const quantity = doc.quantity || 0;
-            const unitPrice = doc.unitPrice || doc.unit_price || 0;
-            const total = doc.total || 0;
-            const description = doc.description || '';
+            const date = doc.date || '';
+            const total = parseFloat(doc.total || 0);
+            
             let lineItems = parseDocumentItemDetails(doc);
-            if (!lineItems.length) {
-                // Fallback: split comma-separated itemType into multiple rows if needed
+            
+            if (lineItems.length === 0) {
+                const qty = parseFloat(doc.quantity || 0);
+                const unit = parseFloat(doc.unitPrice || doc.unit_price || 0);
                 const rawLabel = itemType;
                 const parts = String(rawLabel).split(',').map(s => s.trim()).filter(Boolean);
                 if (parts.length > 1) {
-                    lineItems = parts.map((p, idx) => {
-                        const isOtherRow = /other/i.test(String(p));
-                        return {
-                            serviceType: p,
-                            description: isOtherRow ? description : '',
-                            subText: '',
-                            quantity: idx === 0 ? quantity : null,
-                            unitPrice: idx === 0 ? unitPrice : null,
-                            total: idx === 0 ? total : null
-                        };
-                    });
+                    lineItems = parts.map((p, idx) => ({
+                        serviceType: p,
+                        description: idx === 0 ? (doc.description || '') : '',
+                        subText: idx === 0 ? (doc.subText || doc.sub_text || '') : '',
+                        quantity: idx === 0 ? qty : null,
+                        unitPrice: idx === 0 ? unit : null,
+                        total: idx === 0 ? total : null
+                    }));
                 } else {
                     lineItems = [{
-                        serviceType: itemType,
-                        description: description,
-                        subText: '',
-                        quantity: quantity,
-                        unitPrice: unitPrice,
+                        serviceType: rawLabel,
+                        description: doc.description || '',
+                        subText: doc.subText || doc.sub_text || '',
+                        quantity: qty,
+                        unitPrice: unit,
                         total: total
                     }];
                 }
             }
+            
+            const tableRows = lineItems.map(item => `
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 8px 6px; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word;">
+                        <div style="font-weight: 600;">${item.serviceType}</div>
+                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px; word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap;">${item.description}</div>` : ''}
+                        ${item.subText ? `<div style="font-size: 11px; color: #7f8c8d; margin-top: 4px; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;">${item.subText}</div>` : ''}
+                    </td>
+                    <td style="padding: 8px 6px; text-align: center;">${item.quantity || item.quantity === 0 ? item.quantity.toLocaleString() : ''}</td>
+                    <td style="padding: 8px 6px; text-align: right;">${item.unitPrice || item.unitPrice === 0 ? 'Rs. ' + item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
+                    <td style="padding: 8px 6px; text-align: right; font-weight: bold;">${item.total || item.total === 0 ? 'Rs. ' + item.total.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
+                </tr>
+            `).join('');
             
             return `
                 <!DOCTYPE html>
@@ -7566,89 +7574,156 @@
                     <title>${title} - ${docNumber}</title>
                     <style>
                         @media print { 
-                            body { margin: 0; } 
-                            .no-print { display: none; } 
+                            body { margin: 0; padding: 0; }
+                            .no-print { display: none; }
                         }
-                        body { font-family: Arial, sans-serif; padding: 30px; max-width: 800px; margin: 0 auto; }
-                        .header { border-bottom: 4px solid ${color}; padding-bottom: 20px; margin-bottom: 30px; }
-                        .company-info { text-align: right; }
-                        .client-info { margin: 20px 0; }
-                        .document-details { margin: 20px 0; }
-                        .items-table { width: 100%; border-collapse: collapse; margin: 30px 0; }
-                        .items-table th, .items-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-                        .items-table th { background-color: #f8f9fa; }
-                        .total-section { text-align: right; margin-top: 20px; }
-                        .footer { border-top: 2px solid #e5e7eb; padding-top: 20px; margin-top: 40px; text-align: center; color: #666; }
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
                     </style>
                 </head>
                 <body>
-                    <div class="header">
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div>
-                                <h1 style="color: ${color}; margin: 0; font-size: 2.5rem;">${title}</h1>
-                                <p style="margin: 5px 0; font-size: 1.2rem; color: #666;">${docNumber}</p>
+                    <div style="display: flex; font-family: Arial, sans-serif; width: 100%; box-sizing: border-box;">
+                        <!-- Sidebar -->
+                        <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-sizing: border-box; justify-content: space-between; min-height: 100vh;">
+                            <div style="margin-bottom: 15px; text-align: center;">
+                                ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 158px; margin-bottom: 5px; object-fit: contain;">` : ''}
+                                <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
                             </div>
-                            <div class="company-info">
-                                <h3 style="margin: 0; color: #333;">${COMPANY_INFO.name}</h3>
-                                <p style="margin: 5px 0; color: #666;">${COMPANY_INFO.tagline}</p>
-                                <p style="margin: 5px 0;">${COMPANY_INFO.email}</p>
-                                <p style="margin: 5px 0;">${COMPANY_INFO.phone}</p>
-                                <p style="margin: 5px 0;">${COMPANY_INFO.address}</p>
+                            
+                            <div style="margin-top: auto;">
+                                <div style="margin-bottom: 15px;">
+                                    <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 11px;">
+                                        <span style="width: 14px; margin-right: 8px; text-align: center;">✉</span>
+                                        <span>${COMPANY_INFO.email}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 11px;">
+                                        <span style="width: 14px; margin-right: 8px; text-align: center;">📞</span>
+                                        <span>${COMPANY_INFO.phone}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 11px;">
+                                        <span style="width: 14px; margin-right: 8px; text-align: center;">📍</span>
+                                        <span>${COMPANY_INFO.address}</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-bottom: 6px; font-size: 11px;">
+                                        <span style="width: 14px; margin-right: 8px; text-align: center;">🌐</span>
+                                        <span><strong>${COMPANY_INFO.website}</strong></span>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <div style="font-size: 11px; color: #bdc3c7; margin-bottom: 5px;">Find us on social media:</div>
+                                    <div style="font-size: 12px; font-weight: bold; margin-bottom: 8px;">ayonionstudios</div>
+                                    <div style="display: flex; gap: 8px;">
+                                        <img src="uploads/social-icons/youtube.png" alt="YouTube" style="width: 22px; height: 22px; filter: brightness(0) invert(1);">
+                                        <img src="uploads/social-icons/instagram.png" alt="Instagram" style="width: 22px; height: 22px; filter: brightness(0) invert(1);">
+                                        <img src="uploads/social-icons/facebook.png" alt="Facebook" style="width: 22px; height: 22px; filter: brightness(0) invert(1);">
+                                        <img src="uploads/social-icons/twitter.png" alt="Twitter" style="width: 22px; height: 22px; filter: brightness(0) invert(1);">
+                                        <img src="uploads/social-icons/linkedin.png" alt="LinkedIn" style="width: 22px; height: 22px; filter: brightness(0) invert(1);">
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="client-info">
-                            <h4>Bill To:</h4>
-                            <p><strong>${clientName}</strong></p>
+                        
+                        <!-- Main Content -->
+                        <div style="width: 70%; background: white; padding: 20px 25px; display: flex; flex-direction: column; flex-grow: 1; box-sizing: border-box; min-height: 100vh;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1;">
+                                <div style="flex: 1;">
+                                    <div style="font-size: 12px; color: #7f8c8d; margin-bottom: 3px;">Customer</div>
+                                    <div style="font-size: 16px; font-weight: bold; color: #2c3e50;">${clientName}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 28px; font-weight: bold; color: #2c3e50; margin-bottom: 10px;">${title}</div>
+                                    <div style="font-size: 12px; color: #7f8c8d;">
+                                        <div style="margin-bottom: 3px;">Date: ${formatDate(date)}</div>
+                                        <div style="margin-bottom: 3px;">${title}: ${docNumber}</div>
+                                        <div style="margin-bottom: 3px;">Valid Until: ${formatDate(new Date(new Date(date).getTime() + 14 * 24 * 60 * 60 * 1000))}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <table style="width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 13px; table-layout: auto;">
+                                <colgroup>
+                                    <col style="width: 50%;">
+                                    <col style="width: 17%;">
+                                    <col style="width: 17%;">
+                                    <col style="width: 16%;">
+                                </colgroup>
+                                <thead>
+                                    <tr style="background: #030b0d; border-bottom: 2px solid #ecf0f1;">
+                                        <th style="padding: 8px 6px; text-align: left; font-weight: bold; color: white;">Description</th>
+                                        <th style="padding: 8px 6px; text-align: center; font-weight: bold; color: white;">Quantity</th>
+                                        <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: white;">Unit Price</th>
+                                        <th style="padding: 8px 6px; text-align: right; font-weight: bold; color: white;">Amount (Rs.)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tableRows}
+                                </tbody>
+                            </table>
+                            
+                            <div style="margin-top: 15px; text-align: right;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #ecf0f1;">
+                                    <span>Subtotal:</span>
+                                    <span>${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #ecf0f1;">
+                                    <span>Discount:</span>
+                                    <span>-</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 2px solid #2c3e50; border-bottom: 2px solid #2c3e50; font-weight: bold; font-size: 16px; margin-top: 6px;">
+                                    <span>Total:</span>
+                                    <span>${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                                </div>
+                            </div>
+                            
+                            ${docType === 'receipt' ? `
+                            <div style="margin-top: auto; padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #f59e0b;">
+                                <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Payment Confirmation.</div>
+                                <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you!</div>
+                                <div style="font-size: 12px; line-height: 1.6; color: #555;">
+                                    We have successfully received your payment, thank you! We are grateful for your trust and for choosing to work with us. 
+                                    Should you have any questions, please do not hesitate to contact us.
+                                </div>
+                            </div>
+                            ` : docType === 'quotation' ? `
+                            <div style="margin-top: auto; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+                                <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you</div>
+                                <div style="font-size: 12px; line-height: 1.4; color: #555;">
+                                    Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.<br><br>
+                                    <strong>Payment Instructions:</strong><br>
+                                    • All cheques should be crossed and made payable to Ayonion Studios (pvt) Ltd.<br>
+                                    • The quotation is valid for two weeks from the day issued.<br>
+                                    • This is a computer generated quotation, No signature required.<br><br>
+                                    <div style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 4px; border-left: 3px solid #3498db;">
+                                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">Please deposit the advance payment to the below account</div>
+                                        <div><strong>Ayonion Studios (pvt) Ltd</strong></div>
+                                        <div><strong>101001037178</strong></div>
+                                        <div><strong>NDB Bank, Kadawatha Branch</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            ` : `
+                            <div style="margin-top: auto; padding: 12px; background: #f8f9fa; border-radius: 6px;">
+                                <div style="font-size: 14px; font-weight: bold; color: #2c3e50; margin-bottom: 8px;">Thank you</div>
+                                <div style="font-size: 12px; line-height: 1.4; color: #555;">
+                                    Thank you for reaching out Ayonion Studios. We will deliver you the best service possible.<br><br>
+                                    <strong>Payment Instructions:</strong><br>
+                                    • All cheques should be crossed and made payable to Ayonion Studios (pvt) Ltd.<br>
+                                    • The invoice is valid for two weeks from the day issued.<br>
+                                    • This is a computer generated invoice, No signature required.<br><br>
+                                    <div style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 4px; border-left: 3px solid #3498db;">
+                                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 5px;">Please deposit the advance payment to the below account</div>
+                                        <div><strong>Ayonion Studios (pvt) Ltd</strong></div>
+                                        <div><strong>101001037178</strong></div>
+                                        <div><strong>NDB Bank, Kadawatha Branch</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                            `}
+                            
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; font-size: 12px;">
+                                Thank you and have a good day! Team Ayonion Studios.
+                            </div>
                         </div>
-                        <div class="document-details">
-                            <p><strong>Date:</strong> ${date}</p>
-                            <p><strong>Item Type:</strong> ${itemType}</p>
-                        </div>
-                    </div>
-                    
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th>Description</th>
-                                <th>Quantity</th>
-                                <th>Unit Price</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${lineItems.map(item => `
-                                <tr>
-                                    <td>
-                                        <div style="font-weight: 600;">${item.serviceType}</div>
-                                        ${item.description && item.description !== item.serviceType ? `<div style="font-size: 11px; color: #555; margin-top: 4px;">${item.description}</div>` : ''}
-                                        ${item.subText ? `<div style="font-size: 11px; color: #666; margin-top: 4px; white-space: pre-line;">${item.subText}</div>` : ''}
-                                    </td>
-                                    <td>${item.quantity || item.quantity === 0 ? item.quantity : ''}</td>
-                                    <td>${item.unitPrice || item.unitPrice === 0 ? 'Rs. ' + item.unitPrice.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
-                                    <td>${item.total || item.total === 0 ? 'Rs. ' + item.total.toLocaleString(undefined, { minimumFractionDigits: 2 }) : ''}</td>
-                                </tr>
-                                `).join('')}
-                        </tbody>
-                    </table>
-                    
-                    <div class="total-section">
-                        <h3>Total: Rs. ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h3>
-                    </div>
-                    
-                    ${docType === 'receipt' ? `
-                    <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-left: 4px solid ${color}; border-radius: 4px;">
-                        <h3 style="color: ${color}; margin: 0 0 15px 0;">Payment Confirmation.</h3>
-                        <h4 style="color: #333; margin: 0 0 15px 0;">Thank you!</h4>
-                        <p style="line-height: 1.6; color: #555; margin: 0;">
-                            We have successfully received your payment, thank you! We are grateful for your trust and for choosing to work with us. 
-                            Should you have any questions, please do not hesitate to contact us.
-                        </p>
-                    </div>
-                    ` : ''}
-                    
-                    <div class="footer">
-                        <p>${COMPANY_INFO.name} | ${COMPANY_INFO.tagline}</p>
-                        <p>Generated on ${formatDate(new Date())}</p>
                     </div>
                     
                     <script>
