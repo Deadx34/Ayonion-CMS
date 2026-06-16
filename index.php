@@ -190,19 +190,17 @@
         
         /* Modal height handling for large documents */
         #viewDocumentModal .modal-dialog {
-            max-height: 90vh !important;
+            max-height: none !important;
             height: auto !important;
-            max-width: 95% !important;
         }
         #viewDocumentModal .modal-body {
-            max-height: 75vh !important;
+            max-height: none !important;
             height: auto !important;
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            padding: 0;
+            overflow: visible !important;
+            padding: 20px;
         }
         #viewDocumentModal .modal-content {
-            max-height: auto !important;
+            max-height: none !important;
             height: auto !important;
         }
         
