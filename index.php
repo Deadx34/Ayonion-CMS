@@ -1682,7 +1682,7 @@
                             </div>
                             <div class="col-md-6 mb-3" id="customerNameField" style="display: none;">
                                 <label class="form-label">Customer Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="docCustomerName" name="docCustomerName" placeholder="Enter customer/company name" required>
+                                <input type="text" class="form-control" id="docCustomerName" name="docCustomerName" placeholder="Enter customer/company name">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Date</label>
