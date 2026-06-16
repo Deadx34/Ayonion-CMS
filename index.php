@@ -110,7 +110,7 @@
             max-width: 100%; 
             margin: 0; 
             box-shadow: none;
-            font-family: 'Times New Roman', serif;
+            font-family: 'Arial', sans-serif;
             line-height: 1.6;
             color: #333;
             user-select: text;
@@ -120,6 +120,7 @@
             height: auto !important;
             max-height: none !important;
             overflow: visible !important;
+            width: 100%;
         }
         .document-preview * {
             pointer-events: none;
@@ -140,12 +141,14 @@
         }
         .document-preview {
             position: relative;
+            display: block;
+            width: 100%;
+            height: auto;
         }
         /* Removed pseudo-element for cleaner print output */
         .document-preview::before {
             content: "";
             display: none;
-        }
         }
         .logo-preview { width: 32px; height: 32px; object-fit: contain; border: 2px solid #e2e8f0; border-radius: 8px; padding: 5px; cursor: pointer; transition: all 0.3s; }
         .logo-preview:hover { transform: scale(1.1); border-color: var(--primary); }
@@ -167,6 +170,8 @@
             .document-preview { padding: 0; }
             .logo-preview { width: 32px; height: 32px; }
             .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            #viewDocumentModal .modal-dialog { max-width: 100% !important; max-height: 100vh !important; }
+            #viewDocumentModal .modal-body { max-height: 80vh !important; }
         }
         @media (max-width: 575.98px) {
             .btn { width: 100%; margin-bottom: 8px; }
@@ -185,17 +190,19 @@
         
         /* Modal height handling for large documents */
         #viewDocumentModal .modal-dialog {
-            max-height: none !important;
+            max-height: 90vh !important;
             height: auto !important;
+            max-width: 95% !important;
         }
         #viewDocumentModal .modal-body {
-            max-height: none !important;
+            max-height: 75vh !important;
             height: auto !important;
-            overflow: visible !important;
-            padding: 20px;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            padding: 0;
         }
         #viewDocumentModal .modal-content {
-            max-height: none !important;
+            max-height: auto !important;
             height: auto !important;
         }
         
@@ -215,10 +222,10 @@
             body { background: white !important; }
             #mainApp, .top-bar, .sidebar, .modal-footer, .btn-close { display: none !important; }
             .modal-dialog { width: 100% !important; max-width: 100% !important; margin: 0 !important; }
-            .modal-content, .modal-body { box-shadow: none !important; border: none !important; padding: 0 !important; }
-            .document-preview { box-shadow: none; max-width: 100%; margin: 0; padding: 0; }
+            .modal-content, .modal-body { box-shadow: none !important; border: none !important; padding: 0 !important; background: white !important; }
+            .document-preview { box-shadow: none; max-width: 100%; margin: 0; padding: 0; height: auto; min-height: 100vh; overflow: visible; }
             .document-preview table { width: 100% !important; table-layout: auto !important; }
-            .document-preview table thead tr { background-color: #BDDFE8 !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
+            .document-preview table thead tr { background-color: #030b0d !important; -webkit-print-color-adjust: exact; color-adjust: exact; }
             .document-preview table tbody tr { page-break-inside: avoid !important; }
             .document-preview table td { word-wrap: break-word !important; overflow-wrap: break-word !important; word-break: break-word !important; white-space: normal !important; }
         }
@@ -7103,9 +7110,9 @@
             `).join('');
 
             const html = `
-                <div style="display: flex; font-family: Arial, sans-serif; min-height: 100vh; height: 100vh; align-items: stretch; width: 100%; box-sizing: border-box; overflow: hidden;">
+                <div style="display: flex; font-family: Arial, sans-serif; min-height: auto; align-items: stretch; width: 100%; box-sizing: border-box; gap: 0;">
                     <!-- Sidebar -->
-                    <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column; flex-shrink: 0; min-height: 100vh; height: 100%; box-sizing: border-box; justify-content: space-between;">
+                    <div style="width: 30%; background: #030b0d; color: white; padding: 20px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-sizing: border-box; justify-content: space-between;">
                         <div style="margin-bottom: 15px; text-align: center;">
                             ${(COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl) ? `<img src="${COMPANY_INFO.logoDark || COMPANY_INFO.logoUrl}" alt="Logo" style="height: 158px; margin-bottom: 5px; object-fit: contain;">` : ''}
                             <div style="font-size: 12px; color: #bdc3c7; margin-bottom: 15px; text-align: center; white-space: nowrap;">Service beyond expectation</div>
@@ -7146,7 +7153,7 @@
                     </div>
                     
                     <!-- Main Content -->
-                    <div style="width: 70%; background: white; padding: 20px 25px; display: flex; flex-direction: column; flex-grow: 1; min-height: 100vh; height: 100%; box-sizing: border-box; overflow: visible;">
+                    <div style="width: 70%; background: white; padding: 20px 25px; display: flex; flex-direction: column; flex-grow: 1; box-sizing: border-box; overflow: visible;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1;">
                             <div style="flex: 1;">
                                 <div style="font-size: 12px; color: #7f8c8d; margin-bottom: 3px;">Customer</div>
