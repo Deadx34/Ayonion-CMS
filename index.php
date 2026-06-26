@@ -510,24 +510,36 @@
                     <div class="card-header"><span><i class="fas fa-file-invoice me-2"></i>Financial Documents</span></div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <button class="btn btn-primary w-100 mb-2" onclick="showCreateDocumentModal('quotation')">
                                     <i class="fas fa-file-alt me-2"></i>Create Quotation
                                 </button>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <button class="btn btn-success w-100 mb-2" onclick="showCreateDocumentModal('invoice')">
                                     <i class="fas fa-file-invoice me-2"></i>Create Invoice
                                 </button>
                             </div>
-                            <div class="col-md-3">
-                                <button class="btn btn-info w-100 mb-2" onclick="showNonCustomerInvoiceModal()">
+                            <div class="col-md-4">
+                                <button class="btn btn-warning w-100 mb-2" onclick="showCreateDocumentModal('receipt')">
+                                    <i class="fas fa-receipt me-2"></i>Create Receipt
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-primary w-100 mb-2" onclick="showNonCustomerDocumentModal('quotation')">
+                                    <i class="fas fa-user-plus me-2"></i>Non-Customer Quotation
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-info w-100 mb-2" onclick="showNonCustomerDocumentModal('invoice')">
                                     <i class="fas fa-user-plus me-2"></i>Non-Customer Invoice
                                 </button>
                             </div>
-                            <div class="col-md-3">
-                                <button class="btn btn-warning w-100 mb-2" onclick="showCreateDocumentModal('receipt')">
-                                    <i class="fas fa-receipt me-2"></i>Create Receipt
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-warning w-100 mb-2" onclick="showNonCustomerDocumentModal('receipt')">
+                                    <i class="fas fa-user-plus me-2"></i>Non-Customer Receipt
                                 </button>
                             </div>
                         </div>
@@ -539,13 +551,18 @@
                     <div class="card-body">
                         <ul class="nav nav-tabs mb-3" id="financeTabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#quotationsTab" role="tab">Quotations</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerQuotationsTab" role="tab"><i class="fas fa-user-plus me-2"></i>Non-Customer Quotations</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#invoicesTab" role="tab">Invoices</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerInvoicesTab" role="tab"><i class="fas fa-user-plus me-2"></i>Non-Customer Invoices</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#receiptsTab" role="tab">Receipts</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerReceiptsTab" role="tab"><i class="fas fa-user-plus me-2"></i>Non-Customer Receipts</a></li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="quotationsTab" role="tabpanel">
                                 <div class="table-responsive"><table class="table table-hover" id="quotationsTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Quote #</th><th class="sortable" data-sort="client" data-type="string">Client</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="quotationsTableBody"></tbody></table></div>
+                            </div>
+                            <div class="tab-pane fade" id="nonCustomerQuotationsTab" role="tabpanel">
+                                <div class="table-responsive"><table class="table table-hover" id="nonCustomerQuotationsTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Quote #</th><th class="sortable" data-sort="customer" data-type="string">Customer</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="nonCustomerQuotationsTableBody"></tbody></table></div>
                             </div>
                             <div class="tab-pane fade" id="invoicesTab" role="tabpanel">
                                 <div class="table-responsive"><table class="table table-hover" id="invoicesTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Invoice #</th><th class="sortable" data-sort="client" data-type="string">Client</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="invoicesTableBody"></tbody></table></div>
@@ -555,6 +572,9 @@
                             </div>
                             <div class="tab-pane fade" id="receiptsTab" role="tabpanel">
                                 <div class="table-responsive"><table class="table table-hover" id="receiptsTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Receipt #</th><th class="sortable" data-sort="client" data-type="string">Client</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="receiptsTableBody"></tbody></table></div>
+                            </div>
+                            <div class="tab-pane fade" id="nonCustomerReceiptsTab" role="tabpanel">
+                                <div class="table-responsive"><table class="table table-hover" id="nonCustomerReceiptsTable"><thead><tr><th class="sortable" data-sort="number" data-type="string">Receipt #</th><th class="sortable" data-sort="customer" data-type="string">Customer</th><th class="sortable" data-sort="type" data-type="string">Type</th><th class="sortable" data-sort="date" data-type="date">Date</th><th class="sortable" data-sort="amount" data-type="number">Amount</th><th>Actions</th></tr></thead><tbody id="nonCustomerReceiptsTableBody"></tbody></table></div>
                             </div>
                         </div>
                     </div>
@@ -6466,6 +6486,7 @@
                 showAlert('Access Denied. Finance Manager/Admin role required.', 'warning');
                 return;
             }
+            resetDocumentModalToCustomerMode();
 			const titles = { quotation: 'Quotation', invoice: 'Invoice', receipt: 'Receipt' };
 			document.getElementById('documentModalTitle').textContent = `Create ${titles[type]}`;
 			document.getElementById('documentForm').reset();
@@ -6521,41 +6542,66 @@
             // NOTE: This currently only loads from local appData. Full PHP handler required.
             populateClientSelect('docClientSelect');
             loadFinancialDocuments('quotation');
+            loadNonCustomerDocuments('quotation');
             loadFinancialDocuments('invoice');
-            loadNonCustomerInvoices();
+            loadNonCustomerDocuments('invoice');
             loadFinancialDocuments('receipt');
+            loadNonCustomerDocuments('receipt');
         }
 
-        function loadNonCustomerInvoices() {
-            // Load and display non-customer invoices from documents table (where client_id is NULL)
-            const nonCustomerInvoices = (appData.documents?.invoices || []).filter(doc => !doc.clientId);
-            const tbody = document.getElementById('nonCustomerInvoicesTableBody');
+        const nonCustomerDocConfig = {
+            quotation: {
+                tableBodyId: 'nonCustomerQuotationsTableBody',
+                tabHref: '#nonCustomerQuotationsTab',
+                label: 'Quotation',
+                docNumPrefix: 'Q'
+            },
+            invoice: {
+                tableBodyId: 'nonCustomerInvoicesTableBody',
+                tabHref: '#nonCustomerInvoicesTab',
+                label: 'Invoice',
+                docNumPrefix: 'I'
+            },
+            receipt: {
+                tableBodyId: 'nonCustomerReceiptsTableBody',
+                tabHref: '#nonCustomerReceiptsTab',
+                label: 'Receipt',
+                docNumPrefix: 'R'
+            }
+        };
+
+        function loadNonCustomerDocuments(type) {
+            const config = nonCustomerDocConfig[type];
+            if (!config) return;
+
+            const allDocs = appData.documents?.[type + 's'] || [];
+            const nonCustomerDocs = allDocs.filter(doc => !doc.clientId);
+            const tbody = document.getElementById(config.tableBodyId);
             const canDelete = hasPermission('canDeleteClient');
 
             if (!tbody) return;
 
-            if (nonCustomerInvoices.length === 0) {
+            if (nonCustomerDocs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center">
                     <div class="empty-state">
                         <i class="fas fa-file-invoice"></i>
-                        <h4>No Non-Customer Invoices Yet</h4>
-                        <p>Create your first non-customer invoice</p>
+                        <h4>No Non-Customer ${config.label}s Yet</h4>
+                        <p>Create your first non-customer ${type}</p>
                     </div>
                 </td></tr>`;
                 return;
             }
 
-            // Sort by ID descending (newest first)
-            const sorted = [...nonCustomerInvoices].sort((a, b) => b.id - a.id);
+            const sorted = [...nonCustomerDocs].sort((a, b) => b.id - a.id);
 
             tbody.innerHTML = sorted.map(doc => {
-                const docNumber = doc.documentNumber || 'INV-' + String(doc.id).slice(-6);
+                const docNumber = doc.documentNumber || config.docNumPrefix + String(doc.id).slice(-6);
                 const customerName = doc.clientName || 'Unknown Customer';
                 const itemType = normalizeItemTypeLabel(doc.itemType || doc.item_type || 'General', doc.itemDetails);
                 const date = doc.date || '';
                 const amount = doc.total || 0;
                 return `
-                <tr onclick="viewDocument('invoice', ${doc.id})" style="cursor: pointer;"
+                <tr onclick="viewDocument('${type}', ${doc.id})" style="cursor: pointer;"
                     data-number="${docNumber}"
                     data-customer="${customerName}"
                     data-type="${itemType}"
@@ -6567,11 +6613,24 @@
                     <td>${formatDate(date)}</td>
                     <td>Rs. ${amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
                     <td onclick="event.stopPropagation();">
-                        <button class="btn btn-sm btn-primary" onclick="viewDocument('invoice', ${doc.id})"><i class="fas fa-eye"></i></button>
-                        ${canDelete ? `<button class="btn btn-sm btn-danger" onclick="deleteDocument('invoice', ${doc.id})"><i class="fas fa-trash"></i></button>` : ''}
+                        <button class="btn btn-sm btn-primary" onclick="viewDocument('${type}', ${doc.id})"><i class="fas fa-eye"></i></button>
+                        ${canDelete ? `<button class="btn btn-sm btn-danger" onclick="deleteDocument('${type}', ${doc.id})"><i class="fas fa-trash"></i></button>` : ''}
                     </td>
                 </tr>`;
             }).join('');
+        }
+
+        function loadNonCustomerInvoices() {
+            loadNonCustomerDocuments('invoice');
+        }
+
+        function showNonCustomerDocumentsTab(type) {
+            const config = nonCustomerDocConfig[type];
+            if (!config) return;
+            const tabTrigger = document.querySelector(`#financeTabs a[href="${config.tabHref}"]`);
+            if (tabTrigger) {
+                new bootstrap.Tab(tabTrigger).show();
+            }
         }
 
         function normalizeItemTypeLabel(rawItemType, itemDetails) {
@@ -6668,7 +6727,7 @@
 
         function loadFinancialDocuments(type) {
              // NOTE: This currently only loads from local appData. Full PHP handler required.
-            const docs = appData.documents[type + 's'];
+            const docs = (appData.documents[type + 's'] || []).filter(doc => doc.clientId);
             const tbody = document.getElementById(type + 'sTableBody');
             const canDelete = hasPermission('canDeleteClient');
 
@@ -6908,18 +6967,19 @@
                 const docNumberInput = document.getElementById('docNumber');
                 const customDocNumber = docNumberInput && docNumberInput.value && docNumberInput.value !== 'Loading...' ? docNumberInput.value.trim() : null;
                 
-                // Check if this is a non-customer invoice
-                if (isNonCustomerInvoiceMode) {
+                // Check if this is a non-customer document
+                if (isNonCustomerDocMode) {
                     const customerName = document.getElementById('docCustomerName').value.trim();
                     if (!customerName) {
                         showAlert('Please enter a customer name.', 'warning');
                         return;
                     }
                     
+                    const nonCustomerDocType = document.getElementById('documentForm').dataset.docType;
                     const formData = {
                         isNonCustomer: true,
                         customerName: customerName,
-                        docType: form.dataset.docType,
+                        docType: nonCustomerDocType,
                         itemTypes: selectedItemTypes,
                         itemDetails: itemDetails,
                         description: documentDescription,
@@ -6927,8 +6987,12 @@
                         customDocumentNumber: customDocNumber
                     };
                     
+                    const createUrl = nonCustomerDocType === 'invoice'
+                        ? 'handler_invoices.php?action=create_non_customer'
+                        : 'handler_finance.php?action=create_non_customer';
+                    
                     try {
-                        const response = await fetch('handler_invoices.php?action=create_non_customer', {
+                        const response = await fetch(createUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             credentials: 'same-origin',
@@ -6941,44 +7005,35 @@
                         }
 
                         const result = await response.json();
+                        const docLabel = (nonCustomerDocConfig[nonCustomerDocType]?.label || nonCustomerDocType);
 
                         if (result.success) {
-                            showAlert(`Invoice created successfully! Invoice #${result.invoiceNumber}`, 'success');
+                            const docNumber = result.invoiceNumber || result.documentNumber || '';
+                            showAlert(`${docLabel} created successfully!${docNumber ? ` #${docNumber}` : ''}`, 'success');
                             bootstrap.Modal.getInstance(document.getElementById('documentModal')).hide();
                             
-                            // Load fresh data and refresh the non-customer invoices tab
                             try {
                                 await loadAllDataFromPHP();
-                                loadNonCustomerInvoices();
-                                const nonCustomerTabTrigger = document.querySelector('#financeTabs a[href="#nonCustomerInvoicesTab"]');
-                                if (nonCustomerTabTrigger) {
-                                    new bootstrap.Tab(nonCustomerTabTrigger).show();
-                                }
-                                // View the created document
+                                loadFinancialDocuments(nonCustomerDocType);
+                                loadNonCustomerDocuments(nonCustomerDocType);
+                                showNonCustomerDocumentsTab(nonCustomerDocType);
                                 if (result.documentId) {
-                                    viewDocument('invoice', result.documentId);
+                                    viewDocument(nonCustomerDocType, result.documentId);
                                 }
                             } catch (e) {
-                                console.warn('Failed to refresh after creating non-customer invoice', e);
+                                console.warn('Failed to refresh after creating non-customer document', e);
                             }
                             
-                            // Reset form
                             this.reset();
                             document.querySelectorAll('#documentForm input[type="checkbox"]').forEach(cb => cb.checked = false);
                             updateItemAmounts();
-                            
-                            // Reset mode
-                            isNonCustomerInvoiceMode = false;
-                            document.getElementById('clientSelectField').style.display = 'block';
-                            document.getElementById('customerNameField').style.display = 'none';
-                            document.getElementById('docClientSelect').required = true;
-                            document.getElementById('docCustomerName').required = false;
+                            resetDocumentModalToCustomerMode();
                         } else {
-                            showAlert(result.message || 'Failed to create invoice.', 'error');
+                            showAlert(result.message || `Failed to create ${docLabel.toLowerCase()}.`, 'error');
                         }
                     } catch (error) {
-                        console.error('Error creating non-customer invoice:', error);
-                        showAlert('Error creating non-customer invoice: ' + error.message, 'error');
+                        console.error('Error creating non-customer document:', error);
+                        showAlert(`Error creating non-customer ${nonCustomerDocType}: ` + error.message, 'error');
                     }
                     return;
                 }
@@ -7288,6 +7343,7 @@
                         showAlert(result.message, 'success');
                         await loadAllDataFromPHP();
                         loadFinancialDocuments(type);
+                        loadNonCustomerDocuments(type);
                     } else {
                         showAlert(result.message || 'Failed to delete document.', 'danger');
                     }
@@ -7952,7 +8008,7 @@
         // ============================================
         let selectedCampaigns = [];
         let currentInvoiceData = null;
-        let isNonCustomerInvoiceMode = false; // Track if we're creating a non-customer invoice
+        let isNonCustomerDocMode = false; // Track if we're creating a non-customer document
 
         function toggleAllCampaigns() {
             const selectAll = document.getElementById('selectAllCampaigns');
@@ -8297,42 +8353,72 @@
             new bootstrap.Modal(document.getElementById('invoicePreviewModal')).show();
         }
 
-        function showNonCustomerInvoiceModal() {
-            // Switch to non-customer invoice mode in documentModal
-            isNonCustomerInvoiceMode = true;
+        function showNonCustomerDocumentModal(type) {
+            if (!hasPermission('canManageFinances')) {
+                showAlert('Access Denied. Finance Manager/Admin role required.', 'warning');
+                return;
+            }
+
+            const titles = {
+                quotation: 'Non-Customer Quotation',
+                invoice: 'Non-Customer Invoice',
+                receipt: 'Non-Customer Receipt'
+            };
+
+            isNonCustomerDocMode = true;
             
-            // Show customer name input, hide client select
             document.getElementById('clientSelectField').style.display = 'none';
             document.getElementById('customerNameField').style.display = 'block';
             document.getElementById('docCustomerName').value = '';
             document.getElementById('docCustomerName').required = true;
-            
-            // Make sure client select doesn't require value in non-customer mode
             document.getElementById('docClientSelect').required = false;
             
-            // Update modal title
-            document.getElementById('documentModalTitle').textContent = '📋 Create Non-Customer Invoice';
-            document.getElementById('documentForm').dataset.docType = 'invoice';
+            document.getElementById('documentModalTitle').textContent = `📋 Create ${titles[type] || 'Non-Customer Document'}`;
+            document.getElementById('documentForm').dataset.docType = type;
             
-            // Reset form and checkboxes
             document.getElementById('documentForm').reset();
             document.getElementById('docDate').value = new Date().toISOString().split('T')[0];
             document.querySelectorAll('#documentForm input[type="checkbox"]').forEach(cb => cb.checked = false);
             
-            // Clear other services
             document.getElementById('otherServicesContainer').innerHTML = '<small class="text-muted">Click "Add Other Service" to add custom service items</small>';
             otherServiceCounter = 0;
             
-            // Update item amounts display
             updateItemAmounts();
+
+            const docNumberInput = document.getElementById('docNumber');
+            if (docNumberInput) {
+                docNumberInput.value = 'Loading...';
+                docNumberInput.readOnly = true;
+            }
+            fetch(`handler_finance_next_number.php?action=next_document_number&docType=${type}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && docNumberInput) {
+                        docNumberInput.value = data.nextDocumentNumber;
+                        docNumberInput.readOnly = false;
+                        docNumberInput.style.cursor = 'text';
+                    } else if (docNumberInput) {
+                        docNumberInput.value = 'Unable to fetch';
+                        docNumberInput.readOnly = false;
+                    }
+                })
+                .catch(() => {
+                    if (docNumberInput) {
+                        docNumberInput.value = 'Unable to fetch';
+                        docNumberInput.readOnly = false;
+                    }
+                });
             
-            // Show the modal
             new bootstrap.Modal(document.getElementById('documentModal')).show();
         }
 
-        // Helper function to reset documentModal to customer invoice mode
+        function showNonCustomerInvoiceModal() {
+            showNonCustomerDocumentModal('invoice');
+        }
+
+        // Helper function to reset documentModal to customer mode
         function resetDocumentModalToCustomerMode() {
-            isNonCustomerInvoiceMode = false;
+            isNonCustomerDocMode = false;
             document.getElementById('clientSelectField').style.display = 'block';
             document.getElementById('customerNameField').style.display = 'none';
             document.getElementById('docClientSelect').required = true;
@@ -8732,11 +8818,8 @@
                         }
                         // Refresh the non-customer invoices list and switch to the Non-Customer Invoices tab
                         try {
-                            loadNonCustomerInvoices();
-                            const nonCustomerTabTrigger = document.querySelector('#financeTabs a[href="#nonCustomerInvoicesTab"]');
-                            if (nonCustomerTabTrigger) {
-                                new bootstrap.Tab(nonCustomerTabTrigger).show();
-                            }
+                            loadNonCustomerDocuments('invoice');
+                            showNonCustomerDocumentsTab('invoice');
                         } catch (e) {
                             console.warn('Failed to refresh non-customer invoices view', e);
                         }

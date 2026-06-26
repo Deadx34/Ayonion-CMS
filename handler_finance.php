@@ -68,8 +68,8 @@ if ($action === 'delete') {
             throw new Exception("Failed to delete document.");
         }
 
-        // If it was a receipt, revert the client profile updates
-        if ($docType === 'receipt') {
+        // If it was a receipt, revert the client profile updates (skip non-customer docs)
+        if ($docType === 'receipt' && $clientId > 0) {
             // Prefer aggregated totals from parsed item_details when available
             if (isset($adBudgetTotal) && $adBudgetTotal > 0) {
                 $revert_sql = "UPDATE clients SET total_ad_budget = total_ad_budget - $adBudgetTotal WHERE id = $clientId";
@@ -98,6 +98,114 @@ if ($action === 'delete') {
 
         $conn->commit();
         echo json_encode(["success" => true, "message" => "Document deleted successfully."]);
+    } catch (Exception $e) {
+        $conn->rollback();
+        http_response_code($e->getCode() ?: 500);
+        echo json_encode(["success" => false, "message" => $e->getMessage()]);
+    }
+    $conn->close();
+    exit;
+}
+
+// --- HANDLE CREATE NON-CUSTOMER QUOTATION / RECEIPT (POST) ---
+if ($action === 'create_non_customer') {
+    $conn->begin_transaction();
+    try {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            throw new Exception("Invalid request method.", 405);
+        }
+
+        $input = json_decode(file_get_contents("php://input"), true);
+        $customerName = trim($input['customerName'] ?? '');
+        $docType = $conn->real_escape_string($input['docType'] ?? '');
+        $itemDetails = $input['itemDetails'] ?? [];
+        $itemTypes = $input['itemTypes'] ?? [];
+        $description = $conn->real_escape_string($input['description'] ?? $input['notes'] ?? '');
+        $date = $conn->real_escape_string($input['date'] ?? date('Y-m-d'));
+
+        if (!in_array($docType, ['quotation', 'receipt'], true)) {
+            throw new Exception("Invalid document type for non-customer creation. Use quotation or receipt.", 400);
+        }
+
+        if (empty($customerName)) {
+            throw new Exception("Customer name is required for non-customer documents.", 400);
+        }
+
+        if (empty($itemDetails) || !is_array($itemDetails)) {
+            throw new Exception("At least one document item is required.", 400);
+        }
+
+        $total = 0.00;
+        foreach ($itemDetails as $detail) {
+            $quantity = (float)($detail['quantity'] ?? 1);
+            $unitPrice = (float)($detail['unitPrice'] ?? 0);
+            $total += $quantity * $unitPrice;
+        }
+
+        if ($total <= 0) {
+            throw new Exception("Document total must be greater than zero.", 400);
+        }
+
+        $customDocNumber = $input['customDocumentNumber'] ?? null;
+        if (!empty($customDocNumber) && trim($customDocNumber) !== '') {
+            $documentNumber = trim($customDocNumber);
+        } else {
+            $documentNumber = generateDocumentNumber($conn, $docType);
+        }
+
+        $docId = time() . mt_rand(100, 999);
+        $documentNumberEscaped = $conn->real_escape_string($documentNumber);
+        $customerNameEscaped = $conn->real_escape_string($customerName);
+
+        $docItemDetails = [];
+        $docItemTypes = [];
+        foreach ($itemDetails as $detail) {
+            $itemType = $detail['itemType'] ?? $detail['description'] ?? 'Service';
+            $docItemTypes[] = $itemType;
+            $quantity = (float)($detail['quantity'] ?? 1);
+            $unitPrice = (float)($detail['unitPrice'] ?? 0);
+            $docItemDetails[] = [
+                'itemType' => $itemType,
+                'description' => $detail['description'] ?? '',
+                'quantity' => $quantity,
+                'unitPrice' => $unitPrice,
+                'total' => $quantity * $unitPrice
+            ];
+        }
+
+        $itemDetailsJson = $conn->real_escape_string(json_encode($docItemDetails));
+        $itemTypesJson = $conn->real_escape_string(json_encode($docItemTypes));
+
+        $hasItemDetails = false;
+        $colCheck = $conn->query("SHOW COLUMNS FROM documents LIKE 'item_details'");
+        if ($colCheck && $colCheck->num_rows > 0) {
+            $hasItemDetails = true;
+        }
+
+        if ($hasItemDetails) {
+            $sql_insert_doc = "INSERT INTO documents 
+            (id, document_number, client_id, client_name, doc_type, item_type, item_details, description, quantity, unit_price, total, date) 
+            VALUES 
+            ('$docId', '$documentNumberEscaped', NULL, '$customerNameEscaped', '$docType', '$itemTypesJson', '$itemDetailsJson', '$description', 1, $total, $total, '$date')";
+        } else {
+            $sql_insert_doc = "INSERT INTO documents 
+            (id, document_number, client_id, client_name, doc_type, item_type, description, quantity, unit_price, total, date) 
+            VALUES 
+            ('$docId', '$documentNumberEscaped', NULL, '$customerNameEscaped', '$docType', '$itemDetailsJson', '$description', 1, $total, $total, '$date')";
+        }
+
+        if (!query_db($conn, $sql_insert_doc)) {
+            throw new Exception("Failed to create non-customer document.");
+        }
+
+        $conn->commit();
+        echo json_encode([
+            "success" => true,
+            "message" => ucfirst($docType) . " created successfully.",
+            "documentId" => $docId,
+            "documentNumber" => $documentNumber,
+            "totalAmount" => $total
+        ]);
     } catch (Exception $e) {
         $conn->rollback();
         http_response_code($e->getCode() ?: 500);
