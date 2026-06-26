@@ -533,7 +533,7 @@
                                 </button>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-info w-100 mb-2" onclick="showNonCustomerDocumentModal('invoice')">
+                                <button class="btn btn-outline-success w-100 mb-2" onclick="showNonCustomerDocumentModal('invoice')">
                                     <i class="fas fa-user-plus me-2"></i>Non-Customer Invoice
                                 </button>
                             </div>
