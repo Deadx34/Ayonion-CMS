@@ -167,6 +167,7 @@ if ($action === 'create_non_customer') {
             $docItemDetails[] = [
                 'itemType' => $itemType,
                 'description' => $detail['description'] ?? '',
+                'subText' => $detail['subText'] ?? $detail['sub_text'] ?? '',
                 'quantity' => $quantity,
                 'unitPrice' => $unitPrice,
                 'total' => $quantity * $unitPrice

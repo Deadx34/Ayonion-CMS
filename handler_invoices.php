@@ -285,6 +285,7 @@ try {
             $docItemDetails[] = [
                 'itemType' => $itemType,
                 'description' => $detail['description'] ?? '',
+                'subText' => $detail['subText'] ?? $detail['sub_text'] ?? '',
                 'quantity' => (float)($detail['quantity'] ?? 1),
                 'unitPrice' => (float)($detail['unitPrice'] ?? 0),
                 'total' => ((float)($detail['quantity'] ?? 1)) * ((float)($detail['unitPrice'] ?? 0))
