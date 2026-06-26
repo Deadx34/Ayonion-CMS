@@ -551,11 +551,11 @@
                     <div class="card-body">
                         <ul class="nav nav-tabs mb-3" id="financeTabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#quotationsTab" role="tab">Quotations</a></li>
-                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerQuotationsTab" role="tab"><i class="fas fa-user-plus me-2"></i>Non-Customer Quotations</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerQuotationsTab" role="tab"><i class="fas fa-user-plus me-2"></i>N/C Quotations</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#invoicesTab" role="tab">Invoices</a></li>
-                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerInvoicesTab" role="tab"><i class="fas fa-user-plus me-2"></i>Non-Customer Invoices</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerInvoicesTab" role="tab"><i class="fas fa-user-plus me-2"></i>N/C Invoices</a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#receiptsTab" role="tab">Receipts</a></li>
-                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerReceiptsTab" role="tab"><i class="fas fa-user-plus me-2"></i>Non-Customer Receipts</a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#nonCustomerReceiptsTab" role="tab"><i class="fas fa-user-plus me-2"></i>N/C Receipts</a></li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="quotationsTab" role="tabpanel">
