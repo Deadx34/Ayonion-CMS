@@ -22,12 +22,12 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftpupload.net           # Byet.Host FTP server
-          username: b15_41427299          # replace with your FTP username
+          username: b32_40409860          # replace with your FTP username
           password: ${{ secrets.FTP_PASSWORD_C1 }}
           protocol: ftp                   # force plain FTP
           port: 21
           local-dir: ./                   # root of your repository
-          server-dir: /htdocs/studio-panel/  # target directory for logiclab.byethost15.com/studio-panel
+          server-dir: /logiclabinnovations.22web.org/htdocs/  # target directory for logiclab.byethost15.com/studio-panel
           exclude: |
             **/.git*
             **/.github*
