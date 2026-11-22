@@ -2573,12 +2573,18 @@
                     // NOTE: Users are loaded via the successful login, but we update the cache too
                     
                     saveToLocalStorage(); 
-                    console.log('Data loaded from SQL successfully.');
+                    console.log('[Database] Connection successful. Data loaded from SQL.');
                 } else {
-                    throw new Error(data.message || 'Failed to fetch data from PHP handler.');
+                    const connectionError = data.databaseConnected === false
+                        ? 'Database connection failed.'
+                        : 'Database operation failed.';
+                    console.error('[Database] ' + connectionError, data.message || 'The PHP handler returned an unsuccessful response.');
+                    throw new Error(connectionError);
                 }
             } catch (error) {
-                console.error('❌ Error loading from PHP/SQL:', error);
+                if (!error.message || (!error.message.includes('Database connection failed') && !error.message.includes('Database operation failed'))) {
+                    console.error('[Database] Connection failed or PHP/SQL response could not be read:', error);
+                }
                 showAlert('Unable to connect to server. Using cached data. Please check your connection.', 'warning');
                 loadFromLocalStorage(); // Fallback
             }

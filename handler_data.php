@@ -3,10 +3,26 @@
 
 header('Content-Type: application/json');
 include 'includes/config.php';
-$conn = connect_db();
+
+$conn = null;
+try {
+    $conn = connect_db();
+    if (!$conn || (isset($conn->connect_errno) && $conn->connect_errno !== 0)) {
+        throw new Exception('Database connection failed');
+    }
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'databaseConnected' => false,
+        'message' => 'Database connection failed'
+    ]);
+    exit;
+}
 
 $response_data = [
     'success' => true,
+    'databaseConnected' => true,
     'clients' => [],
     'contentCredits' => [],
     'campaigns' => [],
