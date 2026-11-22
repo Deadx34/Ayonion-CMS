@@ -3,12 +3,16 @@
 
 header('Content-Type: application/json');
 include 'includes/config.php';
-$conn = connect_db();
 
 $action = $_GET['action'] ?? '';
 $input = json_decode(file_get_contents("php://input"), true);
 
 try {
+    $conn = connect_db();
+    if (!$conn || (isset($conn->connect_errno) && $conn->connect_errno !== 0)) {
+        throw new Exception('Database connection failed');
+    }
+
     // Secure session
     if (session_status() === PHP_SESSION_NONE) {
         $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
@@ -79,10 +83,18 @@ try {
     }
 } catch (Throwable $e) {
     http_response_code($e->getCode() ?: 500);
-    echo json_encode([ 'success' => false, 'message' => $e->getMessage() ]);
+    $databaseFailure = stripos($e->getMessage(), 'database') !== false
+        || stripos($e->getMessage(), 'connection') !== false;
+    echo json_encode([
+        'success' => false,
+        'databaseConnected' => $databaseFailure ? false : null,
+        'message' => $databaseFailure ? 'Database connection error.' : $e->getMessage()
+    ]);
+} finally {
+    if (isset($conn) && $conn instanceof mysqli) {
+        $conn->close();
+    }
 }
-
-$conn->close();
 ?>
 
 

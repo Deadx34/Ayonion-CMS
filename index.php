@@ -2629,9 +2629,15 @@
                     body: JSON.stringify({ username, password, role })
                 });
                 
-                const result = await response.json();
+                let result;
+                try {
+                    result = await response.json();
+                } catch (_) {
+                    throw new Error(`Server returned HTTP ${response.status}`);
+                }
 
                 if (result.success) {
+                    console.log('[Database] Connection successful. Login query completed.');
                     const user = result.user;
                     currentUser = { username: user.username, role: user.role, isTempPassword: user.isTempPassword };
 
@@ -2645,6 +2651,9 @@
                         showTempPasswordWarning();
                     }
                 } else {
+                    if (result.databaseConnected === false) {
+                        console.error('[Database] Connection failed. Login could not query the database.');
+                    }
                     throw new Error(result.message);
                 }
 
@@ -2754,8 +2763,15 @@
                     return;
                 }
                 
-                const data = await res.json();
+                let data;
+                try {
+                    data = await res.json();
+                } catch (_) {
+                    console.error('[Database] Connection or settings response failed (HTTP ' + res.status + ').');
+                    throw new Error('Invalid settings response');
+                }
                 if (data.success && data.settings) {
+                    console.log('[Database] Connection successful. Settings loaded.');
                     const settings = data.settings;
                     // Update COMPANY_INFO for reports
                     COMPANY_INFO = {
@@ -2772,8 +2788,13 @@
                     };
                     // Update sidebar header (uses dark logo for dark sidebar background)
                     updateSidebarHeader(settings.company_name, settings.logo_dark || settings.logo_url);
+                } else if (data.databaseConnected === false) {
+                    console.error('[Database] Connection failed. Settings could not be loaded.');
                 }
-            } catch (_) {
+            } catch (error) {
+                if (!String(error.message || '').includes('Invalid settings response')) {
+                    console.error('[Database] Settings request failed:', error);
+                }
                 // Use default company info if settings can't be loaded
                 COMPANY_INFO = { ...DEFAULT_COMPANY_INFO };
             }
